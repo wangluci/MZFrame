@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{509EE6E6-10CF-45B4-953E-B442DF8CA8EB}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MyNet.MQ</RootNamespace>
+    <AssemblyName>MyNet.MQ</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Client\ClientConfig.cs" />
+    <Compile Include="Client\IMQClientSerialization.cs" />
+    <Compile Include="Client\MQConnectionHandler.cs" />
+    <Compile Include="Client\IMQEventListener.cs" />
+    <Compile Include="Client\MQConnection.cs" />
+    <Compile Include="Client\MQConnectionFactory.cs" />
+    <Compile Include="Customer\CNode.cs" />
+    <Compile Include="Customer\MQTree.cs" />
+    <Compile Include="Customer\TNode.cs" />
+    <Compile Include="Customer\Token.cs" />
+    <Compile Include="Customer\Topic.cs" />
+    <Compile Include="IdGenerater.cs" />
+    <Compile Include="IMQServerSerialization.cs" />
+    <Compile Include="MQFilter.cs" />
+    <Compile Include="MQMessage.cs" />
+    <Compile Include="Packet\MQAckRequest.cs" />
+    <Compile Include="Session\MQBinaryHeap.cs" />
+    <Compile Include="Session\MQSession.cs" />
+    <Compile Include="Session\MQSessionManager.cs" />
+    <Compile Include="Packet\ConnCode.cs" />
+    <Compile Include="Packet\MQConnRequest.cs" />
+    <Compile Include="Packet\MQConnResponse.cs" />
+    <Compile Include="Packet\MQDisconnect.cs" />
+    <Compile Include="Packet\MQPubcompRequest.cs" />
+    <Compile Include="Packet\MQPubrecRequest.cs" />
+    <Compile Include="Packet\MQPublishRequest.cs" />
+    <Compile Include="Packet\MQPubrelRequest.cs" />
+    <Compile Include="Packet\MQSubscribeRequest.cs" />
+    <Compile Include="Packet\MQTTType.cs" />
+    <Compile Include="Packet\MQUnsubscribeRequest.cs" />
+    <Compile Include="Packet\MQUnsubscribeResponse.cs" />
+    <Compile Include="Packet\SubCode.cs" />
+    <Compile Include="Parse\IMQParse.cs" />
+    <Compile Include="Parse\MQConnParse.cs" />
+    <Compile Include="Parse\MQPingParse.cs" />
+    <Compile Include="Parse\MQPubackParse.cs" />
+    <Compile Include="Parse\MQPubcompParse.cs" />
+    <Compile Include="Parse\MQPublishParse.cs" />
+    <Compile Include="Parse\MQPubrecParse.cs" />
+    <Compile Include="Parse\MQPubRelParse.cs" />
+    <Compile Include="Parse\MQSubscribeParse.cs" />
+    <Compile Include="Parse\MQUnSubscribeParse.cs" />
+    <Compile Include="HostConfig.cs" />
+    <Compile Include="Customer\MQConsumer.cs" />
+    <Compile Include="MQHandler.cs" />
+    <Compile Include="MQHost.cs" />
+    <Compile Include="Packet\MQPingRequest.cs" />
+    <Compile Include="Packet\MQPongResponse.cs" />
+    <Compile Include="Packet\MQPublishResponse.cs" />
+    <Compile Include="Packet\MQPacket.cs" />
+    <Compile Include="Packet\MQSubscribeResponse.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Session\MQThreadQueue.cs" />
+    <Compile Include="Session\NotAckedRequest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MyNet\MyNet.csproj">
+      <Project>{d5b0f697-7df5-462e-aa9f-6e967c5df428}</Project>
+      <Name>MyNet</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

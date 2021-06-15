@@ -1,0 +1,256 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{CDE0898F-A324-42A1-84BA-727917432E13}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TemplateAction</RootNamespace>
+    <AssemblyName>TemplateAction</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <PublishUrl>http://localhost/TemplateAction/</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Web</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>true</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Cache\CacheItem.cs" />
+    <Compile Include="Cache\CachePool.cs" />
+    <Compile Include="Cache\FileDependency.cs" />
+    <Compile Include="Cache\HashedWheelBucket.cs" />
+    <Compile Include="Cache\HashedWheelTimeout.cs" />
+    <Compile Include="Cache\HashedWheelTimer.cs" />
+    <Compile Include="Cache\TimedAwaiter.cs" />
+    <Compile Include="Cache\TimeDependency.cs" />
+    <Compile Include="Cache\IWheelTimeout.cs" />
+    <Compile Include="Cache\IWheelTimer.cs" />
+    <Compile Include="Cache\TimerTask.cs" />
+    <Compile Include="Common\Converts\ArrayConvert.cs" />
+    <Compile Include="Common\Converts\DictionaryConvert.cs" />
+    <Compile Include="Common\Converts\ListConvert.cs" />
+    <Compile Include="Common\Converts\NoConvert.cs" />
+    <Compile Include="Common\Converts\NotSupportedConvert.cs" />
+    <Compile Include="Common\Converts\NullableConvert.cs" />
+    <Compile Include="Common\Converts\NullConvert.cs" />
+    <Compile Include="Common\Converts\PropertyCache.cs" />
+    <Compile Include="Common\Converts\SimpleContert.cs" />
+    <Compile Include="Common\Converts\TimeConvert.cs" />
+    <Compile Include="Common\ITAConvert.cs" />
+    <Compile Include="Common\TAConverter.cs" />
+    <Compile Include="Core\Attribute\AsyncAttribute.cs" />
+    <Compile Include="Core\Attribute\HttpDeleteAttribute.cs" />
+    <Compile Include="Core\Attribute\HttpPutAttribute.cs" />
+    <Compile Include="Core\Attribute\HttpGetAttribute.cs" />
+    <Compile Include="Core\Attribute\HttpPostAttribute.cs" />
+    <Compile Include="Core\Attribute\RouteAttribute.cs" />
+    <Compile Include="Core\Dispatcher\ContextCreatedEvent.cs" />
+    <Compile Include="Core\Dispatcher\DefaultMultiHandler.cs" />
+    <Compile Include="Core\Dispatcher\EndSessionEvent.cs" />
+    <Compile Include="Core\Dispatcher\IDispatcher.cs" />
+    <Compile Include="Core\Dispatcher\IEventDispatcher.cs" />
+    <Compile Include="Core\Dispatcher\TAEventDispatcher.cs" />
+    <Compile Include="Core\Dispatcher\ITAEventHandler.cs" />
+    <Compile Include="Core\Dispatcher\DefaultHandler.cs" />
+    <Compile Include="Core\Dispatcher\StartSessionEvent.cs" />
+    <Compile Include="Cache\FileDependencyWatcher.cs" />
+    <Compile Include="Cache\IDependency.cs" />
+    <Compile Include="Cache\TimeOutSchedule.cs" />
+    <Compile Include="Core\Interface\IRouterCollectionBuilder.cs" />
+    <Compile Include="Core\Interface\IPluginConfig.cs" />
+    <Compile Include="Core\Interface\IPluginRouterBuilder.cs" />
+    <Compile Include="Core\Interface\IRouterBuilder.cs" />
+    <Compile Include="Core\Interface\IRouterCollection.cs" />
+    <Compile Include="Core\Interface\ITACookieExtensions.cs" />
+    <Compile Include="Core\Interface\ITALogger.cs" />
+    <Compile Include="Core\Interface\ITALoggerFactory.cs" />
+    <Compile Include="Core\Interface\ITALoggerFactoryExtensions.cs" />
+    <Compile Include="Core\Interface\ITAServices.cs" />
+    <Compile Include="Core\Interface\ITARequest.cs" />
+    <Compile Include="Core\Interface\ITAResponse.cs" />
+    <Compile Include="Core\ITAObjectCollection.cs" />
+    <Compile Include="Core\Plugin\PluginEventDispatcher.cs" />
+    <Compile Include="Core\Result\GifResult.cs" />
+    <Compile Include="Core\Result\V404Result.cs" />
+    <Compile Include="Core\Service\IServiceCollection.cs" />
+    <Compile Include="Core\Service\ServiceCollection.cs" />
+    <Compile Include="Core\Service\ServiceDescriptor.cs" />
+    <Compile Include="Core\Service\SimpleStorer.cs" />
+    <Compile Include="Core\Service\ConcurrentProxy.cs" />
+    <Compile Include="Core\Service\ConcurrentStorer.cs" />
+    <Compile Include="Core\TAApplicationExtensions.cs" />
+    <Compile Include="Core\TAObectCollectionExtensions.cs" />
+    <Compile Include="Label\SimpleTemplateContext.cs" />
+    <Compile Include="Core\TAGroupCollection.cs" />
+    <Compile Include="Core\TAObject.cs" />
+    <Compile Include="Core\TAObjectCollection.cs" />
+    <Compile Include="Core\TARequestHandle.cs" />
+    <Compile Include="Common\FileContentType.cs" />
+    <Compile Include="Core\Interface\ITAContext.cs" />
+    <Compile Include="Core\Plugin\PluginObject.cs" />
+    <Compile Include="Core\TARequestHandleBuilder.cs" />
+    <Compile Include="Label\Element\AssignLabel.cs" />
+    <Compile Include="Label\Expression\ExpThis.cs" />
+    <Compile Include="Label\Expression\ExpVar.cs" />
+    <Compile Include="Label\Expression\IExpressionItem.cs" />
+    <Compile Include="Label\Expression\ExpConst.cs" />
+    <Compile Include="Label\Expression\ExpFun.cs" />
+    <Compile Include="Label\Expression\ExpLink.cs" />
+    <Compile Include="Label\Expression\ExpOp.cs" />
+    <Compile Include="Label\Expression\IExpressionLinkItem.cs" />
+    <Compile Include="Label\ITemplateContext.cs" />
+    <Compile Include="Label\AbstractTemplateContext.cs" />
+    <Compile Include="Label\Element\BreakLabel.cs" />
+    <Compile Include="Label\Element\DefineLabel.cs" />
+    <Compile Include="Label\Element\IncludeLabel.cs" />
+    <Compile Include="Label\Element\WhileLabel.cs" />
+    <Compile Include="Label\Expression\AbstractOp.cs" />
+    <Compile Include="Label\Expression\ExceptionOp.cs" />
+    <Compile Include="Label\Expression\IOp.cs" />
+    <Compile Include="Label\CollectionTemplate.cs" />
+    <Compile Include="Label\ITemplatePath.cs" />
+    <Compile Include="Label\DFALib\ItemTree.cs" />
+    <Compile Include="Label\DFALib\ItemTreeLibrary.cs" />
+    <Compile Include="Label\TAExpression.cs" />
+    <Compile Include="Label\Expression\NullArithOp.cs" />
+    <Compile Include="Label\Expression\ValueOp.cs" />
+    <Compile Include="Label\ILabel.cs" />
+    <Compile Include="Label\IProxyLabel.cs" />
+    <Compile Include="Label\IResult.cs" />
+    <Compile Include="Label\Expression\TAVar.cs" />
+    <Compile Include="Label\Expression\OpMan.cs" />
+    <Compile Include="Label\ProxyLabel.cs" />
+    <Compile Include="Core\Attribute\AboutAttribute.cs" />
+    <Compile Include="Core\Attribute\DesAttribute.cs" />
+    <Compile Include="Core\Plugin\AnnotationInfo.cs" />
+    <Compile Include="Core\Interface\IRequestHandle.cs" />
+    <Compile Include="Core\Mapping\ArraryMapping.cs" />
+    <Compile Include="Core\Mapping\ClassMapping.cs" />
+    <Compile Include="Core\Mapping\IParamMapping.cs" />
+    <Compile Include="Core\Mapping\MappingFactory.cs" />
+    <Compile Include="Core\Mapping\ValueMapping.cs" />
+    <Compile Include="Label\TemplateApp.cs" />
+    <Compile Include="Label\TemplateExpress.cs" />
+    <Compile Include="Label\Token\StructWords.cs" />
+    <Compile Include="Label\Token\VarToken.cs" />
+    <Compile Include="Core\Interface\IRouter.cs" />
+    <Compile Include="Core\Interface\ITAAsyncResult.cs" />
+    <Compile Include="Core\Interface\IRequestFile.cs" />
+    <Compile Include="Core\Interface\ITACookie.cs" />
+    <Compile Include="Core\Interface\ITASession.cs" />
+    <Compile Include="Core\Plugin\PluginCollection.cs" />
+    <Compile Include="Core\Plugin\ActionNode.cs" />
+    <Compile Include="Core\Plugin\ControllerNode.cs" />
+    <Compile Include="Core\Plugin\Node.cs" />
+    <Compile Include="Core\Controller\TABaseController.cs" />
+    <Compile Include="Core\Result\AjaxResult.cs" />
+    <Compile Include="Core\Controller\IController.cs" />
+    <Compile Include="Core\TAApplication.cs" />
+    <Compile Include="Label\Element\ElseLabel.cs" />
+    <Compile Include="Label\Element\IfLabel.cs" />
+    <Compile Include="Label\TAParams.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Core\Result\ExceptionResult.cs" />
+    <Compile Include="Core\Result\FileResult.cs" />
+    <Compile Include="Core\Result\PngResult.cs" />
+    <Compile Include="Core\Result\StreamResult.cs" />
+    <Compile Include="Core\Result\ViewResult.cs" />
+    <Compile Include="Core\Result\TextResult.cs" />
+    <Compile Include="Label\TempFuns.cs" />
+    <Compile Include="Label\Template.cs" />
+    <Compile Include="Label\Element\LoopLabel.cs" />
+    <Compile Include="Label\TemplateDocument.cs" />
+    <Compile Include="Label\Element\TxTLabel.cs" />
+    <Compile Include="Label\Token\BaseToken.cs" />
+    <Compile Include="Label\Token\CharSetToken.cs" />
+    <Compile Include="Label\Token\NumberToken.cs" />
+    <Compile Include="Label\Token\StringToken.cs" />
+    <Compile Include="Label\Token\StructToken.cs" />
+    <Compile Include="Label\TemplateSequence.cs" />
+    <Compile Include="Label\Token\TokenSequence.cs" />
+    <Compile Include="Label\Token\UndefinedToken.cs" />
+    <Compile Include="Common\TAUtility.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TemplateAction\TemplateAction.csproj" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /y $(ProjectDir)bin\netstandard2.0\$(TargetName).dll $(SolutionDir)MainWeb\Plugin&#xD;&#xA;xcopy /y $(ProjectDir)bin\netstandard2.0\$(TargetName).pdb $(SolutionDir)MainWeb\Plugin" />
+  </Target>
+
+</Project>

@@ -1,0 +1,74 @@
+﻿using System;
+using System.Collections.Generic;
+using TemplateAction.Common;
+using TemplateAction.Core;
+
+namespace TemplateAction.Route
+{
+    public class RouterBuilder : AbstractRouterBuilder, IRouterBuilder
+    {
+
+        /// <summary>
+        /// 使用默认路由
+        /// </summary>
+        /// <param name="ns">默认命名空间</param>
+        /// <returns></returns>
+        public RouterBuilder UseDefault(string ns)
+        {
+            Dictionary<string, object> defaults = new Dictionary<string, object>();
+            defaults.Add(TAUtility.NS_KEY, ns);
+            defaults.Add(TAUtility.CONTROLLER_KEY, "Home");
+            defaults.Add(TAUtility.ACTION_KEY, "Index");
+            string template = string.Format("{{{0}}}/{{{1}}}/{{id?}}", TAUtility.CONTROLLER_KEY, TAUtility.ACTION_KEY);
+            return MapRoute(new Router(template, defaults));
+        }
+        /// <summary>
+        /// 使用插件路由
+        /// </summary>
+        /// <returns></returns>
+        public RouterBuilder UsePlugin()
+        {
+            Dictionary<string, object> defaults = new Dictionary<string, object>();
+            defaults.Add(TAUtility.CONTROLLER_KEY, "Home");
+            defaults.Add(TAUtility.ACTION_KEY, "Index");
+            string template = string.Format("{{{0}:exists}}/{{{1}}}/{{{2}}}/{{id?}}", TAUtility.NS_KEY, TAUtility.CONTROLLER_KEY, TAUtility.ACTION_KEY);
+            return MapRoute(new Router(template, defaults));
+        }
+        /// <summary>
+        /// 使用Restful接口
+        /// </summary>
+        /// <param name="ns">默认命名空间</param>
+        /// <returns></returns>
+        public RouterBuilder UseRestful(string ns)
+        {
+            string template = string.Format("{{{0}}}/{{id?}}", TAUtility.CONTROLLER_KEY);
+            Dictionary<string, object> getdefaults = new Dictionary<string, object>();
+            getdefaults.Add(TAUtility.NS_KEY, ns);
+            MapRoute(new Router(template, getdefaults));
+            return this;
+        }
+
+        /// <summary>
+        /// 使用Restful插件路由
+        /// </summary>
+        /// <param name="ns"></param>
+        /// <returns></returns>
+        public RouterBuilder UseRestfulPlugin()
+        {
+            string template = string.Format("{{{1}:exists}}/{{{2}}}/{{id?}}", TAUtility.NS_KEY, TAUtility.CONTROLLER_KEY);
+            MapRoute(new Router(template, null));
+            return this;
+        }
+
+        public RouterBuilder MapRoute(IRouter router)
+        {
+            _tmplist.Add(router);
+            return this;
+        }
+
+        public IPluginRouterBuilder NewPluginBuilder()
+        {
+            return new PluginRouterBuilder();
+        }
+    }
+}
