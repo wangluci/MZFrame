@@ -5,6 +5,18 @@
 
 #### 软件架构
 软件架构说明
+MainWeb目录为mvc的测试项目
+MyAccess目录包含orm框架、json、日志、分词等
+MyNet目录为异步的、事件驱动的网络应用程序框架
+MyNet.MQ目录为基于mynet的mqtt协议的消息队列
+MyNet.SocketIO目录为基于mynet的socket.io协议
+MyNet.TemplateAction目录.net framework微服务
+ResumeML目录为.net core的mvc实现例子，是一个简历识别的例子，可以用来识别简历的字段
+SysWeb.TemplateAction目录为asp.net的mvc实现
+TemplateAction目录为mvc框架
+TemplateAction.NetCore目录为.net mvc框架
+TemplateAction.Route目录为mvc框架的路由模块
+TestService目录为mainweb测试项目的一个模块
 
 
 #### 安装教程
