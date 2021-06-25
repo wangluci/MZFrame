@@ -6,7 +6,7 @@
 #### 软件架构
 软件架构说明
 
-MainWeb目录为mvc的测试项目
+MainWeb目录为.net framework下mvc的测试项目
 
 MyAccess目录包含orm框架、json、日志、分词等
 
