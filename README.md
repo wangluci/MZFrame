@@ -33,10 +33,11 @@ TestService目录为mainweb测试项目的一个模块
 
 
 #### 安装教程
+需要至少vs2019打开,
+MZFrame.sln项目为.net framework使用示例
+ResumeML/ResumeML.sln项目为.net core使用示例
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+使用方法可查看ResumeML目录和MainWeb目录里的例子
 
 #### 使用说明
 
