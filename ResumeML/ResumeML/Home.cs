@@ -1,4 +1,5 @@
 ﻿using MyAccess.WordSegment;
+using ResumeML.Business;
 using ResumeMLML.Model;
 using System;
 using System.Collections.Generic;
@@ -10,9 +11,18 @@ namespace ResumeML
 {
     public class Home : TABaseController
     {
-        public Home(ITALoggerFactory loggerFactory)
+        private TestBusiness _business;
+        public Home(ITALoggerFactory loggerFactory, TestBusiness business)
         {
-
+            _business = business;
+        }
+        /// <summary>
+        /// 业务逻辑调用测试
+        /// </summary>
+        /// <returns></returns>
+        public TextResult TestBus()
+        {
+            return Content(_business.printTest());
         }
         /// <summary>
         /// 文字段落转为简历
