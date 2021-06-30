@@ -12,10 +12,6 @@ MyAccess目录包含orm框架、json、日志、分词等
 
 MyNet目录为异步的、事件驱动的网络应用程序框架
 
-MyNet.MQ目录为基于mynet的mqtt协议的消息队列
-
-MyNet.SocketIO目录为基于mynet的socket.io协议
-
 MyNet.TemplateAction目录.net framework微服务
 
 ResumeML目录为.net core的mvc实现例子，是一个简历识别的例子，可以用来识别简历的字段
