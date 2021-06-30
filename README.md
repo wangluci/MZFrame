@@ -1,7 +1,7 @@
 # MZFrame
 
 #### 介绍
-兼容.net core和.net framework的mvc框架，并可让.net framework实现微服务，实现模块化热更新，超简单的orm框架。
+兼容.net core和.net framework的mvc框架，并可让.net framework实现嵌入式http服务器，实现模块化热更新，超简单的orm框架。
 
 #### 软件架构
 软件架构说明
@@ -12,15 +12,15 @@ MyAccess目录包含orm框架、json、日志、分词等
 
 MyNet目录为异步的、事件驱动的网络应用程序框架
 
-MyNet.TemplateAction目录.net framework微服务
+MyNet.TemplateAction目录.net framework嵌入式http服务器，并提供mvc框架支持
 
 ResumeML目录为.net core的mvc实现例子，是一个简历识别的例子，可以用来识别简历的字段
 
-SysWeb.TemplateAction目录为asp.net的mvc实现
+SysWeb.TemplateAction目录为mvc框架asp.net的支持库
 
 TemplateAction目录为mvc框架
 
-TemplateAction.NetCore目录为.net mvc框架
+TemplateAction.NetCore目录为mvc框架.net core支持库
 
 TemplateAction.Route目录为mvc框架的路由模块
 
