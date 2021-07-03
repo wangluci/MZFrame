@@ -51,6 +51,14 @@ namespace TemplateAction.Core
             tmp.PluginName = PluginName;
             _services[imp.FullName] = tmp;
         }
+        public void AddThread<T1, T2>(ProxyFactory factory)
+        {
+            Type imp = typeof(T1);
+            ServiceDescriptor tmp = new ServiceDescriptor(typeof(T2), imp, ServiceLifetime.Thread, factory);
+            tmp.PluginName = PluginName;
+            _services[imp.FullName] = tmp;
+        }
+
         public void AddSingleton<T1, T2>()
         {
             Type imp = typeof(T1);
@@ -63,13 +71,6 @@ namespace TemplateAction.Core
         {
             AddSingleton<T1, T1>();
         }
-        public void AddThread<T1, T2>(ProxyFactory factory)
-        {
-            Type imp = typeof(T1);
-            ServiceDescriptor tmp = new ServiceDescriptor(typeof(T2), imp, ServiceLifetime.Thread, factory);
-            tmp.PluginName = PluginName;
-            _services[imp.FullName] = tmp;
-        }
 
         public void AddSingleton<T1, T2>(ProxyFactory factory)
         {
@@ -77,6 +78,11 @@ namespace TemplateAction.Core
             ServiceDescriptor tmp = new ServiceDescriptor(typeof(T2), imp, ServiceLifetime.Singleton, factory);
             tmp.PluginName = PluginName;
             _services[imp.FullName] = tmp;
+        }
+
+        public void AddSingleton<T1>(ProxyFactory factory)
+        {
+            AddSingleton<T1, T1>(factory);
         }
     }
 }

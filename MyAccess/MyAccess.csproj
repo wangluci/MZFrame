@@ -284,6 +284,7 @@
     <Compile Include="Aop\Intercept\EntitylIntercept.cs" />
     <Compile Include="Aop\DBStore\ThreadDBStore.cs" />
     <Compile Include="Aop\Attribute\TransAttribute.cs" />
+    <Compile Include="Aop\Intercept\ListenerIntercept.cs" />
     <Compile Include="Aop\ITransReturn.cs" />
     <Compile Include="Core\LngLat.cs" />
     <Compile Include="Core\RSACrypter.cs" />

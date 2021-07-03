@@ -13,5 +13,6 @@ namespace TemplateAction.Core
         void AddSingleton<T1>();
         void AddSingleton<T1, T2>();
         void AddSingleton<T1, T2>(ProxyFactory factory);
+        void AddSingleton<T1>(ProxyFactory factory);
     }
 }

@@ -82,5 +82,19 @@ namespace MyAccess.Aop
             be.StartRecord();
             return rt;
         }
+
+
+        /// <summary>
+        /// 创建事件监听器的触发实例
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="callFun">事件触发函数</param>
+        /// <returns></returns>
+        public static T CreateDispatcher<T>(Action<string,object[]> callFun) where T : class
+        {
+            Type interfaceT = typeof(T);
+            ProxyGenerator tpg = GetProxyGenerator(interfaceT);
+            return tpg.CreateInterfaceProxyWithoutTarget<T>(new ListenerIntercept(callFun));
+        }
     }
 }

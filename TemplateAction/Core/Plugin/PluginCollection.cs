@@ -366,6 +366,11 @@ namespace TemplateAction.Core
         /// <returns></returns>
         public object CreateServiceInstance(Type serviceType, ProxyFactory factory)
         {
+            //接口则直接调用factory无参构造
+            if (serviceType.IsInterface && factory != null)
+            {
+                return factory(new object[0]);
+            }
             ConstructorInfo activationConstructor = null;
             ConstructorInfo[] constructors = serviceType.GetConstructors(BindingFlags.Instance | BindingFlags.Public);
             if (constructors.Length > 0)

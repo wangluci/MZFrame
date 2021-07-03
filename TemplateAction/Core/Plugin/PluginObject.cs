@@ -17,6 +17,9 @@ namespace TemplateAction.Core
         private Version mVersion;
         private Dictionary<string, ControllerNode> mControllerList;
         private IServiceCollection _services;
+        /// <summary>
+        /// 插件的局部事件分发器
+        /// </summary>
         private PluginEventDispatcher _dispatcher;
         public PluginEventDispatcher Dispatcher
         {

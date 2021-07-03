@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Reflection;
 using System.Collections.Generic;
 namespace TemplateAction.Core
 {
     /// <summary>
-    /// 事件分发器
+    /// 全局事件分发器
     /// </summary>
-    public class TAEventDispatcher : IEventDispatcher
+    public class TAEventDispatcher : AbstractEventDispatcher
     {
         private LinkedList<IDispatcher> _scopelist = new LinkedList<IDispatcher>();
         private Dictionary<string, object> _handlers;
@@ -49,7 +50,7 @@ namespace TemplateAction.Core
         {
             Register<T, X>(typeof(T).ToString(), handler);
         }
-        public void Register<T, X>(string key, X handler) where T : class where X : ITAEventHandler<T>
+        public override void Register<T, X>(string key, X handler)
         {
             _handlers[key] = handler;
         }
@@ -66,7 +67,7 @@ namespace TemplateAction.Core
         {
             Register<T, DefaultMultiHandler<T>>(typeof(T).ToString(), handler);
         }
-        public void RegisterLoadAfter(Action<TAApplication> ac)
+        public override void RegisterLoadAfter(Action<TAApplication> ac)
         {
             Register<TAApplication, DefaultHandler<TAApplication>>(AFTER_EVENT, new DefaultHandler<TAApplication>(ac));
         }
@@ -74,7 +75,7 @@ namespace TemplateAction.Core
         {
             Register<TAApplication, DefaultHandler<TAApplication>>(BEFORE_EVENT, new DefaultHandler<TAApplication>(ac));
         }
-        public void DispathLoadAfter(TAApplication app)
+        public override void DispathLoadAfter(TAApplication app)
         {
             Dispatch(AFTER_EVENT, app);
         }
@@ -87,7 +88,7 @@ namespace TemplateAction.Core
             Dispatch(typeof(T).ToString(), evt);
         }
 
-        public void Dispatch<T>(string key, T evt) where T : class
+        public override void Dispatch<T>(string key, T evt)
         {
             object rt;
             if (_handlers.TryGetValue(key, out rt))
@@ -107,7 +108,7 @@ namespace TemplateAction.Core
         {
             return IsExistDispatcher(typeof(T).ToString());
         }
-        public bool IsExistDispatcher(string key)
+        public override bool IsExistDispatcher(string key)
         {
             if (_handlers.ContainsKey(key))
             {
@@ -122,5 +123,6 @@ namespace TemplateAction.Core
             }
             return false;
         }
+
     }
 }

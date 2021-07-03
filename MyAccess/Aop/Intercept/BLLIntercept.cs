@@ -2,6 +2,9 @@
 
 namespace MyAccess.Aop
 {
+    /// <summary>
+    /// 业务层拦截器
+    /// </summary>
     public class BLLIntercept : IInterceptor
     {
         public void Intercept(IInvocation invocation)

@@ -4,6 +4,9 @@ using MyAccess.DB;
 
 namespace MyAccess.Aop
 {
+    /// <summary>
+    /// 数据链路层拦截器
+    /// </summary>
     public class DBIntercept : IInterceptor
     {
         public void Intercept(IInvocation invocation)

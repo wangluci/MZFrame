@@ -3,6 +3,9 @@ using System.Reflection;
 
 namespace MyAccess.Aop
 {
+    /// <summary>
+    /// 实体用拦截器
+    /// </summary>
     public class EntitylIntercept : IInterceptor
     {
         public void Intercept(IInvocation invocation)
