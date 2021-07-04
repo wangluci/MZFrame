@@ -564,7 +564,7 @@ namespace TemplateAction.Core
                 plg.Dispatcher.Dispatch(key, evt);
             }
         }
-        public bool IsExistDispatcher(string key)
+        public bool IsExistHandler(string key)
         {
             PluginObject[] tarr = null;
             _lockslim.EnterReadLock();
@@ -583,7 +583,7 @@ namespace TemplateAction.Core
             }
             foreach (PluginObject plg in tarr)
             {
-                if (plg.Dispatcher.IsExistDispatcher(key))
+                if (plg.Dispatcher.IsExistHandler(key))
                 {
                     return true;
                 }

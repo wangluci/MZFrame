@@ -10,8 +10,8 @@
         /// 注册插件的服务和事件
         /// </summary>
         /// <param name="services"></param>
-        /// <param name="dispatcher"></param>
-        void Configure(IServiceCollection services, IEventDispatcher dispatcher);
+        /// <param name="register"></param>
+        void Configure(IServiceCollection services, IEventRegister register);
         /// <summary>
         /// 插件御载处理
         /// </summary>

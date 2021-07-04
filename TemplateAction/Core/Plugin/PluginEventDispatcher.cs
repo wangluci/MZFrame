@@ -36,7 +36,7 @@ namespace TemplateAction.Core
             Dispatch(TAEventDispatcher.AFTER_EVENT, app);
         }
 
-        public override bool IsExistDispatcher(string key)
+        public override bool IsExistHandler(string key)
         {
             return _handlers.ContainsKey(key);
         }

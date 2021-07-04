@@ -104,11 +104,11 @@ namespace TemplateAction.Core
                 di.Dispatch(key, evt);
             }
         }
-        public bool IsExistDispatcher<T>() where T : class
+        public bool IsExistHandler<T>() where T : class
         {
-            return IsExistDispatcher(typeof(T).ToString());
+            return IsExistHandler(typeof(T).ToString());
         }
-        public override bool IsExistDispatcher(string key)
+        public override bool IsExistHandler(string key)
         {
             if (_handlers.ContainsKey(key))
             {
@@ -116,7 +116,7 @@ namespace TemplateAction.Core
             }
             foreach (IDispatcher di in _scopelist)
             {
-                if (di.IsExistDispatcher(key))
+                if (di.IsExistHandler(key))
                 {
                     return true;
                 }
