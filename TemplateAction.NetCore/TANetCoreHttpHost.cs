@@ -96,7 +96,7 @@ namespace TemplateAction.NetCore
             _kestrelOptions.ApplicationServices = serviceprovider;
             _kestrelOptions.Configure(_config.GetSection("Kestrel"));
 
-            if (TemplateAction.Core.TAEventDispatcher.Instance.IsExistDispatcher<ListenOptions>())
+            if (TemplateAction.Core.TAEventDispatcher.Instance.IsExistHandler<ListenOptions>())
             {
                 _kestrelOptions.ConfigureEndpointDefaults(ac =>
                 {
@@ -119,7 +119,7 @@ namespace TemplateAction.NetCore
         {
             if (_startedServer) return;
             _app = new TANetCoreHttpApplication(_appBuilder);
-            _app.Load();
+            _app.Init(Directory.GetCurrentDirectory());
             _appBuilder.ApplicationServices = _servicecollection.AddSingleton<TANetCoreHttpApplication>(_app).BuildServiceProvider();
             await _server.StartAsync(_app, token).ConfigureAwait(false);
             _startedServer = true;

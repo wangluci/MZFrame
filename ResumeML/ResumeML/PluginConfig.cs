@@ -8,7 +8,7 @@ namespace ResumeML
 {
     public class PluginConfig : IPluginConfig
     {
-        public void Configure(IServiceCollection services, IEventDispatcher dispatcher)
+        public void Configure(IServiceCollection services, IEventRegister register)
         {
             services.AddSingleton<TestBusiness, TestBusiness>((object[] arguments) =>
             {

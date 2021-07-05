@@ -23,6 +23,14 @@ namespace TemplateAction.Core
         //监控插件更改
         private FileSystemWatcher _watcher;
         private Timer _timer = null;
+        private string _rootPath;
+        /// <summary>
+        /// 根目录
+        /// </summary>
+        public string RootPath
+        {
+            get { return _rootPath; }
+        }
         /// <summary>
         /// 插件目录
         /// </summary>
@@ -35,20 +43,21 @@ namespace TemplateAction.Core
         {
             get { return _plugins; }
         }
-
+        /// <summary>
+        /// 是否从插件拷贝资源
+        /// </summary>
+        private bool _copyAssetsFromPlugin;
         ~TAApplication()
         {
             Dispose(false);
         }
         public TAApplication()
         {
+            _copyAssetsFromPlugin = false;
             _plugins = new PluginCollection();
             _pluginsnode = TAEventDispatcher.Instance.AddScope(_plugins);
-            //默认插件路径
-            _pluginPath = Path.Combine(Directory.GetCurrentDirectory(), "Plugin");
-            //激活配置文件
-            TAEventDispatcher.Instance.DispathLoadBefore(this);
         }
+
         /// <summary>
         /// 显示释放对象资源
         /// </summary>
@@ -154,8 +163,16 @@ namespace TemplateAction.Core
             _pluginPath = path;
             return this;
         }
+        /// <summary>
+        /// 调用者会从各个插件中复制资源文件
+        /// </summary>
+        /// <returns></returns>
+        public TAApplication UsePluginAssets()
+        {
+            _copyAssetsFromPlugin = true;
+            return this;
+        }
 
- 
         /// <summary>
         /// 获取指定插件的配置文件
         /// </summary>
@@ -183,10 +200,13 @@ namespace TemplateAction.Core
             return _plugins.ContainPlugin(ns);
         }
 
+
         /// <summary>
-        /// 加载一、二级目录下的插件
+        /// 初始化并加载一、二级目录下的插件
         /// </summary>
-        public TAApplication Load()
+        /// <param name="rootpath"></param>
+        /// <returns></returns>
+        public TAApplication Init(string rootpath)
         {
             if (_loaded == 1)
             {
@@ -197,6 +217,12 @@ namespace TemplateAction.Core
             {
                 return this;
             }
+            //初始化根目录
+            _rootPath = rootpath;
+            //默认插件路径
+            _pluginPath = Path.Combine(_rootPath, "Plugin");
+            //激活配置文件
+            TAEventDispatcher.Instance.DispathLoadBefore(this);
             //从应用程序域的程序集中初始化插件集
             _plugins.InitFromEntryAssembly();
             //加载插件
@@ -209,7 +235,11 @@ namespace TemplateAction.Core
                 {
                     if (".dll".Equals(fi.Extension, StringComparison.OrdinalIgnoreCase))
                     {
-                        _plugins.LoadPlugin(fi.FullName);
+                        PluginObject plg = _plugins.LoadPlugin(fi.FullName);
+                        if (_copyAssetsFromPlugin)
+                        {
+                            plg.CopyEmbeddedResourceToPath(_rootPath);
+                        }
                     }
                 }
             }
@@ -261,6 +291,10 @@ namespace TemplateAction.Core
                 PluginObject obj = _plugins.LoadPlugin(tpath);
                 if (obj != null)
                 {
+                    if (_copyAssetsFromPlugin)
+                    {
+                        obj.CopyEmbeddedResourceToPath(_rootPath);
+                    }
                     obj.Dispatcher.DispathLoadAfter(this);
                 }
             }

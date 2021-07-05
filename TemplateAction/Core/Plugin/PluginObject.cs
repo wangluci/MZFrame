@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.IO;
+using TemplateAction.Common;
 
 namespace TemplateAction.Core
 {
@@ -45,13 +47,74 @@ namespace TemplateAction.Core
         {
             get { return _config; }
         }
+        private Assembly _assembly;
+        /// <summary>
+        /// 将嵌入资源拷贝到指定目录，如果存在则替换
+        /// </summary>
+        /// <param name="destpath"></param>
+        public void CopyEmbeddedResourceToPath(string destpath)
+        {
+            if (_assembly == null) return;
+            foreach (string item in _assembly.GetManifestResourceNames())
+            {
+                Stream inputStream = _assembly.GetManifestResourceStream(item);
+                string tmpstr = string.Empty;
+                if (item.EndsWith(TAUtility.FILE_EXT, StringComparison.OrdinalIgnoreCase))
+                {
+                    tmpstr = item.Substring(0, item.Length - TAUtility.FILE_EXT.Length);
+                    string[] patharr = tmpstr.Split(new char[] { '.' });
+                    if (patharr.Length == 0) continue;
+                    tmpstr = string.Empty;
+                    for (int i = 0; i < patharr.Length; i++)
+                    {
+                        tmpstr = tmpstr + Path.DirectorySeparatorChar + patharr[i];
+                    }
+                    if (tmpstr[0] == Path.DirectorySeparatorChar)
+                    {
+                        tmpstr = tmpstr.Substring(1);
+                    }
+                    tmpstr = tmpstr + TAUtility.FILE_EXT;
+                }
+                else
+                {
+                    string[] patharr = item.Split(new char[] { '.' });
+                    if (patharr.Length == 0) continue;
+                    int tmplen = patharr.Length - 1;
+                    tmpstr = string.Empty;
+                    for (int i = 0; i < tmplen; i++)
+                    {
+                        tmpstr = tmpstr + Path.DirectorySeparatorChar + patharr[i];
+                    }
+                    tmpstr = tmpstr + "." + patharr[patharr.Length - 1];
+                    if (tmpstr[0] == Path.DirectorySeparatorChar)
+                    {
+                        tmpstr = tmpstr.Substring(1);
+                    }
+                }
+
+                string destfile = Path.Combine(destpath, tmpstr);
+                string destdir = Path.GetDirectoryName(destfile);
+                if (!Directory.Exists(destdir))
+                {
+                    Directory.CreateDirectory(destdir);
+                }
+                using (FileStream fileStream = File.Create(destfile))
+                {
+                    inputStream.Seek(0, SeekOrigin.Begin);
+                    inputStream.CopyTo(fileStream);
+                }
+
+            }
+        }
         public static PluginObject Create(PluginCollection collection, Assembly assembly)
         {
+
             PluginObject pluginObj = new PluginObject();
             if (collection.RouterBuilder != null)
             {
                 pluginObj._routerBuilder = collection.RouterBuilder.NewPluginBuilder();
             }
+            pluginObj._assembly = assembly;
             pluginObj._storer = new ConcurrentStorer(collection);
             pluginObj.mControllerList = new Dictionary<string, ControllerNode>();
             pluginObj._dispatcher = new PluginEventDispatcher();

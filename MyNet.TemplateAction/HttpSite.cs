@@ -146,11 +146,9 @@ namespace MyNet.TemplateAction
 
             TAEventDispatcher.Instance.RegisterLoadBefore(app =>
             {            
-                //设置插件目录
-                app.UsePluginPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugin"));
                 OnSiteConfig(app);
             });
-            _app = new TAApplication().Load();
+            _app = new TAApplication().Init(AppDomain.CurrentDomain.BaseDirectory);
             //站点开始
             OnSiteStart();
             _sessionManager = new HttpSessionManager();
