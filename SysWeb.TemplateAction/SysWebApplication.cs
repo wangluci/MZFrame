@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web;
 using TemplateAction.Core;
 
 namespace SysWeb.TemplateAction
@@ -8,20 +9,21 @@ namespace SysWeb.TemplateAction
     /// </summary>
     public class SysWebApplication
     {
-        private SysWebApplication() { }
-        private class Nested
+        private volatile static TAApplication _app = null;
+        private static readonly object lockobj = new object();
+        public static TAApplication GetInstance(HttpContext context)
         {
-            // 显式静态构造告诉C＃编译器未标记类型BeforeFieldInit
-            // 保证在调用Nested静态类时才进行实例初始化
-            static Nested(){}
-            internal static readonly TAApplication Instance = new TAApplication();
-        }
-        public static TAApplication Application
-        {
-            get
+            if (_app == null)
             {
-                return Nested.Instance.Load();
+                lock (lockobj)
+                {
+                    if (_app == null)
+                    {
+                        _app = new TAApplication().Init(context.Server.MapPath("/"));
+                    }
+                }
             }
+            return _app;
         }
     }
 }

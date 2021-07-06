@@ -50,7 +50,7 @@ namespace SysWeb.TemplateAction
         {
             get
             {
-                return SysWebApplication.Application;
+                return SysWebApplication.GetInstance(_httpContext);
             }
         }
 

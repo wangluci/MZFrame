@@ -43,10 +43,23 @@ namespace TemplateAction.Core
             else
             {
                 zPath = "/" + mHandle.NameSpace + "/" + module + "/" + node + TAUtility.FILE_EXT;
+               
+            }
+            string realpath = mHandle.Context.MapPath(zPath);
+            TemplateDocument indexTemp = TemplateApp.Instance.LoadRawPage(realpath);
+            if (indexTemp == null)
+            {
+                //判断是否从模块中取视图文件
+                if (tdata.ReadAssetsFromPlugin)
+                {
+                    indexTemp = tdata.FindPluginView(zPath);
+                }
+                if (indexTemp == null)
+                {
+                    return "视图不存在";
+                }
             }
 
-            zPath = mHandle.Context.MapPath(zPath);
-            TemplateDocument indexTemp = TemplateApp.Instance.LoadRawPage(zPath);
             return indexTemp.MakeHtml(mHandle.TemplateContext);
         }
         public void Output()

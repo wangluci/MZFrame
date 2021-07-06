@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
 using TemplateAction.Common;
+using TemplateAction.Label;
+using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace TemplateAction.Core
 {
@@ -48,13 +51,13 @@ namespace TemplateAction.Core
             get { return _config; }
         }
         private Assembly _assembly;
+
+     
         /// <summary>
-        /// 将嵌入资源拷贝到指定目录，如果存在则替换
+        /// 更新模块资源
         /// </summary>
-        /// <param name="destpath"></param>
-        public void CopyEmbeddedResourceToPath(string destpath)
+        internal void UpdateAssetsAndDocument(ConcurrentDictionary<string, byte[]> assets, ConcurrentDictionary<string, TemplateDocument> documents)
         {
-            if (_assembly == null) return;
             foreach (string item in _assembly.GetManifestResourceNames())
             {
                 Stream inputStream = _assembly.GetManifestResourceStream(item);
@@ -67,13 +70,20 @@ namespace TemplateAction.Core
                     tmpstr = string.Empty;
                     for (int i = 0; i < patharr.Length; i++)
                     {
-                        tmpstr = tmpstr + Path.DirectorySeparatorChar + patharr[i];
-                    }
-                    if (tmpstr[0] == Path.DirectorySeparatorChar)
-                    {
-                        tmpstr = tmpstr.Substring(1);
+                        tmpstr = tmpstr + "/" + patharr[i];
                     }
                     tmpstr = tmpstr + TAUtility.FILE_EXT;
+                    if (tmpstr[0] != '/')
+                    {
+                        tmpstr = "/" + tmpstr;
+                    }
+
+                    using (StreamReader sr = new StreamReader(inputStream))
+                    {
+                        TemplateDocument doc = new TemplateDocument(sr.ReadToEnd());
+                        documents.AddOrUpdate(tmpstr.ToLower(), doc, (key, oldValue) => doc);
+                    }
+
                 }
                 else
                 {
@@ -83,25 +93,18 @@ namespace TemplateAction.Core
                     tmpstr = string.Empty;
                     for (int i = 0; i < tmplen; i++)
                     {
-                        tmpstr = tmpstr + Path.DirectorySeparatorChar + patharr[i];
+                        tmpstr = tmpstr + "/" + patharr[i];
                     }
                     tmpstr = tmpstr + "." + patharr[patharr.Length - 1];
-                    if (tmpstr[0] == Path.DirectorySeparatorChar)
+                    if (tmpstr[0] != '/')
                     {
-                        tmpstr = tmpstr.Substring(1);
+                        tmpstr = "/" + tmpstr;
                     }
-                }
 
-                string destfile = Path.Combine(destpath, tmpstr);
-                string destdir = Path.GetDirectoryName(destfile);
-                if (!Directory.Exists(destdir))
-                {
-                    Directory.CreateDirectory(destdir);
-                }
-                using (FileStream fileStream = File.Create(destfile))
-                {
+                    byte[] bytes = new byte[inputStream.Length];
                     inputStream.Seek(0, SeekOrigin.Begin);
-                    inputStream.CopyTo(fileStream);
+                    inputStream.Read(bytes, 0, bytes.Length);
+                    assets.AddOrUpdate(tmpstr.ToLower(), bytes, (key, oldValue) => bytes);
                 }
 
             }
@@ -110,11 +113,13 @@ namespace TemplateAction.Core
         {
 
             PluginObject pluginObj = new PluginObject();
+            pluginObj._assembly = assembly;
             if (collection.RouterBuilder != null)
             {
                 pluginObj._routerBuilder = collection.RouterBuilder.NewPluginBuilder();
             }
-            pluginObj._assembly = assembly;
+           
+
             pluginObj._storer = new ConcurrentStorer(collection);
             pluginObj.mControllerList = new Dictionary<string, ControllerNode>();
             pluginObj._dispatcher = new PluginEventDispatcher();

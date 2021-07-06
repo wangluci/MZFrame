@@ -44,18 +44,26 @@ namespace TemplateAction.Core
             get { return _plugins; }
         }
         /// <summary>
-        /// 是否从插件拷贝资源
+        /// 是否从插件读取资源
         /// </summary>
-        private bool _copyAssetsFromPlugin;
+        private bool _readAssetsFromPlugin;
+        public bool ReadAssetsFromPlugin
+        {
+            get { return _readAssetsFromPlugin; }
+        }
+        private ConcurrentDictionary<string, byte[]> _assets;
+        private ConcurrentDictionary<string, TemplateDocument> _documents;
         ~TAApplication()
         {
             Dispose(false);
         }
         public TAApplication()
         {
-            _copyAssetsFromPlugin = false;
+            _readAssetsFromPlugin = true;
             _plugins = new PluginCollection();
             _pluginsnode = TAEventDispatcher.Instance.AddScope(_plugins);
+            _assets = new ConcurrentDictionary<string, byte[]>();
+            _documents = new ConcurrentDictionary<string, TemplateDocument>();
         }
 
         /// <summary>
@@ -166,10 +174,11 @@ namespace TemplateAction.Core
         /// <summary>
         /// 调用者会从各个插件中复制资源文件
         /// </summary>
+        /// <param name="enable"></param>
         /// <returns></returns>
-        public TAApplication UsePluginAssets()
+        public TAApplication UsePluginAssets(bool enable)
         {
-            _copyAssetsFromPlugin = true;
+            _readAssetsFromPlugin = enable;
             return this;
         }
 
@@ -188,7 +197,34 @@ namespace TemplateAction.Core
             }
             return default(T);
         }
-
+        /// <summary>
+        /// 查找插件里的资源文件
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public byte[] FindPluginAssets(string path)
+        {
+            byte[] outbytes;
+            if (_assets.TryGetValue(path, out outbytes))
+            {
+                return outbytes;
+            }
+            return null;
+        }
+        /// <summary>
+        /// 查找插件里的视图文件
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public TemplateDocument FindPluginView(string path)
+        {
+            TemplateDocument outdoc;
+            if (_documents.TryGetValue(path, out outdoc))
+            {
+                return outdoc;
+            }
+            return null;
+        }
 
         /// <summary>
         /// 判断是否包含指定名称的插件
@@ -236,9 +272,9 @@ namespace TemplateAction.Core
                     if (".dll".Equals(fi.Extension, StringComparison.OrdinalIgnoreCase))
                     {
                         PluginObject plg = _plugins.LoadPlugin(fi.FullName);
-                        if (_copyAssetsFromPlugin)
+                        if (plg != null && _readAssetsFromPlugin)
                         {
-                            plg.CopyEmbeddedResourceToPath(_rootPath);
+                            plg.UpdateAssetsAndDocument(_assets, _documents);
                         }
                     }
                 }
@@ -291,9 +327,9 @@ namespace TemplateAction.Core
                 PluginObject obj = _plugins.LoadPlugin(tpath);
                 if (obj != null)
                 {
-                    if (_copyAssetsFromPlugin)
+                    if (_readAssetsFromPlugin)
                     {
-                        obj.CopyEmbeddedResourceToPath(_rootPath);
+                        obj.UpdateAssetsAndDocument(_assets, _documents);
                     }
                     obj.Dispatcher.DispathLoadAfter(this);
                 }

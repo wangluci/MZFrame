@@ -66,7 +66,7 @@ namespace TemplateAction.Label
                 }
                 else
                 {
-                    filedoc = new TemplateDocument();
+                    return null;
                 }
             }
 
