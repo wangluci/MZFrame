@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web;
+using System.Web.Hosting;
 using TemplateAction.Core;
 
 namespace SysWeb.TemplateAction
@@ -19,7 +20,12 @@ namespace SysWeb.TemplateAction
                 {
                     if (_app == null)
                     {
-                        _app = new TAApplication().Init(context.Server.MapPath("/"));
+                        TAApplication tmpapp = new TAApplication().Init(context.Server.MapPath("/"));
+                        if (tmpapp.ReadAssetsFromPlugin)
+                        {
+                            HostingEnvironment.RegisterVirtualPathProvider(new AssetsMapPathProvider(tmpapp));
+                        }
+                        _app = tmpapp;
                     }
                 }
             }

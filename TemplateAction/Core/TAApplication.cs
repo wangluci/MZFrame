@@ -198,6 +198,15 @@ namespace TemplateAction.Core
             return default(T);
         }
         /// <summary>
+        /// 判断插件是否存在指定资源
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public bool ExistPluginAssets(string path)
+        {
+            return _assets.ContainsKey(path.ToLower());
+        }
+        /// <summary>
         /// 查找插件里的资源文件
         /// </summary>
         /// <param name="path"></param>
@@ -205,7 +214,7 @@ namespace TemplateAction.Core
         public byte[] FindPluginAssets(string path)
         {
             byte[] outbytes;
-            if (_assets.TryGetValue(path, out outbytes))
+            if (_assets.TryGetValue(path.ToLower(), out outbytes))
             {
                 return outbytes;
             }
@@ -219,7 +228,7 @@ namespace TemplateAction.Core
         public TemplateDocument FindPluginView(string path)
         {
             TemplateDocument outdoc;
-            if (_documents.TryGetValue(path, out outdoc))
+            if (_documents.TryGetValue(path.ToLower(), out outdoc))
             {
                 return outdoc;
             }
@@ -235,7 +244,64 @@ namespace TemplateAction.Core
         {
             return _plugins.ContainPlugin(ns);
         }
+        /// <summary>
+        /// 更新模块资源
+        /// </summary>
+        private void UpdateAssetsAndDocumentThread(Object obj)
+        {
+            PluginObject plg = obj as PluginObject;
+            System.Reflection.Assembly assem = plg.TargetAssembly;
+            foreach (string item in assem.GetManifestResourceNames())
+            {
+                Stream inputStream = assem.GetManifestResourceStream(item);
+                string tmpstr = string.Empty;
+                if (item.EndsWith(TAUtility.FILE_EXT, StringComparison.OrdinalIgnoreCase))
+                {
+                    tmpstr = item.Substring(0, item.Length - TAUtility.FILE_EXT.Length);
+                    string[] patharr = tmpstr.Split(new char[] { '.' });
+                    if (patharr.Length == 0) continue;
+                    tmpstr = string.Empty;
+                    for (int i = 0; i < patharr.Length; i++)
+                    {
+                        tmpstr = tmpstr + "/" + patharr[i];
+                    }
+                    tmpstr = tmpstr + TAUtility.FILE_EXT;
+                    if (tmpstr[0] != '/')
+                    {
+                        tmpstr = "/" + tmpstr;
+                    }
 
+                    using (StreamReader sr = new StreamReader(inputStream))
+                    {
+                        TemplateDocument doc = new TemplateDocument(sr.ReadToEnd());
+                        _documents.AddOrUpdate(tmpstr.ToLower(), doc, (key, oldValue) => doc);
+                    }
+
+                }
+                else
+                {
+                    string[] patharr = item.Split(new char[] { '.' });
+                    if (patharr.Length == 0) continue;
+                    int tmplen = patharr.Length - 1;
+                    tmpstr = string.Empty;
+                    for (int i = 0; i < tmplen; i++)
+                    {
+                        tmpstr = tmpstr + "/" + patharr[i];
+                    }
+                    tmpstr = tmpstr + "." + patharr[patharr.Length - 1];
+                    if (tmpstr[0] != '/')
+                    {
+                        tmpstr = "/" + tmpstr;
+                    }
+
+                    byte[] bytes = new byte[inputStream.Length];
+                    inputStream.Seek(0, SeekOrigin.Begin);
+                    inputStream.Read(bytes, 0, bytes.Length);
+                    _assets.AddOrUpdate(tmpstr.ToLower(), bytes, (key, oldValue) => bytes);
+                }
+
+            }
+        }
 
         /// <summary>
         /// 初始化并加载一、二级目录下的插件
@@ -274,7 +340,8 @@ namespace TemplateAction.Core
                         PluginObject plg = _plugins.LoadPlugin(fi.FullName);
                         if (plg != null && _readAssetsFromPlugin)
                         {
-                            plg.UpdateAssetsAndDocument(_assets, _documents);
+                            Thread t = new Thread(UpdateAssetsAndDocumentThread);
+                            t.Start(plg);
                         }
                     }
                 }
@@ -329,7 +396,8 @@ namespace TemplateAction.Core
                 {
                     if (_readAssetsFromPlugin)
                     {
-                        obj.UpdateAssetsAndDocument(_assets, _documents);
+                        Thread t = new Thread(UpdateAssetsAndDocumentThread);
+                        t.Start(obj);
                     }
                     obj.Dispatcher.DispathLoadAfter(this);
                 }

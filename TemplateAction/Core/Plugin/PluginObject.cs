@@ -51,64 +51,12 @@ namespace TemplateAction.Core
             get { return _config; }
         }
         private Assembly _assembly;
-
-     
-        /// <summary>
-        /// 更新模块资源
-        /// </summary>
-        internal void UpdateAssetsAndDocument(ConcurrentDictionary<string, byte[]> assets, ConcurrentDictionary<string, TemplateDocument> documents)
+        public Assembly TargetAssembly
         {
-            foreach (string item in _assembly.GetManifestResourceNames())
-            {
-                Stream inputStream = _assembly.GetManifestResourceStream(item);
-                string tmpstr = string.Empty;
-                if (item.EndsWith(TAUtility.FILE_EXT, StringComparison.OrdinalIgnoreCase))
-                {
-                    tmpstr = item.Substring(0, item.Length - TAUtility.FILE_EXT.Length);
-                    string[] patharr = tmpstr.Split(new char[] { '.' });
-                    if (patharr.Length == 0) continue;
-                    tmpstr = string.Empty;
-                    for (int i = 0; i < patharr.Length; i++)
-                    {
-                        tmpstr = tmpstr + "/" + patharr[i];
-                    }
-                    tmpstr = tmpstr + TAUtility.FILE_EXT;
-                    if (tmpstr[0] != '/')
-                    {
-                        tmpstr = "/" + tmpstr;
-                    }
-
-                    using (StreamReader sr = new StreamReader(inputStream))
-                    {
-                        TemplateDocument doc = new TemplateDocument(sr.ReadToEnd());
-                        documents.AddOrUpdate(tmpstr.ToLower(), doc, (key, oldValue) => doc);
-                    }
-
-                }
-                else
-                {
-                    string[] patharr = item.Split(new char[] { '.' });
-                    if (patharr.Length == 0) continue;
-                    int tmplen = patharr.Length - 1;
-                    tmpstr = string.Empty;
-                    for (int i = 0; i < tmplen; i++)
-                    {
-                        tmpstr = tmpstr + "/" + patharr[i];
-                    }
-                    tmpstr = tmpstr + "." + patharr[patharr.Length - 1];
-                    if (tmpstr[0] != '/')
-                    {
-                        tmpstr = "/" + tmpstr;
-                    }
-
-                    byte[] bytes = new byte[inputStream.Length];
-                    inputStream.Seek(0, SeekOrigin.Begin);
-                    inputStream.Read(bytes, 0, bytes.Length);
-                    assets.AddOrUpdate(tmpstr.ToLower(), bytes, (key, oldValue) => bytes);
-                }
-
-            }
+            get { return _assembly; }
         }
+     
+      
         public static PluginObject Create(PluginCollection collection, Assembly assembly)
         {
 
