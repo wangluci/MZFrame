@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.IO;
-using TemplateAction.Common;
-using TemplateAction.Label;
-using System.Threading.Tasks;
-using System.Collections.Concurrent;
+using TemplateAction.Cache;
 
 namespace TemplateAction.Core
 {
@@ -55,8 +51,12 @@ namespace TemplateAction.Core
         {
             get { return _assembly; }
         }
-     
-      
+
+        private FileDependency _cacheDependency;
+        public FileDependency CacheDependency
+        {
+            get { return _cacheDependency; }
+        }
         public static PluginObject Create(PluginCollection collection, Assembly assembly)
         {
 
@@ -66,8 +66,8 @@ namespace TemplateAction.Core
             {
                 pluginObj._routerBuilder = collection.RouterBuilder.NewPluginBuilder();
             }
-           
 
+            pluginObj._cacheDependency = new FileDependency();
             pluginObj._storer = new ConcurrentStorer(collection);
             pluginObj.mControllerList = new Dictionary<string, ControllerNode>();
             pluginObj._dispatcher = new PluginEventDispatcher();

@@ -43,11 +43,24 @@ namespace TemplateAction.Label
             _pool.Empty();
         }
         /// <summary>
+        /// 添加模板原
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="input"></param>
+        /// <param name="dep"></param>
+        public void AddViewPage(string path, string input, FileDependency dep)
+        {
+            path = path.ToLower();
+            TemplateDocument filedoc = new TemplateDocument(input);
+            _pool.Remove(path);
+            _pool.Insert(path, filedoc, new UnionOrDependency(dep, _watcher.CreateFileDependency(path)));
+        }
+        /// <summary>
         /// 加载模板原文件
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public TemplateDocument LoadRawPage(string path)
+        public TemplateDocument LoadViewPage(string path)
         {
             path = path.ToLower();
             TemplateDocument filedoc = _pool.Get(path) as TemplateDocument;
@@ -72,7 +85,7 @@ namespace TemplateAction.Label
 
             return filedoc;
         }
-    
+
         /// <summary>
         /// 获取系统函数
         /// </summary>

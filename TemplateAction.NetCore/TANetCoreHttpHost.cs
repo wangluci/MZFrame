@@ -8,8 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Builder.Internal;
-using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Builder;
 using Microsoft.AspNetCore.Hosting.Internal;
@@ -119,7 +117,7 @@ namespace TemplateAction.NetCore
         {
             if (_startedServer) return;
             _app = new TANetCoreHttpApplication(_appBuilder);
-            _app.Init(Directory.GetCurrentDirectory());
+            _app.Init(_workroot);
             _appBuilder.ApplicationServices = _servicecollection.AddSingleton<TANetCoreHttpApplication>(_app).BuildServiceProvider();
             await _server.StartAsync(_app, token).ConfigureAwait(false);
             _startedServer = true;

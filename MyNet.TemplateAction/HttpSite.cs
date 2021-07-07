@@ -25,12 +25,13 @@ namespace MyNet.TemplateAction
             TAUtility.FILE_EXT,".config",".csproj",".cs",".dll",".exe",".pdb"
         };
         /// <summary>
-        /// 根目录
+        /// Web目录
         /// </summary>
-        protected string _rootdir;
-        public string RootDir
+        protected string _wwwroot;
+        protected string _rootpath;
+        public string RootPath
         {
-            get { return _rootdir; }
+            get { return _rootpath; }
         }
         protected string _ip;
         protected int _port;
@@ -105,7 +106,8 @@ namespace MyNet.TemplateAction
             _gzip = false;
             _ip = ip;
             _port = port;
-            _rootdir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Web");
+            _rootpath = AppDomain.CurrentDomain.BaseDirectory;
+            _wwwroot = Path.Combine(_rootpath, "Web");
             //注册action监听
             TAEventDispatcher.Instance.Register(new DefaultHandler<ActionEvent>(evt =>
             {
@@ -145,10 +147,10 @@ namespace MyNet.TemplateAction
             }
 
             TAEventDispatcher.Instance.RegisterLoadBefore(app =>
-            {            
+            {
                 OnSiteConfig(app);
             });
-            _app = new TAApplication().Init(AppDomain.CurrentDomain.BaseDirectory);
+            _app = new TAApplication().Init(_rootpath);
             //站点开始
             OnSiteStart();
             _sessionManager = new HttpSessionManager();
@@ -188,7 +190,7 @@ namespace MyNet.TemplateAction
             {
                 rootdef = true;
             }
-            
+
             //判断是否为静态文件
             if (TAUtility.IsStaticFile(request.Path) || rootdef)
             {
@@ -383,8 +385,8 @@ namespace MyNet.TemplateAction
             {
                 path = path.Replace("/", "\\");
             }
-            
-            return Path.Combine(_rootdir, path);
+
+            return Path.Combine(_wwwroot, path);
         }
 
 
@@ -394,7 +396,7 @@ namespace MyNet.TemplateAction
         protected virtual void OnSiteStart() { }
         protected virtual void OnSiteStop() { }
         protected virtual void ConfigurePipelineBefore(IChannelPipeline pipeline) { }
-        protected virtual void ConfigurePipeline(IChannelPipeline pipeline){}
+        protected virtual void ConfigurePipeline(IChannelPipeline pipeline) { }
         protected virtual void ConfigurePipelineAfter(IChannelPipeline pipeline) { }
         protected override void OnUnManDisposed()
         {

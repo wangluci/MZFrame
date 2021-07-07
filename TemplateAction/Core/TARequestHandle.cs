@@ -145,18 +145,10 @@ namespace TemplateAction.Core
                 zPath = "/" + mNameSpace + "/" + mController + "/" + src;
             }
             string realpath = this.MapPath(zPath);
-            TemplateDocument indexTemp = TemplateApp.Instance.LoadRawPage(realpath);
+            TemplateDocument indexTemp = TemplateApp.Instance.LoadViewPage(realpath);
             if (indexTemp == null)
             {
-                //判断是否从模块中取视图文件
-                if (mContext.Application.ReadAssetsFromPlugin)
-                {
-                    indexTemp = mContext.Application.FindPluginView(zPath);
-                }
-                if (indexTemp == null)
-                {
-                    return "视图不存在";
-                }
+                return "视图不存在";
             }
             return indexTemp.MakeHtml(this);
         }

@@ -51,8 +51,6 @@ namespace TemplateAction.Core
         {
             get { return _readAssetsFromPlugin; }
         }
-        private ConcurrentDictionary<string, byte[]> _assets;
-        private ConcurrentDictionary<string, TemplateDocument> _documents;
         ~TAApplication()
         {
             Dispose(false);
@@ -62,8 +60,6 @@ namespace TemplateAction.Core
             _readAssetsFromPlugin = true;
             _plugins = new PluginCollection();
             _pluginsnode = TAEventDispatcher.Instance.AddScope(_plugins);
-            _assets = new ConcurrentDictionary<string, byte[]>();
-            _documents = new ConcurrentDictionary<string, TemplateDocument>();
         }
 
         /// <summary>
@@ -197,43 +193,6 @@ namespace TemplateAction.Core
             }
             return default(T);
         }
-        /// <summary>
-        /// 判断插件是否存在指定资源
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public bool ExistPluginAssets(string path)
-        {
-            return _assets.ContainsKey(path.ToLower());
-        }
-        /// <summary>
-        /// 查找插件里的资源文件
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public byte[] FindPluginAssets(string path)
-        {
-            byte[] outbytes;
-            if (_assets.TryGetValue(path.ToLower(), out outbytes))
-            {
-                return outbytes;
-            }
-            return null;
-        }
-        /// <summary>
-        /// 查找插件里的视图文件
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public TemplateDocument FindPluginView(string path)
-        {
-            TemplateDocument outdoc;
-            if (_documents.TryGetValue(path.ToLower(), out outdoc))
-            {
-                return outdoc;
-            }
-            return null;
-        }
 
         /// <summary>
         /// 判断是否包含指定名称的插件
@@ -247,9 +206,8 @@ namespace TemplateAction.Core
         /// <summary>
         /// 更新模块资源
         /// </summary>
-        private void UpdateAssetsAndDocumentThread(Object obj)
+        private void UpdateAssetsAndDocument(PluginObject plg)
         {
-            PluginObject plg = obj as PluginObject;
             System.Reflection.Assembly assem = plg.TargetAssembly;
             foreach (string item in assem.GetManifestResourceNames())
             {
@@ -263,53 +221,37 @@ namespace TemplateAction.Core
                     tmpstr = string.Empty;
                     for (int i = 0; i < patharr.Length; i++)
                     {
-                        tmpstr = tmpstr + "/" + patharr[i];
+                        tmpstr = tmpstr + Path.DirectorySeparatorChar + patharr[i];
                     }
                     tmpstr = tmpstr + TAUtility.FILE_EXT;
-                    if (tmpstr[0] != '/')
+                    if (tmpstr[0] == Path.DirectorySeparatorChar)
                     {
-                        tmpstr = "/" + tmpstr;
+                        tmpstr = tmpstr.Substring(1);
                     }
 
                     using (StreamReader sr = new StreamReader(inputStream))
                     {
-                        TemplateDocument doc = new TemplateDocument(sr.ReadToEnd());
-                        _documents.AddOrUpdate(tmpstr.ToLower(), doc, (key, oldValue) => doc);
+                        TemplateApp.Instance.AddViewPage(Path.Combine(_rootPath, tmpstr), sr.ReadToEnd(), plg.CacheDependency);
                     }
 
                 }
-                else
-                {
-                    string[] patharr = item.Split(new char[] { '.' });
-                    if (patharr.Length == 0) continue;
-                    int tmplen = patharr.Length - 1;
-                    tmpstr = string.Empty;
-                    for (int i = 0; i < tmplen; i++)
-                    {
-                        tmpstr = tmpstr + "/" + patharr[i];
-                    }
-                    tmpstr = tmpstr + "." + patharr[patharr.Length - 1];
-                    if (tmpstr[0] != '/')
-                    {
-                        tmpstr = "/" + tmpstr;
-                    }
 
-                    byte[] bytes = new byte[inputStream.Length];
-                    inputStream.Seek(0, SeekOrigin.Begin);
-                    inputStream.Read(bytes, 0, bytes.Length);
-                    _assets.AddOrUpdate(tmpstr.ToLower(), bytes, (key, oldValue) => bytes);
-                }
 
             }
         }
 
+
         /// <summary>
-        /// 初始化并加载一、二级目录下的插件
+        /// 初始化并加载目录下的插件
         /// </summary>
         /// <param name="rootpath"></param>
         /// <returns></returns>
         public TAApplication Init(string rootpath)
         {
+            if (rootpath.Length > 0 && rootpath[rootpath.Length - 1] == Path.DirectorySeparatorChar)
+            {
+                rootpath = rootpath.Substring(0, rootpath.Length - 1);
+            }
             if (_loaded == 1)
             {
                 return this;
@@ -340,8 +282,7 @@ namespace TemplateAction.Core
                         PluginObject plg = _plugins.LoadPlugin(fi.FullName);
                         if (plg != null && _readAssetsFromPlugin)
                         {
-                            Thread t = new Thread(UpdateAssetsAndDocumentThread);
-                            t.Start(plg);
+                            UpdateAssetsAndDocument(plg);
                         }
                     }
                 }
@@ -396,8 +337,7 @@ namespace TemplateAction.Core
                 {
                     if (_readAssetsFromPlugin)
                     {
-                        Thread t = new Thread(UpdateAssetsAndDocumentThread);
-                        t.Start(obj);
+                        UpdateAssetsAndDocument(obj);
                     }
                     obj.Dispatcher.DispathLoadAfter(this);
                 }

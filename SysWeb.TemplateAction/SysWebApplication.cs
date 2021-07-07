@@ -20,12 +20,7 @@ namespace SysWeb.TemplateAction
                 {
                     if (_app == null)
                     {
-                        TAApplication tmpapp = new TAApplication().Init(context.Server.MapPath("/"));
-                        if (tmpapp.ReadAssetsFromPlugin)
-                        {
-                            HostingEnvironment.RegisterVirtualPathProvider(new AssetsMapPathProvider(tmpapp));
-                        }
-                        _app = tmpapp;
+                        _app = new TAApplication().Init(context.Server.MapPath("~"));
                     }
                 }
             }
