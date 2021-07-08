@@ -16,6 +16,10 @@ namespace ResumeML
         {
             _business = business;
         }
+        public ViewResult Test()
+        {
+            return View();
+        }
         /// <summary>
         /// 业务逻辑调用测试
         /// </summary>

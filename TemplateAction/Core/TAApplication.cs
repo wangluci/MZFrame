@@ -206,7 +206,7 @@ namespace TemplateAction.Core
         /// <summary>
         /// 更新模块资源
         /// </summary>
-        private void UpdateAssetsAndDocument(PluginObject plg)
+        private void UpdateDocument(PluginObject plg)
         {
             System.Reflection.Assembly assem = plg.TargetAssembly;
             foreach (string item in assem.GetManifestResourceNames())
@@ -267,6 +267,8 @@ namespace TemplateAction.Core
             _pluginPath = Path.Combine(_rootPath, "Plugin");
             //激活配置文件
             TAEventDispatcher.Instance.DispathLoadBefore(this);
+            //初始化模板
+            TemplateApp.Instance.Init(_rootPath);
             //从应用程序域的程序集中初始化插件集
             _plugins.InitFromEntryAssembly();
             //加载插件
@@ -282,7 +284,7 @@ namespace TemplateAction.Core
                         PluginObject plg = _plugins.LoadPlugin(fi.FullName);
                         if (plg != null && _readAssetsFromPlugin)
                         {
-                            UpdateAssetsAndDocument(plg);
+                            UpdateDocument(plg);
                         }
                     }
                 }
@@ -337,8 +339,9 @@ namespace TemplateAction.Core
                 {
                     if (_readAssetsFromPlugin)
                     {
-                        UpdateAssetsAndDocument(obj);
+                        UpdateDocument(obj);
                     }
+                    obj.CacheDependency.NoticeChange();
                     obj.Dispatcher.DispathLoadAfter(this);
                 }
             }

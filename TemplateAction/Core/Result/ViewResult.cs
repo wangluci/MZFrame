@@ -34,18 +34,9 @@ namespace TemplateAction.Core
         /// <returns></returns>
         public string ModuleToString(string module, string node)
         {
-            string zPath = "";
             TAApplication tdata = mHandle.Context.Application;
-            if (module.Equals("root"))
-            {
-                zPath = "/" + node + TAUtility.FILE_EXT;
-            }
-            else
-            {
-                zPath = "/" + mHandle.NameSpace + "/" + module + "/" + node + TAUtility.FILE_EXT;
-               
-            }
-            string realpath = mHandle.Context.MapPath(zPath);
+            string zPath = "/" + mHandle.NameSpace + "/" + module + "/" + node + TAUtility.FILE_EXT;
+            string realpath = TemplateApp.Instance.Relative2TemplatePath(zPath);
             TemplateDocument indexTemp = TemplateApp.Instance.LoadViewPage(realpath);
             if (indexTemp == null)
             {

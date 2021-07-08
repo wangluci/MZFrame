@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using TemplateAction.Cache;
 using TemplateAction.Common;
 namespace TemplateAction.Label
 {
     /// <summary>
-    /// 提供模板扩展数据
+    /// 模板应用：使用模板功能必需初始化此类,TAApplication已默认初始化
     /// </summary>
     public class TemplateApp
     {
@@ -22,6 +23,7 @@ namespace TemplateAction.Label
         private CachePool _pool;
         //模板监听器
         private FileDependencyWatcher _watcher;
+        private string _rootpath;
         private TemplateApp()
         {
             _pool = new CachePool();
@@ -33,7 +35,15 @@ namespace TemplateAction.Label
             {
                 mSysMethods.Add(method.Name, method);
             }
-            _watcher = new FileDependencyWatcher(AppDomain.CurrentDomain.BaseDirectory, "*" + TAUtility.FILE_EXT);
+        }
+        /// <summary>
+        /// 初始化模板目录
+        /// </summary>
+        /// <param name="path"></param>
+        public void Init(string path)
+        {
+            _rootpath = path;
+            _watcher = new FileDependencyWatcher(path, "*" + TAUtility.FILE_EXT);
         }
         /// <summary>
         /// 清除缓存
@@ -100,7 +110,42 @@ namespace TemplateAction.Label
             }
             return null;
         }
+        /// <summary>
+        /// 相对路径转换成模板路径
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public string Relative2TemplatePath(string path)
+        {
+            if (path == null) return string.Empty;
+            int ss = 0;
+            if (path.Length > 0)
+            {
+                if (path[0] == '~')
+                {
+                    ss++;
+                }
+            }
+            if (ss < path.Length)
+            {
+                if (path[ss] == '/')
+                {
+                    ss++;
+                }
+            }
 
+            if (ss > 0)
+            {
+                path = path.Substring(ss);
+            }
+            //windows系统
+            if (Path.DirectorySeparatorChar.Equals('\\'))
+            {
+                path = path.Replace("/", "\\");
+            }
+
+            return Path.Combine(_rootpath, path);
+        }
         public static TemplateApp Instance
         {
             get

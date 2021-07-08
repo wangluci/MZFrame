@@ -144,17 +144,13 @@ namespace TemplateAction.Core
             {
                 zPath = "/" + mNameSpace + "/" + mController + "/" + src;
             }
-            string realpath = this.MapPath(zPath);
+            string realpath = TemplateApp.Instance.Relative2TemplatePath(zPath);
             TemplateDocument indexTemp = TemplateApp.Instance.LoadViewPage(realpath);
             if (indexTemp == null)
             {
                 return "视图不存在";
             }
             return indexTemp.MakeHtml(this);
-        }
-        public string MapPath(string path)
-        {
-            return mContext.MapPath(path);
         }
     }
 }
