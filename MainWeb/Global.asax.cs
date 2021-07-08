@@ -17,10 +17,7 @@ namespace MainWeb
             {
                 //设置路由
                 app.UseRouterBuilder(new RouterBuilder().UsePlugin().UseDefault("TestService"));
-                //设置插件目录
-                app.UsePluginPath(HttpContext.Current.Server.MapPath("~/Plugin"));
             });
-
             MyAccess.log4net.Config.XmlConfigurator.ConfigureAndWatch(new FileInfo(Server.MapPath("log4net.config")));
         }
 
