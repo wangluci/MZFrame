@@ -112,7 +112,7 @@ namespace TemplateAction.Label
             return theLabel;
         }
         /// <summary>
-        /// 解释{{#}}里面的语句
+        /// 解释@{}里面的语句
         /// </summary>
         /// <param name="parent"></param>
         /// <param name="sequence"></param>
