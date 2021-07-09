@@ -43,11 +43,11 @@ ResumeML/ResumeML.sln项目为.net core使用示例
 
     不推荐用标签<loop></loop>的写法，只有在<m:def var="变量名"></m:def>才推荐
 
-    - 变量定义
+- 变量定义
 
     变量有两种写法$a和a
     
-    - 循环语句for
+- 循环语句for
 
     for语句有两种写法for(($a,$i) in $b)和for($a in $b)
 
