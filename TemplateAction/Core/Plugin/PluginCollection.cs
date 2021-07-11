@@ -64,9 +64,14 @@ namespace TemplateAction.Core
 
             return list as List<T>;
         }
+ 
         public T GetService<T>() where T : class
         {
-            return GetService(typeof(T)) as T;
+            return GetService(typeof(T).FullName) as T;
+        }
+        public object GetService(Type tp)
+        {
+            return GetService(tp.FullName);
         }
         public void UseRouter(IRouterBuilder builder)
         {
@@ -291,12 +296,11 @@ namespace TemplateAction.Core
         /// <summary>
         /// 获取服务实例
         /// </summary>
-        /// <param name="serviceType"></param>
-        /// <param name="ns"></param>
+        /// <param name="key"></param>
         /// <returns></returns>
-        private object GetService(Type target)
+        public object GetService(string key)
         {
-            ServiceDescriptor sd = FindService(target.FullName);
+            ServiceDescriptor sd = FindService(key);
             return Des2Instance(sd);
         }
         public object CreateServiceInstance(Type serviceType)
