@@ -4,7 +4,6 @@ using TemplateAction.Core;
 using TemplateAction.Route;
 using System.Web;
 using MyAccess.WordSegment;
-using TemplateAction.Core.Extensions;
 
 namespace MainWeb
 {
@@ -13,7 +12,7 @@ namespace MainWeb
 
         protected void Application_Start(object sender, EventArgs e)
         {
-            TAEventDispatcher.Instance.RegisterLoadBefore(app =>
+            TAEventDispatcher.Instance.RegisterLoadBefore<TASiteApplication>(app =>
             {
                 //设置路由
                 app.UseRouterBuilder(new RouterBuilder().UsePlugin().UseDefault("TestService"));

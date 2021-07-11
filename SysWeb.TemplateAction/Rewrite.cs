@@ -4,7 +4,6 @@ using TemplateAction.Core;
 using TemplateAction.Common;
 using System.Configuration;
 using TemplateAction.Core.Dispatcher;
-using TemplateAction.Core.Extensions;
 
 namespace SysWeb.TemplateAction
 {
@@ -69,7 +68,7 @@ namespace SysWeb.TemplateAction
                     application.CompleteRequest();
                     return;
                 }
-                if (builder.CreateAsync())
+                if (builder.Async != null)
                 {
                     context.Items["Async"] = builder;
                     return;

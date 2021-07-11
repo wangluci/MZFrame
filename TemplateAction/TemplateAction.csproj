@@ -77,6 +77,7 @@
     <Compile Include="Cache\HashedWheelBucket.cs" />
     <Compile Include="Cache\HashedWheelTimeout.cs" />
     <Compile Include="Cache\HashedWheelTimer.cs" />
+    <Compile Include="Cache\UnionOrDependency.cs" />
     <Compile Include="Cache\TimedAwaiter.cs" />
     <Compile Include="Cache\TimeDependency.cs" />
     <Compile Include="Cache\IWheelTimeout.cs" />
@@ -106,6 +107,7 @@
     <Compile Include="Core\Dispatcher\EndSessionEvent.cs" />
     <Compile Include="Core\Dispatcher\IDispatcher.cs" />
     <Compile Include="Core\Dispatcher\IEventDispatcher.cs" />
+    <Compile Include="Core\Dispatcher\IEventRegister.cs" />
     <Compile Include="Core\Dispatcher\TAEventDispatcher.cs" />
     <Compile Include="Core\Dispatcher\ITAEventHandler.cs" />
     <Compile Include="Core\Dispatcher\DefaultHandler.cs" />
@@ -113,6 +115,8 @@
     <Compile Include="Cache\FileDependencyWatcher.cs" />
     <Compile Include="Cache\IDependency.cs" />
     <Compile Include="Cache\TimeOutSchedule.cs" />
+    <Compile Include="Core\Filter\IFilterMiddleware.cs" />
+    <Compile Include="Core\Filter\MvcMiddleware.cs" />
     <Compile Include="Core\Interface\IRouterCollectionBuilder.cs" />
     <Compile Include="Core\Interface\IPluginConfig.cs" />
     <Compile Include="Core\Interface\IPluginRouterBuilder.cs" />
@@ -135,8 +139,8 @@
     <Compile Include="Core\Service\SimpleStorer.cs" />
     <Compile Include="Core\Service\ConcurrentProxy.cs" />
     <Compile Include="Core\Service\ConcurrentStorer.cs" />
-    <Compile Include="Core\TAApplicationExtensions.cs" />
     <Compile Include="Core\TAObectCollectionExtensions.cs" />
+    <Compile Include="Core\TASiteApplication.cs" />
     <Compile Include="Label\SimpleTemplateContext.cs" />
     <Compile Include="Core\TAGroupCollection.cs" />
     <Compile Include="Core\TAObject.cs" />

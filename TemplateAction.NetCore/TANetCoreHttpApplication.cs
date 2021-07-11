@@ -8,7 +8,7 @@ using TemplateAction.Core;
 
 namespace TemplateAction.NetCore
 {
-    public class TANetCoreHttpApplication : TAApplication, IHttpApplication<HttpContext>
+    public class TANetCoreHttpApplication : TASiteApplication, IHttpApplication<HttpContext>
     {
         private readonly RequestDelegate _requestDelegate;
         private IApplicationBuilder _appbuilder;

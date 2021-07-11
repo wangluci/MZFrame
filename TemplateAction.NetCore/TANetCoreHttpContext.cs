@@ -33,7 +33,7 @@ namespace TemplateAction.NetCore
             _response = new TANetCoreHttpResponse(context);
             _dicItems = new Hashtable();
         }
-        public TAApplication Application
+        public TASiteApplication Application
         {
             get { return _app; }
         }

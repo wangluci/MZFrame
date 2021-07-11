@@ -536,6 +536,7 @@ namespace TemplateAction.Core
                 }
                 if (oldPlugin != null)
                 {
+                    oldPlugin.CacheDependency.NoticeChange();
                     oldPlugin.Unload();
                 }
             }

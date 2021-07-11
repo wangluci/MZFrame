@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using TemplateAction.Common;
 using TemplateAction.Core;
 using TemplateAction.Core.Dispatcher;
-using TemplateAction.Core.Extensions;
 
 namespace TemplateAction.NetCore
 {
@@ -48,7 +47,7 @@ namespace TemplateAction.NetCore
         {
             await ((TANetCoreHttpFile)file).SaveAsAsync(filename);
         }
-        public static IApplicationBuilder UseTAMvc(this IApplicationBuilder app, Action<TAApplication> init = null)
+        public static IApplicationBuilder UseTAMvc(this IApplicationBuilder app, Action<TASiteApplication> init = null)
         {
             if (init != null)
             {
@@ -78,7 +77,7 @@ namespace TemplateAction.NetCore
                             context.Response.Write("{\"Code\":-669,\"Message\":\"请先配置路由\"}");
                             return Task.CompletedTask;
                         }
-                        if (builder.CreateAsync())
+                        if (builder.Async != null)
                         {
                             return builder.StartAsync();
                         }

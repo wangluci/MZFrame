@@ -10,7 +10,6 @@ using System.Threading;
 using TemplateAction.Common;
 using TemplateAction.Core;
 using TemplateAction.Core.Dispatcher;
-using TemplateAction.Core.Extensions;
 
 namespace MyNet.TemplateAction
 {
@@ -42,8 +41,8 @@ namespace MyNet.TemplateAction
             return _sessionManager;
         }
 
-        protected TAApplication _app;
-        public TAApplication Application
+        protected TASiteApplication _app;
+        public TASiteApplication Application
         {
             get { return _app; }
         }
@@ -146,11 +145,11 @@ namespace MyNet.TemplateAction
                 return;
             }
 
-            TAEventDispatcher.Instance.RegisterLoadBefore(app =>
+            TAEventDispatcher.Instance.RegisterLoadBefore<TASiteApplication>(app =>
             {
                 OnSiteConfig(app);
             });
-            _app = new TAApplication().Init(_rootpath);
+            _app = new TASiteApplication().Init(_rootpath);
             //站点开始
             OnSiteStart();
             _sessionManager = new HttpSessionManager();
@@ -329,7 +328,7 @@ namespace MyNet.TemplateAction
                 response.End(context);
                 return;
             }
-            if (builder.CreateAsync())
+            if (builder.Async != null)
             {
                 MyNetAsyncResult asynrs = new MyNetAsyncResult(builder);
                 if (builder.Async.AsyncTimeout > 0)

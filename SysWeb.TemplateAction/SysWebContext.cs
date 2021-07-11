@@ -46,7 +46,7 @@ namespace SysWeb.TemplateAction
         }
 
 
-        public TAApplication Application
+        public TASiteApplication Application
         {
             get
             {

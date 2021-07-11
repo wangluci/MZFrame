@@ -10,9 +10,9 @@ namespace SysWeb.TemplateAction
     /// </summary>
     public class SysWebApplication
     {
-        private volatile static TAApplication _app = null;
+        private volatile static TASiteApplication _app = null;
         private static readonly object lockobj = new object();
-        public static TAApplication GetInstance(HttpContext context)
+        public static TASiteApplication GetInstance(HttpContext context)
         {
             if (_app == null)
             {
@@ -20,7 +20,7 @@ namespace SysWeb.TemplateAction
                 {
                     if (_app == null)
                     {
-                        _app = new TAApplication().Init(context.Server.MapPath("~"));
+                        _app = new TASiteApplication().Init(context.Server.MapPath("~"));
                     }
                 }
             }

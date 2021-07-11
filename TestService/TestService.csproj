@@ -9,6 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Home\index.my.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Home\index.my.html" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MyAccess\MyAccess.csproj" />
     <ProjectReference Include="..\TemplateAction\TemplateAction.csproj" />
   </ItemGroup>

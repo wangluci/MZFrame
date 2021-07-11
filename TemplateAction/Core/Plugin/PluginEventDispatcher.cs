@@ -27,11 +27,11 @@ namespace TemplateAction.Core
                 }
             }
         }
-        public override void RegisterLoadAfter(Action<TAApplication> ac)
+        public override void RegisterLoadAfter<T>(Action<T> ac)
         {
-            Register<TAApplication, DefaultHandler<TAApplication>>(TAEventDispatcher.AFTER_EVENT, new DefaultHandler<TAApplication>(ac));
+            Register<T, DefaultHandler<T>>(TAEventDispatcher.AFTER_EVENT, new DefaultHandler<T>(ac));
         }
-        public override void DispathLoadAfter(TAApplication app)
+        public override void DispathLoadAfter<T>(T app)
         {
             Dispatch(TAEventDispatcher.AFTER_EVENT, app);
         }

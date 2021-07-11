@@ -13,7 +13,7 @@ namespace TemplateAction.Core
         /// 获取当前的应用程序，包含模板和插件
         /// </summary>
         /// <returns></returns>
-        TAApplication Application { get; }
+        TASiteApplication Application { get; }
         /// <summary>
         ///  HTTP 请求过程中数据共享
         /// </summary>

@@ -3,6 +3,6 @@ namespace TemplateAction.Core
 {
     internal interface IEventDispatcher : IDispatcher, IEventRegister
     {
-        void DispathLoadAfter(TAApplication app);
+        void DispathLoadAfter<T>(T app) where T : TAApplication;
     }
 }

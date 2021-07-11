@@ -12,39 +12,34 @@ namespace TemplateAction.Core
         {
             get { return _context; }
         }
-        private string _ns;
-        private string _controller;
-        private string _action;
-        private ITAObjectCollection _exparams;
-        private Type _controllerType;
-        private ActionNode _node;
+
         private AsyncAttribute _async;
         public AsyncAttribute Async
         {
             get { return _async; }
         }
-
-        public TARequestHandleBuilder(ITAContext context, string ns, string controller, string action, ITAObjectCollection exparams, Type controllerType, ActionNode node)
+        private TARequestHandle _request;
+        public TARequestHandleBuilder(PluginCollection pluginCollection, ITAContext context, string ns, string controller, string action, ITAObjectCollection exparams)
         {
+            _async = null;
             _context = context;
-            _ns = ns;
-            _controller = controller;
-            _action = action;
-            _exparams = exparams;
-            _controllerType = controllerType;
-            _node = node;
+            _request = new TARequestHandle(pluginCollection, context, ns, controller, action, exparams);
+
+
+            if (_request.ActionNode == null) return;
+            if (_request.ActionNode.Async == null) return;
+            _async = _request.ActionNode.Async;
         }
 
         /// <summary>
-        /// 开始执行异步
+        /// .net framework 异步执行
         /// </summary>
         /// <param name="res"></param>
         public void StartAsync(ITAAsyncResult res)
         {
-            if (_node.Method.ReturnType.IsAssignableFrom(typeof(Task)))
+            if (_request.ActionNode.Method.ReturnType.IsAssignableFrom(typeof(Task)))
             {
-                TARequestHandle rh = new TARequestHandle(_context, _ns, _controller, _action, _exparams);
-                Task rt = rh.Excute(_controllerType, _node) as Task;
+                Task rt = _request.Excute() as Task;
                 if (rt == null)
                 {
                     res.Completed(new V404Result(_context));
@@ -73,13 +68,15 @@ namespace TemplateAction.Core
                 });
             }
         }
-
+        /// <summary>
+        /// .net core 异步执行
+        /// </summary>
+        /// <returns></returns>
         public Task StartAsync()
         {
-            if (_node.Method.ReturnType.IsAssignableFrom(typeof(Task)))
+            if (_request.ActionNode.Method.ReturnType.IsAssignableFrom(typeof(Task)))
             {
-                TARequestHandle rh = new TARequestHandle(_context, _ns, _controller, _action, _exparams);
-                Task rt = rh.Excute(_controllerType, _node) as Task;
+                Task rt = _request.Excute() as Task;
                 if (rt != null)
                 {
                     return rt;
@@ -96,18 +93,14 @@ namespace TemplateAction.Core
                 return Task.Run(this.BuildAndExcute);
             }
         }
-        public bool CreateAsync()
-        {
-            if (_node == null) return false;
-            if (_node.Async == null) return false;
-            _async = _node.Async;
-            return true;
-        }
 
+        /// <summary>
+        /// 同步执行
+        /// </summary>
+        /// <returns></returns>
         public IResult BuildAndExcute()
         {
-            TARequestHandle rh = new TARequestHandle(_context, _ns, _controller, _action, _exparams);
-            IResult rt = rh.Excute(_controllerType, _node) as IResult;
+            IResult rt = _request.Excute() as IResult;
             if (rt == null)
             {
                 return new V404Result(_context);

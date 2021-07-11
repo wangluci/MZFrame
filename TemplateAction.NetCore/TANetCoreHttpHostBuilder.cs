@@ -10,7 +10,6 @@ using System.Reflection;
 using System.Text;
 using TemplateAction.Core;
 using TemplateAction.Core.Dispatcher;
-using TemplateAction.Core.Extensions;
 using TemplateAction.Route;
 
 namespace TemplateAction.NetCore

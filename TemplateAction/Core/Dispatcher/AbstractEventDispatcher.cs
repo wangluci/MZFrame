@@ -46,11 +46,11 @@ namespace TemplateAction.Core
 
 
         public abstract void Dispatch<T>(string key, T evt) where T : class;
-        public abstract void DispathLoadAfter(TAApplication app);
         public abstract bool IsExistHandler(string key);
         public abstract void Register<T, X>(string key, X handler)
             where T : class
             where X : ITAEventHandler<T>;
-        public abstract void RegisterLoadAfter(Action<TAApplication> ac);
+        public abstract void DispathLoadAfter<T>(T app) where T : TAApplication;
+        public abstract void RegisterLoadAfter<T>(Action<T> ac) where T : TAApplication;
     }
 }

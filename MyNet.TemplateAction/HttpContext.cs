@@ -41,7 +41,7 @@ namespace MyNet.TemplateAction
             _session = _site.GetSessionManager().CreateSession(this);
         }
 
-        public TAApplication Application
+        public TASiteApplication Application
         {
             get
             {

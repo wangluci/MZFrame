@@ -16,6 +16,6 @@ namespace TemplateAction.Core
         bool IsDefine(string key);
         ITAContext Context { get; }
         ITemplateContext TemplateContext { get; }
-        object Excute(Type controllerType, ActionNode action);
+        object Excute();
     }
 }
