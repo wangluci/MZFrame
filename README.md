@@ -53,6 +53,8 @@ ResumeML/ResumeML.sln项目为.net core使用示例
 
     不推荐用标签<loop></loop>的写法，只有在<m:def var="变量名"></m:def>才推荐
 
+
+```
 - 变量定义
 
     变量有两种写法$a和a
@@ -62,6 +64,8 @@ ResumeML/ResumeML.sln项目为.net core使用示例
     for语句有两种写法for(($a,$i) in $b)和for($a in $b)
 
     其中$a变量为集合$b的元素，$i变量为索引号,$b为集合，最后以end结尾
+```
+
     
     
 2.  xxxx
