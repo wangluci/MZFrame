@@ -33,6 +33,11 @@ namespace TemplateAction.Core
         /// 插件目录
         /// </summary>
         protected string _pluginPath;
+        public string PluginPath
+        {
+            get { return _pluginPath; }
+            internal set { _pluginPath = value; }
+        }
         public IServiceCollection Services
         {
             get { return _plugins.Services; }
@@ -73,22 +78,7 @@ namespace TemplateAction.Core
             }
         }
 
-        /// <summary>
-        /// 创建实例并自动创建引用的参数实例
-        /// </summary>
-        /// <param name="serviceType"></param>
-        /// <returns></returns>
-        internal object CreateInstance(Type serviceType)
-        {
-            return _plugins.CreateServiceInstance(serviceType);
-        }
 
-
-        public TAApplication UsePluginPath(string path)
-        {
-            _pluginPath = path;
-            return this;
-        }
 
         /// <summary>
         /// 获取指定插件的配置文件
@@ -143,8 +133,7 @@ namespace TemplateAction.Core
         /// 初始化并加载目录下的插件
         /// </summary>
         /// <param name="rootpath"></param>
-        /// <returns></returns>
-        public TAApplication Init(string rootpath)
+        internal void TAInit(string rootpath)
         {
             if (rootpath.Length > 0 && rootpath[rootpath.Length - 1] == Path.DirectorySeparatorChar)
             {
@@ -152,12 +141,12 @@ namespace TemplateAction.Core
             }
             if (_loaded == 1)
             {
-                return this;
+                return;
             }
             int orists = Interlocked.CompareExchange(ref _loaded, 1, 0);
             if (orists != 0)
             {
-                return this;
+                return;
             }
             //初始化根目录
             _rootPath = rootpath;
@@ -204,7 +193,7 @@ namespace TemplateAction.Core
 
             _timer = new Timer(new TimerCallback(OnWatchedFileChange),
                              null, Timeout.Infinite, Timeout.Infinite);
-            return this;
+            return;
         }
 
         #region 插件监听代码

@@ -34,7 +34,7 @@ namespace TemplateAction.Core
         /// <returns></returns>
         public string ModuleToString(string module, string node)
         {
-            TAApplication tdata = mHandle.Context.Application;
+            TASiteApplication tdata = mHandle.Context.Application;
             string zPath = "/" + mHandle.NameSpace + "/" + module + "/" + node + TAUtility.FILE_EXT;
             string realpath = TemplateApp.Instance.Relative2TemplatePath(zPath);
             TemplateDocument indexTemp = TemplateApp.Instance.LoadViewPage(realpath);
