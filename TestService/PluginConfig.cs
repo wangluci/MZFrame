@@ -5,10 +5,8 @@ namespace TestService
 {
     public class PluginConfig : IPluginConfig
     {
-        public void Configure(IServiceCollection services, IEventRegister register)
-        {   
-            //新增一个事件监听
-            register.AddListener(new TestListener());
+        public void Configure(IServiceCollection services)
+        {
             //注册一个事件分发
             services.AddSingleton<ITestListener>((object[] arguments) =>
             {
@@ -16,8 +14,13 @@ namespace TestService
             });
             //添加身份验证
             services.AddSingleton<AuthMiddleware>();
+            //添加监听实例
+            services.AddSingleton<TestListener>();
         }
-        public void Loaded(ITAApplication app) { }
+        public void Loaded(ITAApplication app, IEventRegister register) {
+            //新增一个事件监听
+            register.AddListener(app.ServiceProvider.GetService<TestListener>());
+        }
         public void Unload() { }
     }
 }
