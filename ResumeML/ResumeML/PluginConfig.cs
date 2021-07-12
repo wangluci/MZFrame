@@ -1,7 +1,4 @@
 ﻿using ResumeML.Business;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using TemplateAction.Core;
 
 namespace ResumeML
@@ -15,6 +12,7 @@ namespace ResumeML
                 return MyAccess.Aop.InterceptFactory.CreateBLL(typeof(TestBusiness), arguments);
             });
         }
+        public void Loaded(ITAApplication app) { }
         public void Unload() { }
     }
 }
