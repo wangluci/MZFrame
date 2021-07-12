@@ -19,16 +19,14 @@ namespace TemplateAction.Core
         {
             get { return _readAssetsFromPlugin; }
         }
-        /// <summary>
-        /// Action拦截器中间件列表
-        /// </summary>
-        private LinkedList<IFilterMiddleware> _filters = new LinkedList<IFilterMiddleware>();
-        internal LinkedList<IFilterMiddleware> Filters
+        private FilterCenter _filterCenter;
+        internal FilterCenter Filters
         {
-            get { return _filters; }
+            get { return _filterCenter; }
         }
         public TASiteApplication()
         {
+            _filterCenter = new FilterCenter();
             _readAssetsFromPlugin = true;
         }
         /// <summary>
@@ -41,27 +39,31 @@ namespace TemplateAction.Core
             return _plugins.CreateServiceInstance(serviceType);
         }
         /// <summary>
-        /// 使用指定中间件
+        /// 使用指定中间件，需要先AddSingle注册
         /// </summary>
-        /// <param name="middleware"></param>
+        /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public TASiteApplication UseFilterMiddleware(IFilterMiddleware middleware)
-        {
-            _filters.AddFirst(middleware);
-            return this;
-        }
         public TASiteApplication UseFilterMiddleware<T>() where T : class, IFilterMiddleware
         {
-            UseFilterMiddleware(ServiceProvider.GetService<T>());
+            UseFilterMiddleware(typeof(T).FullName);
             return this;
         }
+        /// <summary>
+        /// 使用指定中间件，需要先AddSingle注册
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public TASiteApplication UseFilterMiddleware(string key)
         {
-            IFilterMiddleware filter = ServiceProvider.GetService(key) as IFilterMiddleware;
-            if (filter != null)
-            {
-                UseFilterMiddleware(filter);
-            }
+            _filterCenter.AddFirst(new PluginMiddleware(key));
+            return this;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public TASiteApplication ClearFilter()
+        {
             return this;
         }
         /// <summary>
@@ -161,8 +163,6 @@ namespace TemplateAction.Core
         }
         protected override void BeforeInit()
         {
-            //添加Mvc中间件
-            _filters.AddLast(new MvcMiddleware());
             //激活配置文件
             TAEventDispatcher.Instance.DispathLoadBefore(this);
         }

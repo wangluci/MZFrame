@@ -7,7 +7,7 @@ namespace TemplateAction.Core
     public class MvcMiddleware : IFilterMiddleware
     {
         protected const string CONTROLLER_PRE = "CONTR_STORE_";
-        public object Excute(TARequestHandle request, IFilterMiddleware next)
+        public object Excute(TARequestHandle request, FilterMiddlewareNode next)
         {
             if (request.ControllerType == null) return null;
             if (request.ActionNode == null) return null;
