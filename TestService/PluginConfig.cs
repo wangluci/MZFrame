@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using TemplateAction.Core;
 
 namespace TestService
@@ -15,7 +14,10 @@ namespace TestService
             {
                 return MyAccess.Aop.InterceptFactory.CreateDispatcher<ITestListener>(TAEventDispatcher.Instance.Dispatch);
             });
+            //添加身份验证
+            services.AddSingleton<AuthMiddleware>();
         }
+        public void Loaded(ITAApplication app) { }
         public void Unload() { }
     }
 }
