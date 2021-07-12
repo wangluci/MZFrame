@@ -111,7 +111,7 @@ namespace TemplateAction.Core
         /// <param name="plg"></param>
         protected virtual void AfterPluginChanged(PluginObject plg)
         {
-            plg.Config.Loaded(this);
+            plg.Config.Loaded(this, plg.Dispatcher);
         }
         /// <summary>
         /// 初始化前
@@ -129,7 +129,7 @@ namespace TemplateAction.Core
             //执行加载完成事件
             foreach(PluginObject plg in plglist)
             {
-                plg.Config.Loaded(this);
+                plg.Config.Loaded(this, plg.Dispatcher);
             }
         }
         /// <summary>

@@ -94,7 +94,7 @@ namespace TemplateAction.Core
                         pluginObj._config = Activator.CreateInstance(t) as IPluginConfig;
                         if (pluginObj._config != null)
                         {
-                            pluginObj._config.Configure(pluginObj._services, pluginObj._dispatcher);
+                            pluginObj._config.Configure(pluginObj._services);
                         }
                     }
                 }

@@ -10,13 +10,13 @@
         /// 注册插件的服务和事件
         /// </summary>
         /// <param name="services"></param>
-        /// <param name="register"></param>
-        void Configure(IServiceCollection services, IEventRegister register);
+        void Configure(IServiceCollection services);
         /// <summary>
         /// 插件加载完成后调用
         /// </summary>
         /// <param name="app"></param>
-        void Loaded(ITAApplication app);
+        /// <param name="register"></param>
+        void Loaded(ITAApplication app, IEventRegister register);
         /// <summary>
         /// 插件御载处理
         /// </summary>
