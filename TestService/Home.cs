@@ -10,5 +10,9 @@ namespace TestService
         {
             return View();
         }
+        public TextResult Test()
+        {
+            return Content("身份认证例子");
+        }
     }
 }
