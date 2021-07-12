@@ -106,7 +106,6 @@
     <Compile Include="Core\Dispatcher\DefaultMultiHandler.cs" />
     <Compile Include="Core\Dispatcher\EndSessionEvent.cs" />
     <Compile Include="Core\Dispatcher\IDispatcher.cs" />
-    <Compile Include="Core\Dispatcher\IEventDispatcher.cs" />
     <Compile Include="Core\Dispatcher\IEventRegister.cs" />
     <Compile Include="Core\Dispatcher\TAEventDispatcher.cs" />
     <Compile Include="Core\Dispatcher\ITAEventHandler.cs" />
@@ -115,8 +114,11 @@
     <Compile Include="Cache\FileDependencyWatcher.cs" />
     <Compile Include="Cache\IDependency.cs" />
     <Compile Include="Cache\TimeOutSchedule.cs" />
+    <Compile Include="Core\Filter\FilterCenter.cs" />
+    <Compile Include="Core\Filter\FilterMiddlewareNode.cs" />
     <Compile Include="Core\Filter\IFilterMiddleware.cs" />
     <Compile Include="Core\Filter\MvcMiddleware.cs" />
+    <Compile Include="Core\Filter\PluginMiddleware.cs" />
     <Compile Include="Core\Interface\IRouterCollectionBuilder.cs" />
     <Compile Include="Core\Interface\IPluginConfig.cs" />
     <Compile Include="Core\Interface\IPluginRouterBuilder.cs" />
@@ -129,6 +131,7 @@
     <Compile Include="Core\Interface\ITAServices.cs" />
     <Compile Include="Core\Interface\ITARequest.cs" />
     <Compile Include="Core\Interface\ITAResponse.cs" />
+    <Compile Include="Core\ITAApplication.cs" />
     <Compile Include="Core\ITAObjectCollection.cs" />
     <Compile Include="Core\Plugin\PluginEventDispatcher.cs" />
     <Compile Include="Core\Result\GifResult.cs" />
@@ -139,6 +142,7 @@
     <Compile Include="Core\Service\SimpleStorer.cs" />
     <Compile Include="Core\Service\ConcurrentProxy.cs" />
     <Compile Include="Core\Service\ConcurrentStorer.cs" />
+    <Compile Include="Core\TAApplicationExtensions.cs" />
     <Compile Include="Core\TAObectCollectionExtensions.cs" />
     <Compile Include="Core\TASiteApplication.cs" />
     <Compile Include="Label\SimpleTemplateContext.cs" />
