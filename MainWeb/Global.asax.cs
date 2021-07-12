@@ -16,6 +16,8 @@ namespace MainWeb
             {
                 //设置路由
                 app.UseRouterBuilder(new RouterBuilder().UsePlugin().UseDefault("TestService"));
+                //使用身份认证
+                app.UseFilterMiddleware("TestService.AuthMiddleware");
             });
             MyAccess.log4net.Config.XmlConfigurator.ConfigureAndWatch(new FileInfo(Server.MapPath("log4net.config")));
         }
