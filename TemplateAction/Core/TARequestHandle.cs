@@ -79,10 +79,7 @@ namespace TemplateAction.Core
         /// <returns></returns>
         public object Excute()
         {
-            LinkedList<IFilterMiddleware> filters = mContext.Application.Filters;
-            LinkedListNode<IFilterMiddleware> node = filters.First;
-            IFilterMiddleware nextMiddleware = node.Next == null ? null : node.Next.Value;
-            return node.Value.Excute(this, nextMiddleware);
+            return mContext.Application.Filters.Excute(this);
         }
         /// <summary>
         /// 模板Include语法调用

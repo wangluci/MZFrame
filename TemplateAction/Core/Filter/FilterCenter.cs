@@ -21,6 +21,10 @@ namespace TemplateAction.Core
                 _first = nextnode;
             }
         }
+        public object Excute(TARequestHandle request)
+        {
+            return _first.Excute(request);
+        }
         public void AddFirst(IFilterMiddleware filter)
         {
             FilterMiddlewareNode node = new FilterMiddlewareNode(filter);
