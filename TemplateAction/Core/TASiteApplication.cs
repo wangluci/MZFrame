@@ -64,6 +64,7 @@ namespace TemplateAction.Core
         /// <returns></returns>
         public TASiteApplication ClearFilter()
         {
+            _filterCenter.Clear();
             return this;
         }
         /// <summary>
@@ -71,7 +72,7 @@ namespace TemplateAction.Core
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public TARequestHandleBuilder UseRoute(ITAContext context)
+        public TARequestHandleBuilder Route(ITAContext context)
         {
             IDictionary<string, object> dict = _plugins.Route(context);
             if (!Equals(dict, null))
@@ -159,7 +160,7 @@ namespace TemplateAction.Core
             {
                 UpdateDocument(plg);
             }
-            plg.Dispatcher.DispathLoadAfter(this);
+            base.AfterPluginChanged(plg);
         }
         protected override void BeforeInit()
         {
@@ -172,8 +173,7 @@ namespace TemplateAction.Core
             {
                 UpdateDocument(plg);
             }
-            //执行加载完成事件
-            TAEventDispatcher.Instance.DispathLoadAfter(this);
+            base.AfterInit(plglist);
         }
         /// <summary>
         /// 更新模块资源

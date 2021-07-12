@@ -27,14 +27,6 @@ namespace TemplateAction.Core
                 }
             }
         }
-        public override void RegisterLoadAfter<T>(Action<T> ac)
-        {
-            Register<T, DefaultHandler<T>>(TAEventDispatcher.AFTER_EVENT, new DefaultHandler<T>(ac));
-        }
-        public override void DispathLoadAfter<T>(T app)
-        {
-            Dispatch(TAEventDispatcher.AFTER_EVENT, app);
-        }
 
         public override bool IsExistHandler(string key)
         {

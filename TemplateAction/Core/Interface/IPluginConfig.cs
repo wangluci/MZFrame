@@ -13,6 +13,11 @@
         /// <param name="register"></param>
         void Configure(IServiceCollection services, IEventRegister register);
         /// <summary>
+        /// 插件加载完成后调用
+        /// </summary>
+        /// <param name="app"></param>
+        void Loaded(ITAApplication app);
+        /// <summary>
         /// 插件御载处理
         /// </summary>
         void Unload();

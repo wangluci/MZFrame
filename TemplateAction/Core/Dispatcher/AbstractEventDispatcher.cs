@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace TemplateAction.Core
 {
-    public abstract class AbstractEventDispatcher : IEventDispatcher
+    public abstract class AbstractEventDispatcher : IDispatcher, IEventRegister
     {
         private void PriAddListener(Type interfacetype, object listener)
         {
@@ -50,7 +50,5 @@ namespace TemplateAction.Core
         public abstract void Register<T, X>(string key, X handler)
             where T : class
             where X : ITAEventHandler<T>;
-        public abstract void DispathLoadAfter<T>(T app) where T : TAApplication;
-        public abstract void RegisterLoadAfter<T>(Action<T> ac) where T : TAApplication;
     }
 }

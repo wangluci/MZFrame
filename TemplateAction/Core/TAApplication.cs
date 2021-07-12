@@ -9,7 +9,7 @@ namespace TemplateAction.Core
     /// <summary>
     /// 加载所有的插件
     /// </summary>
-    public class TAApplication : IDisposable
+    public class TAApplication : IDisposable, ITAApplication
     {
         protected bool _disposed = false;
         protected int _loaded = 0;
@@ -111,7 +111,7 @@ namespace TemplateAction.Core
         /// <param name="plg"></param>
         protected virtual void AfterPluginChanged(PluginObject plg)
         {
-            plg.Dispatcher.DispathLoadAfter(this);
+            plg.Config.Loaded(this);
         }
         /// <summary>
         /// 初始化前
@@ -127,7 +127,10 @@ namespace TemplateAction.Core
         protected virtual void AfterInit(List<PluginObject> plglist)
         {
             //执行加载完成事件
-            TAEventDispatcher.Instance.DispathLoadAfter(this);
+            foreach(PluginObject plg in plglist)
+            {
+                plg.Config.Loaded(this);
+            }
         }
         /// <summary>
         /// 初始化并加载目录下的插件

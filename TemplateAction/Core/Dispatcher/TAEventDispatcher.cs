@@ -67,18 +67,12 @@ namespace TemplateAction.Core
         {
             Register<T, DefaultMultiHandler<T>>(typeof(T).ToString(), handler);
         }
-        public override void RegisterLoadAfter<T>(Action<T> ac)
-        {
-            Register<T, DefaultHandler<T>>(AFTER_EVENT, new DefaultHandler<T>(ac));
-        }
+
         public void RegisterLoadBefore<T>(Action<T> ac) where T : TAApplication
         {
             Register<T, DefaultHandler<T>>(BEFORE_EVENT, new DefaultHandler<T>(ac));
         }
-        public override void DispathLoadAfter<T>(T app)
-        {
-            Dispatch(AFTER_EVENT, app);
-        }
+ 
         public void DispathLoadBefore<T>(T app) where T: TAApplication
         {
             Dispatch(BEFORE_EVENT, app);
