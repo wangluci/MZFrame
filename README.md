@@ -58,12 +58,41 @@ ResumeML/ResumeML.sln项目为.net core使用示例
 - 变量定义
 
     变量有两种写法$a和a
+
+- 变量输出
+    
+    @=a可不进行html编码，直接输出
+
+    @a输出经过html编码的字符串
+
     
 - 循环语句for
 
     for语句有两种写法for(($a,$i) in $b)和for($a in $b)
 
     其中$a变量为集合$b的元素，$i变量为索引号,$b为集合，最后以end结尾
+
+- 条件语句if、else if、else
+
+    示例：  
+    @if(条件)  
+    语句  
+    @else if(条件)  
+    语句  
+    @else  
+    语句  
+    @end  
+    条件语句最后以end结尾
+
+- 条件循环语句while
+
+    指定条件正确则循环，以end结尾
+
+- 中断语句break
+
+    在有end结尾的语句中都可以使用break提前中断执行
+
+
 ```
 
     
