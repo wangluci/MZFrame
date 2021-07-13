@@ -65,6 +65,14 @@ ResumeML/ResumeML.sln项目为.net core使用示例
 
     @a输出经过html编码的字符串
 
+- 函数定义
+
+    函数分为系统函数与自定义函数。  
+    系统函数为TemplateAction.Label.TempFuns中定义好的函数  
+    自定义函数为通过SetGlobal设置的函数
+
+    调用方法：@函数名(参数名)
+
     
 - 循环语句for
 
