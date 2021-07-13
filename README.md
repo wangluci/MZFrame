@@ -105,7 +105,7 @@ ResumeML/ResumeML.sln项目为.net core使用示例
 
     
     
-2.  xxxx
+2.  模块化说明
 3.  xxxx
 
 #### 参与贡献
