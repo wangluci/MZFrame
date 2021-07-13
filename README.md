@@ -51,7 +51,7 @@ ResumeML/ResumeML.sln项目为.net core使用示例
 
     视图代码应该用@{代码}或直接@代码然后换行的方式，
 
-    不推荐用标签<loop></loop>的写法，只有在<m:def var="变量名"></m:def>才推荐
+    不推荐用标签<loop></loop>的写法，只有在使用<m:def var="变量名"></m:def>定义变量时才推荐
 
 
 ```
