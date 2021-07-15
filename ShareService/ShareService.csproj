@@ -1,24 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <OutputPath>bin\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Home\index.my.html" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Home\index.my.html" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\MyAccess\MyAccess.csproj" />
-    <ProjectReference Include="..\ShareService\ShareService.csproj" />
     <ProjectReference Include="..\TemplateAction\TemplateAction.csproj" />
   </ItemGroup>
 

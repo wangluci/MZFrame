@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using System.Reflection;
 using TemplateAction.Label;
 
 namespace TemplateAction.Core
@@ -11,6 +12,10 @@ namespace TemplateAction.Core
     /// </summary>
     public class TAApplication : IDisposable, ITAApplication
     {
+        /// <summary>
+        /// 模块后缀名
+        /// </summary>
+        public const string ModExt = ".dll";
         protected bool _disposed = false;
         protected int _loaded = 0;
         /// <summary>
@@ -55,8 +60,28 @@ namespace TemplateAction.Core
         {
             _plugins = new PluginCollection();
             _pluginsnode = TAEventDispatcher.Instance.AddScope(_plugins);
+            AppDomain.CurrentDomain.AssemblyResolve += (sender, e) => LoadEmbeddedAssembly(e.Name);
         }
-
+        /// <summary>
+        /// 模块引用其它模块时调用
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        private Assembly LoadEmbeddedAssembly(string name)
+        {
+            string[] tarr = name.Split(',');
+            PluginObject plg = _plugins.GetPlugin(tarr[0].ToLower());
+            if (plg == null)
+            {
+                string filepath = _rootPath + Path.DirectorySeparatorChar + name + ModExt;
+                plg = _plugins.LoadPlugin(filepath);
+                if (plg != null)
+                {
+                    AfterPluginChanged(plg);
+                }
+            }
+            return plg.TargetAssembly;
+        }
         /// <summary>
         /// 显示释放对象资源
         /// </summary>
@@ -127,7 +152,7 @@ namespace TemplateAction.Core
         protected virtual void AfterInit(List<PluginObject> plglist)
         {
             //执行加载完成事件
-            foreach(PluginObject plg in plglist)
+            foreach (PluginObject plg in plglist)
             {
                 plg.Config.Loaded(this, plg.Dispatcher);
             }
@@ -169,12 +194,16 @@ namespace TemplateAction.Core
                 FileInfo[] tmodfiles = info.GetFiles();
                 foreach (FileInfo fi in tmodfiles)
                 {
-                    if (".dll".Equals(fi.Extension, StringComparison.OrdinalIgnoreCase))
+                    if (ModExt.Equals(fi.Extension, StringComparison.OrdinalIgnoreCase))
                     {
-                        PluginObject plg = _plugins.LoadPlugin(fi.FullName);
-                        if (plg != null)
+                        string filename = Path.GetFileName(fi.FullName);
+                        if (_plugins.GetPlugin(filename.ToLower()) == null)
                         {
-                            tmpPlugins.Add(plg);
+                            PluginObject plg = _plugins.LoadPlugin(fi.FullName);
+                            if (plg != null)
+                            {
+                                tmpPlugins.Add(plg);
+                            }
                         }
                     }
                 }
@@ -187,7 +216,7 @@ namespace TemplateAction.Core
 
             //开启监控插件更改
             _watcher = new FileSystemWatcher();
-            _watcher.Filter = "*.dll";
+            _watcher.Filter = "*"+ ModExt;
             _watcher.NotifyFilter = NotifyFilters.LastWrite;
             _watcher.Path = _pluginPath;
             _watcher.EnableRaisingEvents = true;
