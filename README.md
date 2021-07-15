@@ -36,7 +36,7 @@ TemplateAction.Route目录为mvc框架的路由模块
 
 TestService目录为mainweb测试项目的一个模块
 
-
+ShareService目录为共享模块目录，这个模块的类可以让其它模块直接引用
 
 #### 安装教程
 需要至少vs2019打开,
@@ -48,6 +48,8 @@ ResumeML/ResumeML.sln项目为.net core使用示例
 #### 使用说明
 
 1.  MVC视图语法说明
+
+    框架自动识别继承自TABaseController的控制器，其中模块名代表namespace，类名代表controller，方法名代表action。
 
     视图代码应该用@{代码}或直接@代码然后换行的方式，
 
@@ -106,7 +108,18 @@ ResumeML/ResumeML.sln项目为.net core使用示例
     
     
 2.  模块化说明
-3.  xxxx
+
+- 模块定义  
+    每个模块下面要定义一个继承自IPluginConfig的类。  
+    类中的void Configure(IServiceCollection services)方法里注册要给其它模块使用的实例。  
+    类中的void Loaded(ITAApplication app, IEventRegister register)方法为模块初始化并加载完成后调用。  
+    在热更新模块时旧的模块Unload方法会被调用，新的模块Loaded方法被调用。  
+
+- 模块使用  
+    本框架只支持通过构造函数的方式注入
+
+
+    
 
 #### 参与贡献
 
