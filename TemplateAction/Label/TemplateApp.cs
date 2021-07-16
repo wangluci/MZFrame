@@ -72,8 +72,8 @@ namespace TemplateAction.Label
         /// <returns></returns>
         public TemplateDocument LoadViewPage(string path)
         {
-            path = path.ToLower();
-            TemplateDocument filedoc = _pool.Get(path) as TemplateDocument;
+            string lowpath = path.ToLower();
+            TemplateDocument filedoc = _pool.Get(lowpath) as TemplateDocument;
             if (Equals(filedoc, null))
             {
                 string filecont;
@@ -81,10 +81,10 @@ namespace TemplateAction.Label
                 if (err == 0)
                 {
                     filedoc = new TemplateDocument(filecont);
-                    FileDependency filedep = _watcher.CreateFileDependency(path);
+                    FileDependency filedep = _watcher.CreateFileDependency(lowpath);
                     if (filedep != null)
                     {
-                        _pool.Insert(path, filedoc, filedep);
+                        _pool.Insert(lowpath, filedoc, filedep);
                     }
                 }
                 else

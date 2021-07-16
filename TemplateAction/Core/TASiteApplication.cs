@@ -107,9 +107,6 @@ namespace TemplateAction.Core
         }
         public TARequestHandleBuilder CreateTARequestHandleBuilder(ITAContext context, string ns, string controller, string action, ITAObjectCollection ext = null)
         {
-            ns = ns.ToLower();
-            controller = controller.ToLower();
-            action = action.ToLower();
             return new TARequestHandleBuilder(_plugins, context, ns, controller, action, ext);
         }
         /// <summary>
