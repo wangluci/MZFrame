@@ -320,7 +320,7 @@ namespace MyNet.TemplateAction
 
             HttpContext httpcontext = new HttpContext(context, request, response, this);
             TAEventDispatcher.Instance.Dispatch(new ContextCreatedEvent(httpcontext));
-            TARequestHandleBuilder builder = _app.UseRoute(httpcontext);
+            TARequestHandleBuilder builder = _app.Route(httpcontext);
             if (builder == null)
             {
                 response.ContentType = "application/json";

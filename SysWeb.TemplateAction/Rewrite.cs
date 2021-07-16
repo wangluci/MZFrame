@@ -60,7 +60,7 @@ namespace SysWeb.TemplateAction
 
                 SysWebContext syscontext = new SysWebContext(context);
                 TAEventDispatcher.Instance.Dispatch(new ContextCreatedEvent(syscontext));
-                TARequestHandleBuilder builder = syscontext.Application.UseRoute(syscontext);
+                TARequestHandleBuilder builder = syscontext.Application.Route(syscontext);
                 if (builder == null)
                 {
                     application.Response.ContentType = "application/json";

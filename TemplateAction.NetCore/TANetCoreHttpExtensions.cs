@@ -70,7 +70,7 @@ namespace TemplateAction.NetCore
                         }
 
                         TANetCoreHttpContext tacontext = new TANetCoreHttpContext(taapp, context);
-                        TARequestHandleBuilder builder = tacontext.Application.UseRoute(tacontext);
+                        TARequestHandleBuilder builder = tacontext.Application.Route(tacontext);
                         if (builder == null)
                         {
                             context.Response.ContentType = "application/json";
