@@ -30,7 +30,7 @@ namespace TemplateAction.Core
         public Node GetChildNode(string key)
         {
             Node rtVal = null;
-            if (mChildrens.TryGetValue(key, out rtVal))
+            if (mChildrens.TryGetValue(key.ToLower(), out rtVal))
             {
                 return rtVal;
             }
@@ -38,7 +38,7 @@ namespace TemplateAction.Core
         }
         public void AddChildNode(string key, Node n)
         {
-            mChildrens[key] = n;
+            mChildrens[key.ToLower()] = n;
         }
     }
 }

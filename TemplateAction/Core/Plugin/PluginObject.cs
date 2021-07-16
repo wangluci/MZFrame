@@ -73,7 +73,7 @@ namespace TemplateAction.Core
             pluginObj._dispatcher = new PluginEventDispatcher();
             string myControllerName = typeof(IController).FullName;
             string myPluginConfigName = typeof(IPluginConfig).FullName;
-            pluginObj.mName = assembly.GetName().Name.ToLower();
+            pluginObj.mName = assembly.GetName().Name;
             pluginObj._services = new ServiceCollection(pluginObj.mName);
             pluginObj.mVersion = assembly.GetName().Version;
             Type[] exports = assembly.GetExportedTypes();
@@ -86,7 +86,7 @@ namespace TemplateAction.Core
                     {
                         //获取插件的控制器节点数据
                         ControllerNode n = new ControllerNode(pluginObj, t);
-                        pluginObj.mControllerList[n.Key] = n;
+                        pluginObj.mControllerList[n.Key.ToLower()] = n;
                     }
                     else if (t.GetInterface(myPluginConfigName) != null)
                     {
@@ -126,26 +126,11 @@ namespace TemplateAction.Core
         {
             return mControllerList.ContainsKey(key);
         }
-        /// <summary>
-        /// 获取指定controller
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public Type GetControllerByKey(string key)
-        {
-            ControllerNode rtVal = null;
-
-            if (mControllerList.TryGetValue(key, out rtVal))
-            {
-                return rtVal.ControllerType;
-            }
-            return null;
-        }
         public ControllerNode GetControllerNodeByKey(string controller)
         {
             ControllerNode rtVal = null;
 
-            if (mControllerList.TryGetValue(controller, out rtVal))
+            if (mControllerList.TryGetValue(controller.ToLower(), out rtVal))
             {
                 return rtVal;
             }
@@ -154,7 +139,7 @@ namespace TemplateAction.Core
         public ActionNode GetMethodByKey(string controller, string action)
         {
             ControllerNode rtVal = null;
-            if (mControllerList.TryGetValue(controller, out rtVal))
+            if (mControllerList.TryGetValue(controller.ToLower(), out rtVal))
             {
                 ActionNode an = rtVal.GetChildNode(action) as ActionNode;
                 if (an != null)

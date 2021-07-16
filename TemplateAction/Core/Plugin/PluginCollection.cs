@@ -64,7 +64,7 @@ namespace TemplateAction.Core
 
             return list as List<T>;
         }
- 
+
         public T GetService<T>() where T : class
         {
             return GetService(typeof(T).FullName) as T;
@@ -427,22 +427,12 @@ namespace TemplateAction.Core
         }
 
         /// <summary>
-        /// 获取指定插件的控制器
+        /// 获取Controller节点
         /// </summary>
-        /// <param name="plugin"></param>
-        /// <param name="key"></param>
+        /// <param name="ns"></param>
+        /// <param name="controller"></param>
         /// <returns></returns>
-        public Type GetControllerByKeyInPlugin(string ns, string key)
-        {
-            PluginObject pobj = GetPlugin(ns);
-            if (pobj != null)
-            {
-                return pobj.GetControllerByKey(key);
-            }
-            return null;
-        }
-
-        public ControllerNode GetControllerNodeByKeyInPlugin(string ns, string controller)
+        public ControllerNode GetControllerByKeyInPlugin(string ns, string controller)
         {
             PluginObject pobj = GetPlugin(ns);
             if (pobj != null)
@@ -452,7 +442,14 @@ namespace TemplateAction.Core
             return null;
         }
 
-        public ActionNode GetMethodByKeyInPlugin(string controller, string action, string ns)
+        /// <summary>
+        /// 获取Action节点
+        /// </summary>
+        /// <param name="ns"></param>
+        /// <param name="controller"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public ActionNode GetMethodByKeyInPlugin(string ns, string controller, string action)
         {
             PluginObject pobj = GetPlugin(ns);
             if (pobj != null)
@@ -498,7 +495,7 @@ namespace TemplateAction.Core
             try
             {
                 PluginObject pobj = null;
-                if (mPluginList.TryGetValue(ns, out pobj))
+                if (mPluginList.TryGetValue(ns.ToLower(), out pobj))
                 {
                     return pobj;
                 }
@@ -517,7 +514,7 @@ namespace TemplateAction.Core
                 PluginObject newObj = PluginObject.Create(this, ass);
                 if (newObj != null)
                 {
-                    mPluginList[newObj.Name] = newObj;
+                    mPluginList[newObj.Name.ToLower()] = newObj;
                 }
             }
         }
@@ -531,8 +528,9 @@ namespace TemplateAction.Core
                 _lockslim.EnterWriteLock();
                 try
                 {
-                    mPluginList.TryGetValue(newObj.Name, out oldPlugin);
-                    mPluginList[newObj.Name] = newObj;
+                    string keylow = newObj.Name.ToLower();
+                    mPluginList.TryGetValue(keylow, out oldPlugin);
+                    mPluginList[keylow] = newObj;
                 }
                 finally
                 {

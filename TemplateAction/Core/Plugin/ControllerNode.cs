@@ -14,9 +14,18 @@ namespace TemplateAction.Core
         {
             get { return mType; }
         }
+        private string mPluginName;
+        /// <summary>
+        /// 所属模块名
+        /// </summary>
+        public string PluginName
+        {
+            get { return mPluginName; }
+        }
         public ControllerNode(PluginObject plugin, Type type)
         {
-            mKey = type.Name.ToLower();
+            mKey = type.Name;
+            mPluginName = plugin.Name;
             object[] attrs = type.GetCustomAttributes(typeof(DesAttribute), false);
             mType = type;
             foreach (object attrobj in attrs)

@@ -7,7 +7,7 @@ namespace TestService
     {
         public object Excute(TARequestHandle request, FilterMiddlewareNode next)
         {
-            if (request.NameSpace == "testservice" && request.Controller == "home" && request.Action == "test")
+            if (request.NameSpace == "TestService" && request.Controller == "Home" && request.Action == "Test")
             {
                 //需要身份认证
                 request.Context.Response.Write("带有身份认证\n");

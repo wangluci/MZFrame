@@ -9,15 +9,16 @@ namespace TemplateAction.Core
         protected const string CONTROLLER_PRE = "CONTR_STORE_";
         public object Excute(TARequestHandle request, FilterMiddlewareNode next)
         {
-            if (request.ControllerType == null) return null;
+            if (request.ControllerNode == null) return null;
             if (request.ActionNode == null) return null;
             ITAContext context = request.Context;
+            Type ct = request.ControllerNode.ControllerType;
             //创建控制器
-            string tmpcontrollkey = CONTROLLER_PRE + request.ControllerType.FullName;
+            string tmpcontrollkey = CONTROLLER_PRE + ct.FullName;
             IController c = context.Items[tmpcontrollkey] as IController;
             if (c == null)
             {
-                c = context.Application.CreateInstance(request.ControllerType) as IController;
+                c = context.Application.CreateInstance(ct) as IController;
                 context.Items[tmpcontrollkey] = c;
             }
             if (c == null)

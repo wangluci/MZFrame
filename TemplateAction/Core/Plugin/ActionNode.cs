@@ -81,7 +81,7 @@ namespace TemplateAction.Core
         public ActionNode(PluginObject plugin, string controller, MethodInfo method)
         {
             _allowHttpMethod = 0;
-            mKey = method.Name.ToLower();
+            mKey = method.Name;
             mMethod = method;
             bool allowget = false;
             bool allowput = false;

@@ -143,10 +143,7 @@ namespace TemplateAction.Core
             TAInit(rootpath);
             return this;
         }
-        public ControllerNode FindControllerNode(string ns, string controller)
-        {
-            return _plugins.GetControllerNodeByKeyInPlugin(ns, controller);
-        }
+
         public bool ControllerExist(string controller)
         {
             return _plugins.ContainController(controller);

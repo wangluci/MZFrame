@@ -38,10 +38,10 @@ namespace TemplateAction.Core
         {
             get { return _extparams; }
         }
-        protected Type _controllerType;
-        public Type ControllerType
+        protected ControllerNode _controllerNode;
+        public ControllerNode ControllerNode
         {
-            get { return _controllerType; }
+            get { return _controllerNode; }
         }
         protected ActionNode _node;
         public ActionNode ActionNode
@@ -54,14 +54,11 @@ namespace TemplateAction.Core
             mContext = context;
             mTemplateContext = this;
             _extparams = ext;
-            string tmpns = ns.ToLower();
-            string tmpct = controller.ToLower();
-            string tmpac = action.ToLower();
-            _controllerType = pluginCollection.GetControllerByKeyInPlugin(tmpns, tmpct);
-            _node = pluginCollection.GetMethodByKeyInPlugin(tmpct, tmpac, tmpns);
-            mNameSpace = _controllerType.Assembly.GetName().Name;
-            mController = _controllerType.Name;
-            mAction = _node.Method.Name;
+            _controllerNode = pluginCollection.GetControllerByKeyInPlugin(ns, controller);
+            _node = pluginCollection.GetMethodByKeyInPlugin(ns, controller, action);
+            mNameSpace = _controllerNode.PluginName;
+            mController = _controllerNode.Key;
+            mAction = _node.Key;
         }
         public void AddGlobal(string key, object value)
         {
