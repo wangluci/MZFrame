@@ -38,7 +38,7 @@ namespace TemplateAction.NetCore
         private KestrelServer _server;
         private bool _startedServer = false;
         private bool _stopped = false;
-        private string _webroot = "web";
+        private string _webroot = "Web";
         private string _workroot;
         private KestrelServerOptions _kestrelOptions;
         public const string WORK_PATH = "TA_WorkPath";

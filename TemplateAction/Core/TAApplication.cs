@@ -179,7 +179,7 @@ namespace TemplateAction.Core
             //初始化根目录
             _rootPath = rootpath;
             //默认插件路径
-            _pluginPath = Path.Combine(_rootPath, "plugin");
+            _pluginPath = Path.Combine(_rootPath, "Plugin");
             BeforeInit();
             //初始化模板
             TemplateApp.Instance.Init(_rootPath);
