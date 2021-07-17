@@ -323,9 +323,7 @@ namespace MyNet.TemplateAction
             TARequestHandleBuilder builder = _app.Route(httpcontext);
             if (builder == null)
             {
-                response.ContentType = "application/json";
-                response.Write("{\"Code\":-669,\"Message\":\"请先配置路由\"}");
-                response.End(context);
+                response.End404(context);
                 return;
             }
             if (builder.Async != null)

@@ -107,7 +107,13 @@ namespace TemplateAction.Core
         }
         public TARequestHandleBuilder CreateTARequestHandleBuilder(ITAContext context, string ns, string controller, string action, ITAObjectCollection ext = null)
         {
-            return new TARequestHandleBuilder(_plugins, context, ns, controller, action, ext);
+            ControllerNode controllerNode = _plugins.GetControllerByKeyInPlugin(ns, controller);
+            ActionNode node = _plugins.GetMethodByKeyInPlugin(ns, controller, action);
+            if (controllerNode == null || node == null)
+            {
+                return null;
+            }
+            return new TARequestHandleBuilder(context, controllerNode, node, ext);
         }
         /// <summary>
         /// 使用指定路由创建工厂并加载全局路由

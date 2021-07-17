@@ -19,12 +19,11 @@ namespace TemplateAction.Core
             get { return _async; }
         }
         private TARequestHandle _request;
-        public TARequestHandleBuilder(PluginCollection pluginCollection, ITAContext context, string ns, string controller, string action, ITAObjectCollection exparams)
+        public TARequestHandleBuilder(ITAContext context, ControllerNode controller, ActionNode action, ITAObjectCollection exparams)
         {
             _async = null;
             _context = context;
-            _request = new TARequestHandle(pluginCollection, context, ns, controller, action, exparams);
-
+            _request = new TARequestHandle(context, controller, action, exparams);
 
             if (_request.ActionNode == null) return;
             if (_request.ActionNode.Async == null) return;

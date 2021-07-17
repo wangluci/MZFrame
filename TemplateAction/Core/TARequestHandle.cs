@@ -49,15 +49,15 @@ namespace TemplateAction.Core
             get { return _node; }
         }
 
-        public TARequestHandle(PluginCollection pluginCollection, ITAContext context, string ns, string controller, string action, ITAObjectCollection ext)
+        public TARequestHandle(ITAContext context, ControllerNode controller, ActionNode action, ITAObjectCollection ext)
         {
             mContext = context;
             mTemplateContext = this;
             _extparams = ext;
-            _controllerNode = pluginCollection.GetControllerByKeyInPlugin(ns, controller);
-            _node = pluginCollection.GetMethodByKeyInPlugin(ns, controller, action);
-            mNameSpace = _controllerNode.PluginName;
-            mController = _controllerNode.Key;
+            _controllerNode = controller;
+            _node = action;
+            mNameSpace = controller.PluginName;
+            mController = action.Key;
             mAction = _node.Key;
         }
         public void AddGlobal(string key, object value)

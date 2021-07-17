@@ -68,24 +68,25 @@ namespace TemplateAction.NetCore
                             context.Response.Write("{\"Code\":-667,\"Message\":\"文件受限制不能访问\"}");
                             return Task.CompletedTask;
                         }
-
+                        else if (TAUtility.IsStaticFile(requestUrl))
+                        {
+                            return next(context);
+                        }
                         TANetCoreHttpContext tacontext = new TANetCoreHttpContext(taapp, context);
                         TARequestHandleBuilder builder = tacontext.Application.Route(tacontext);
-                        if (builder == null)
+                        if (builder != null)
                         {
-                            context.Response.ContentType = "application/json";
-                            context.Response.Write("{\"Code\":-669,\"Message\":\"请先配置路由\"}");
-                            return Task.CompletedTask;
+                            if (builder.Async != null)
+                            {
+                                return builder.StartAsync();
+                            }
+                            else
+                            {
+                                builder.BuildAndExcute().Output();
+                                return Task.CompletedTask;
+                            }
                         }
-                        if (builder.Async != null)
-                        {
-                            return builder.StartAsync();
-                        }
-                        else
-                        {
-                            builder.BuildAndExcute().Output();
-                            return Task.CompletedTask;
-                        }
+                  
                     }
                     return next(context);
                 };

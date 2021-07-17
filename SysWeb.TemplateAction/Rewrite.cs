@@ -61,22 +61,19 @@ namespace SysWeb.TemplateAction
                 SysWebContext syscontext = new SysWebContext(context);
                 TAEventDispatcher.Instance.Dispatch(new ContextCreatedEvent(syscontext));
                 TARequestHandleBuilder builder = syscontext.Application.Route(syscontext);
-                if (builder == null)
+                if (builder != null)
                 {
-                    application.Response.ContentType = "application/json";
-                    application.Response.Write("{\"Code\":-669,\"Message\":\"请先配置路由\"}");
-                    application.CompleteRequest();
-                    return;
+                    if (builder.Async != null)
+                    {
+                        context.Items["Async"] = builder;
+                        return;
+                    }
+                    else
+                    {
+                        builder.BuildAndExcute().Output();
+                    }
                 }
-                if (builder.Async != null)
-                {
-                    context.Items["Async"] = builder;
-                    return;
-                }
-                else
-                {
-                    builder.BuildAndExcute().Output();
-                }
+             
                 application.CompleteRequest();
             }
             catch (Exception ex)
