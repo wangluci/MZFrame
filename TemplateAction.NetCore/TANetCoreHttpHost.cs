@@ -21,6 +21,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using TemplateAction.Label;
 
 namespace TemplateAction.NetCore
 {
@@ -71,6 +72,9 @@ namespace TemplateAction.NetCore
                 Directory.CreateDirectory(webroot);
             }
             hostoptions.WebRoot = webroot;
+            //初始化模板
+            TemplateApp.Instance.Init(webroot);
+
             _hostingEnvironment.Initialize(_workroot, hostoptions);
             _servicecollection.AddSingleton<IHostingEnvironment>(_hostingEnvironment);
 

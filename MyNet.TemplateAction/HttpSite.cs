@@ -10,6 +10,7 @@ using System.Threading;
 using TemplateAction.Common;
 using TemplateAction.Core;
 using TemplateAction.Core.Dispatcher;
+using TemplateAction.Label;
 
 namespace MyNet.TemplateAction
 {
@@ -107,6 +108,7 @@ namespace MyNet.TemplateAction
             _port = port;
             _rootpath = AppDomain.CurrentDomain.BaseDirectory;
             _wwwroot = Path.Combine(_rootpath, "Web");
+            TemplateApp.Instance.Init(_wwwroot);
             //注册action监听
             TAEventDispatcher.Instance.Register(new DefaultHandler<ActionEvent>(evt =>
             {

@@ -164,6 +164,8 @@ namespace TemplateAction.Core
         }
         protected override void BeforeInit()
         {
+            //如果模板引擎未初始化，就使用默认路径初始化
+            TemplateApp.Instance.Init(_rootPath);
             //激活配置文件
             TAEventDispatcher.Instance.DispathLoadBefore(this);
         }

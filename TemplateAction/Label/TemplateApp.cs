@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using TemplateAction.Cache;
 using TemplateAction.Common;
 namespace TemplateAction.Label
@@ -24,6 +25,7 @@ namespace TemplateAction.Label
         //模板监听器
         private FileDependencyWatcher _watcher;
         private string _rootpath;
+        private int _inited = 0;
         private TemplateApp()
         {
             _pool = new CachePool();
@@ -49,6 +51,15 @@ namespace TemplateAction.Label
         /// <param name="path"></param>
         public void Init(string path)
         {
+            if (_inited == 1)
+            {
+                return;
+            }
+            int orists = Interlocked.CompareExchange(ref _inited, 1, 0);
+            if (orists != 0)
+            {
+                return;
+            }
             _rootpath = path;
             _watcher = new FileDependencyWatcher(path, "*" + TAUtility.FILE_EXT);
         }
@@ -60,7 +71,7 @@ namespace TemplateAction.Label
             _pool.Empty();
         }
         /// <summary>
-        /// 添加模板原
+        /// 添加插件模板
         /// </summary>
         /// <param name="path"></param>
         /// <param name="input"></param>

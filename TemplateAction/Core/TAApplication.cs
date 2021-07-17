@@ -181,8 +181,6 @@ namespace TemplateAction.Core
             //默认插件路径
             _pluginPath = Path.Combine(_rootPath, "Plugin");
             BeforeInit();
-            //初始化模板
-            TemplateApp.Instance.Init(_rootPath);
             //从应用程序域的程序集中初始化插件集
             _plugins.InitFromEntryAssembly();
             //加载插件
