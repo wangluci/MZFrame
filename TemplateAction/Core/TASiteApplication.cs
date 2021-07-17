@@ -203,7 +203,7 @@ namespace TemplateAction.Core
 
                     using (StreamReader sr = new StreamReader(inputStream))
                     {
-                        TemplateApp.Instance.AddViewPage(Path.Combine(_rootPath, tmpstr), sr.ReadToEnd(), plg.CacheDependency);
+                        TemplateApp.Instance.AddViewPage(tmpstr, sr.ReadToEnd(), plg.CacheDependency);
                     }
 
                 }

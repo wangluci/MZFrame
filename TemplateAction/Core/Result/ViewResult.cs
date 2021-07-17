@@ -36,8 +36,7 @@ namespace TemplateAction.Core
         {
             TASiteApplication tdata = mHandle.Context.Application;
             string zPath = "/" + mHandle.NameSpace + "/" + module + "/" + node + TAUtility.FILE_EXT;
-            string realpath = TemplateApp.Instance.Relative2TemplatePath(zPath);
-            TemplateDocument indexTemp = TemplateApp.Instance.LoadViewPage(realpath);
+            TemplateDocument indexTemp = TemplateApp.Instance.LoadViewPage(zPath);
             if (indexTemp == null)
             {
                 return "视图不存在";

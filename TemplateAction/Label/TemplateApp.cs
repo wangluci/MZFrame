@@ -36,6 +36,13 @@ namespace TemplateAction.Label
                 mSysMethods.Add(method.Name, method);
             }
         }
+        public static TemplateApp Instance
+        {
+            get
+            {
+                return _instance;
+            }
+        }
         /// <summary>
         /// 初始化模板目录
         /// </summary>
@@ -60,18 +67,19 @@ namespace TemplateAction.Label
         /// <param name="dep"></param>
         public void AddViewPage(string path, string input, FileDependency dep)
         {
-            path = path.ToLower();
+            string tmppath = Path.Combine(_rootpath, path).ToLower();
             TemplateDocument filedoc = new TemplateDocument(input);
-            _pool.Remove(path);
-            _pool.Insert(path, filedoc, new UnionOrDependency(dep, _watcher.CreateFileDependency(path)));
+            _pool.Remove(tmppath);
+            _pool.Insert(tmppath, filedoc, new UnionOrDependency(dep, _watcher.CreateFileDependency(tmppath)));
         }
         /// <summary>
         /// 加载模板原文件
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public TemplateDocument LoadViewPage(string path)
+        public TemplateDocument LoadViewPage(string relativePath)
         {
+            string path = TemplateApp.Instance.Relative2TemplatePath(relativePath);
             string lowpath = path.ToLower();
             TemplateDocument filedoc = _pool.Get(lowpath) as TemplateDocument;
             if (Equals(filedoc, null))
@@ -115,7 +123,7 @@ namespace TemplateAction.Label
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public string Relative2TemplatePath(string path)
+        private string Relative2TemplatePath(string path)
         {
             if (path == null) return string.Empty;
             int ss = 0;
@@ -146,12 +154,6 @@ namespace TemplateAction.Label
 
             return Path.Combine(_rootpath, path);
         }
-        public static TemplateApp Instance
-        {
-            get
-            {
-                return _instance;
-            }
-        }
+ 
     }
 }

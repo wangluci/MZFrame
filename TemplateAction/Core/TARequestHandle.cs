@@ -57,8 +57,8 @@ namespace TemplateAction.Core
             _controllerNode = controller;
             _node = action;
             mNameSpace = controller.PluginName;
-            mController = action.Key;
-            mAction = _node.Key;
+            mController = controller.Key;
+            mAction = action.Key;
         }
         public void AddGlobal(string key, object value)
         {
@@ -96,8 +96,7 @@ namespace TemplateAction.Core
             {
                 zPath = "/" + mNameSpace + "/" + mController + "/" + src;
             }
-            string realpath = TemplateApp.Instance.Relative2TemplatePath(zPath);
-            TemplateDocument indexTemp = TemplateApp.Instance.LoadViewPage(realpath);
+            TemplateDocument indexTemp = TemplateApp.Instance.LoadViewPage(zPath);
             if (indexTemp == null)
             {
                 return "视图不存在";
