@@ -108,11 +108,11 @@ namespace TemplateAction.Core
         public TARequestHandleBuilder CreateTARequestHandleBuilder(ITAContext context, string ns, string controller, string action, ITAObjectCollection ext = null)
         {
             ControllerNode controllerNode = _plugins.GetControllerByKeyInPlugin(ns, controller);
-            ActionNode node = _plugins.GetMethodByKeyInPlugin(ns, controller, action);
-            if (controllerNode == null || node == null)
-            {
+            if (controllerNode == null)
                 return null;
-            }
+            ActionNode node = _plugins.GetMethodByKeyInPlugin(ns, controller, action);
+            if (node == null)
+                return null;
             return new TARequestHandleBuilder(context, controllerNode, node, ext);
         }
         /// <summary>
