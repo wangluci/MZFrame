@@ -9,7 +9,7 @@ namespace TemplateAction.Core
     /// <summary>
     /// web应用程序
     /// </summary>
-    public class TASiteApplication : TAApplication
+    public class TASiteApplication : TAAbstractApplication
     {
         /// <summary>
         /// 是否从插件读取资源
@@ -146,7 +146,7 @@ namespace TemplateAction.Core
         }
         public TASiteApplication Init(string rootpath)
         {
-            TAInit(rootpath);
+            InitApplication(rootpath);
             return this;
         }
 

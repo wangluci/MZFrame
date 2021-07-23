@@ -391,7 +391,7 @@ namespace MyNet.TemplateAction
 
         protected virtual void OnSessionStart(ITASession session) { }
         protected virtual void OnSessionEnd(ITASession session) { }
-        protected virtual void OnSiteConfig(TAApplication app) { }
+        protected virtual void OnSiteConfig(TAAbstractApplication app) { }
         protected virtual void OnSiteStart() { }
         protected virtual void OnSiteStop() { }
         protected virtual void ConfigurePipelineBefore(IChannelPipeline pipeline) { }

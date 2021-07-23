@@ -15,7 +15,7 @@ namespace SysWeb.TemplateAction
         /// </summary>
         /// <param name="app"></param>
         /// <returns></returns>
-        public static TAApplication UseSession(this TAApplication app)
+        public static TASiteApplication UseSession(this TASiteApplication app)
         {
             TAEventDispatcher.Instance.Register(new DefaultHandler<ContextCreatedEvent>(evt =>
             {

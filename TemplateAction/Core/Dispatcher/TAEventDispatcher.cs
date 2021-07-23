@@ -68,12 +68,12 @@ namespace TemplateAction.Core
             Register<T, DefaultMultiHandler<T>>(typeof(T).ToString(), handler);
         }
 
-        public void RegisterLoadBefore<T>(Action<T> ac) where T : TAApplication
+        public void RegisterLoadBefore<T>(Action<T> ac) where T : TAAbstractApplication
         {
             Register<T, DefaultHandler<T>>(BEFORE_EVENT, new DefaultHandler<T>(ac));
         }
  
-        public void DispathLoadBefore<T>(T app) where T: TAApplication
+        public void DispathLoadBefore<T>(T app) where T: TAAbstractApplication
         {
             Dispatch(BEFORE_EVENT, app);
         }

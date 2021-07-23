@@ -142,7 +142,7 @@
     <Compile Include="Core\Service\SimpleStorer.cs" />
     <Compile Include="Core\Service\ConcurrentProxy.cs" />
     <Compile Include="Core\Service\ConcurrentStorer.cs" />
-    <Compile Include="Core\TAApplicationExtensions.cs" />
+    <Compile Include="Core\TAApplication.cs" />
     <Compile Include="Core\TAObectCollectionExtensions.cs" />
     <Compile Include="Core\TASiteApplication.cs" />
     <Compile Include="Label\SimpleTemplateContext.cs" />
@@ -210,7 +210,7 @@
     <Compile Include="Core\Controller\TABaseController.cs" />
     <Compile Include="Core\Result\AjaxResult.cs" />
     <Compile Include="Core\Controller\IController.cs" />
-    <Compile Include="Core\TAApplication.cs" />
+    <Compile Include="Core\TAAbstractApplication.cs" />
     <Compile Include="Label\Element\ElseLabel.cs" />
     <Compile Include="Label\Element\IfLabel.cs" />
     <Compile Include="Label\TAParams.cs" />
