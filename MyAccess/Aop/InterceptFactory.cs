@@ -11,7 +11,8 @@ namespace MyAccess.Aop
         private static ConcurrentDictionary<string, ProxyGenerator> _cacheProxyGenerator = new ConcurrentDictionary<string, ProxyGenerator>();
         public static ProxyGenerator GetProxyGenerator(Type t)
         {
-            string tfullname = t.Assembly.GetHashCode().ToString();
+            string guid = t.Assembly.ManifestModule.ModuleVersionId.ToString();
+            string tfullname = t.Assembly.GetHashCode() + guid;
             return _cacheProxyGenerator.GetOrAdd(tfullname, (string k) =>
             {
                 return new ProxyGenerator();
@@ -90,7 +91,7 @@ namespace MyAccess.Aop
         /// <typeparam name="T"></typeparam>
         /// <param name="callFun">事件触发函数</param>
         /// <returns></returns>
-        public static T CreateDispatcher<T>(Action<string,object[]> callFun) where T : class
+        public static T CreateDispatcher<T>(Action<string, object[]> callFun) where T : class
         {
             Type interfaceT = typeof(T);
             ProxyGenerator tpg = GetProxyGenerator(interfaceT);

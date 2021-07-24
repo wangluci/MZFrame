@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Runtime.Loader;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting.Server;
@@ -12,7 +16,62 @@ namespace TemplateAction.NetCore
     {
         private readonly RequestDelegate _requestDelegate;
         private IApplicationBuilder _appbuilder;
-
+        private Dictionary<string, AssemblyLoadContext> _assemblyContexts = new Dictionary<string, AssemblyLoadContext>();
+        private bool _useUnload = false;
+        /// <summary>
+        /// 是否允许释放插件内存
+        /// </summary>
+        /// <returns></returns>
+        public TANetCoreHttpApplication UseMemoryUnload()
+        {
+            if (!_useUnload)
+            {
+                _useUnload = true;
+                //监听插件卸载
+                TAEventDispatcher.Instance.RegisterPluginUnloadBefore<PluginObject>(obj =>
+                {
+                    string tkey = Assembly2Key(obj.TargetAssembly);
+                    AssemblyLoadContext asscontext;
+                    if (_assemblyContexts.TryGetValue(tkey, out asscontext))
+                    {
+                        asscontext.Unload();
+                        _assemblyContexts.Remove(tkey);
+                    }
+                });
+            }
+            return this;
+        }
+        private string Assembly2Key(Assembly assembly)
+        {
+            string guid = assembly.ManifestModule.ModuleVersionId.ToString();
+            return assembly.GetHashCode() + guid;
+        }
+        /// <summary>
+        /// 重写程序集加载
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        protected override Assembly LoadAssembly(string path)
+        {
+            AssemblyLoadContext alc = new AssemblyLoadContext(Guid.NewGuid().ToString("N"), _useUnload);
+            using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+            {
+                Assembly ass = alc.LoadFromStream(fs);
+                _assemblyContexts.Add(Assembly2Key(ass), alc);
+                return ass;
+            }
+        }
+        /// <summary>
+        /// 同步卸载指定插件
+        /// </summary>
+        /// <param name="ns"></param>
+        public void UnloadPlugin(string ns)
+        {
+            PushConcurrentTask(() =>
+            {
+                _plugins.RemovePlugin(ns);
+            });
+        }
         public TANetCoreHttpApplication(IApplicationBuilder appbuilder)
         {
             _requestDelegate = appbuilder.Build();

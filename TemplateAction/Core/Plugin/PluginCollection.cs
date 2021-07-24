@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using System.Collections.Concurrent;
+using System.IO;
+
 namespace TemplateAction.Core
 {
     /// <summary>
@@ -511,17 +513,51 @@ namespace TemplateAction.Core
             Assembly ass = Assembly.GetEntryAssembly();
             if (ass != null)
             {
-                PluginObject newObj = PluginObject.Create(this, ass);
+                PluginObject newObj = PluginObject.Create(this, ass, string.Empty);
                 if (newObj != null)
                 {
                     mPluginList[newObj.Name.ToLower()] = newObj;
                 }
             }
         }
-        public PluginObject LoadPlugin(string path)
+        /// <summary>
+        /// 移除指定插件
+        /// </summary>
+        /// <param name="ns"></param>
+        public void RemovePlugin(string ns)
         {
-            Assembly tAssembly = Assembly.Load(System.IO.File.ReadAllBytes(path));
-            PluginObject newObj = PluginObject.Create(this, tAssembly);
+            PluginObject oldPlugin;
+            _lockslim.EnterWriteLock();
+            try
+            {
+                mPluginList.TryGetValue(ns.ToLower(), out oldPlugin);
+                mPluginList.Remove(oldPlugin.Name.ToLower());
+            }
+            finally
+            {
+                _lockslim.ExitWriteLock();
+            }
+            if (oldPlugin != null)
+            {
+                oldPlugin.CacheDependency.NoticeChange();
+                oldPlugin.Unload();
+                try
+                {
+                    File.Delete(oldPlugin.PluginPath);
+                }
+                catch { }
+            }
+        }
+        /// <summary>
+        /// 创建插件
+        /// </summary>
+        /// <param name="tAssembly"></param>
+        /// <param name="filepath"></param>
+        /// <returns></returns>
+        public PluginObject CreatePlugin(Assembly tAssembly, string filepath)
+        {
+            if (tAssembly == null) return null;
+            PluginObject newObj = PluginObject.Create(this, tAssembly, filepath);
             if (newObj != null)
             {
                 PluginObject oldPlugin;

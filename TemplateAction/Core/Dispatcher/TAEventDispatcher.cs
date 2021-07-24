@@ -11,7 +11,7 @@ namespace TemplateAction.Core
         private LinkedList<IDispatcher> _scopelist = new LinkedList<IDispatcher>();
         private Dictionary<string, object> _handlers;
         public const string BEFORE_EVENT = "TA_BEFORE_LOAD";
-        public const string AFTER_EVENT = "TA_AFTER_LOAD";
+        public const string PLUGIN_UNLOAD_AFTER_EVENT = "TA_PLUGIN_UNLOAD_AFTER_EVENT";
         private class Nested
         {
             // 显式静态构造告诉C＃编译器未标记类型BeforeFieldInit
@@ -67,13 +67,39 @@ namespace TemplateAction.Core
         {
             Register<T, DefaultMultiHandler<T>>(typeof(T).ToString(), handler);
         }
-
+        /// <summary>
+        /// 监听应用加载前初始化事件
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="ac"></param>
         public void RegisterLoadBefore<T>(Action<T> ac) where T : TAAbstractApplication
         {
             Register<T, DefaultHandler<T>>(BEFORE_EVENT, new DefaultHandler<T>(ac));
         }
- 
-        public void DispathLoadBefore<T>(T app) where T: TAAbstractApplication
+        /// <summary>
+        /// 监听插件卸载后事件
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="ac"></param>
+        public void RegisterPluginUnloadBefore<T>(Action<T> ac) where T : PluginObject
+        {
+            Register<T, DefaultHandler<T>>(PLUGIN_UNLOAD_AFTER_EVENT, new DefaultHandler<T>(ac));
+        }
+        /// <summary>
+        /// 分发插件卸载后事件
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="plugin"></param>
+        internal void DispathPluginUnload<T>(T plugin) where T : PluginObject
+        {
+            Dispatch(PLUGIN_UNLOAD_AFTER_EVENT, plugin);
+        }
+        /// <summary>
+        /// 分发应用加载前初始化事件
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="app"></param>
+        internal void DispathLoadBefore<T>(T app) where T : TAAbstractApplication
         {
             Dispatch(BEFORE_EVENT, app);
         }

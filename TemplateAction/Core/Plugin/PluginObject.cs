@@ -57,11 +57,16 @@ namespace TemplateAction.Core
         {
             get { return _cacheDependency; }
         }
-        public static PluginObject Create(PluginCollection collection, Assembly assembly)
+        private string _plgPath;
+        public string PluginPath
         {
-
+            get { return _plgPath; }
+        }
+        public static PluginObject Create(PluginCollection collection, Assembly assembly, string pluginpath)
+        {
             PluginObject pluginObj = new PluginObject();
             pluginObj._assembly = assembly;
+            pluginObj._plgPath = pluginpath;
             if (collection.RouterBuilder != null)
             {
                 pluginObj._routerBuilder = collection.RouterBuilder.NewPluginBuilder();
@@ -163,6 +168,7 @@ namespace TemplateAction.Core
         /// </summary>
         public void Unload()
         {
+            TAEventDispatcher.Instance.DispathPluginUnload(this);
             if (_config != null)
             {
                 _config.Unload();

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
 using System.Reflection;
 using TemplateAction.Label;
+using TemplateAction.Cache;
 
 namespace TemplateAction.Core
 {
@@ -25,7 +27,7 @@ namespace TemplateAction.Core
         protected LinkedListNode<IDispatcher> _pluginsnode;
         //监控插件更改
         protected FileSystemWatcher _watcher;
-        protected Timer _timer = null;
+        protected HashedWheelTimer _timer = null;
         protected string _rootPath;
         /// <summary>
         /// 根目录
@@ -61,6 +63,7 @@ namespace TemplateAction.Core
             _pluginsnode = TAEventDispatcher.Instance.AddScope(_plugins);
             AppDomain.CurrentDomain.AssemblyResolve += (sender, e) => LoadEmbeddedAssembly(e.Name);
         }
+
         /// <summary>
         /// 模块引用其它模块时调用
         /// </summary>
@@ -69,14 +72,19 @@ namespace TemplateAction.Core
         private Assembly LoadEmbeddedAssembly(string name)
         {
             string[] tarr = name.Split(',');
-            PluginObject plg = _plugins.GetPlugin(tarr[0].ToLower());
+            PluginObject plg = _plugins.GetPlugin(tarr[0]);
             if (plg == null)
             {
                 string filepath = _rootPath + Path.DirectorySeparatorChar + name + ModExt;
-                plg = _plugins.LoadPlugin(filepath);
+                Assembly assem = LoadAssembly(filepath);
+                plg = _plugins.CreatePlugin(assem, filepath);
                 if (plg != null)
                 {
                     AfterPluginChanged(plg);
+                }
+                else
+                {
+                    return null;
                 }
             }
             return plg.TargetAssembly;
@@ -95,7 +103,7 @@ namespace TemplateAction.Core
             _disposed = true;
             TAEventDispatcher.Instance.RemoveScope(_pluginsnode);
             _watcher.Dispose();
-            _timer.Dispose();
+            _timer.Stop();
             if (disposing)
             {
                 GC.SuppressFinalize(this);
@@ -112,7 +120,7 @@ namespace TemplateAction.Core
         /// <returns></returns>
         public T FindConfig<T>(string ns) where T : IPluginConfig
         {
-            PluginObject obj = _plugins.GetPlugin(ns.ToLower());
+            PluginObject obj = _plugins.GetPlugin(ns);
             if (obj != null)
             {
                 return (T)obj.Config;
@@ -128,6 +136,15 @@ namespace TemplateAction.Core
         public bool PluginExist(string ns)
         {
             return _plugins.ContainPlugin(ns);
+        }
+        /// <summary>
+        /// 加载程序集
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        protected virtual Assembly LoadAssembly(string path)
+        {
+            return Assembly.Load(System.IO.File.ReadAllBytes(path));
         }
         /// <summary>
         /// 插件更新时
@@ -194,9 +211,10 @@ namespace TemplateAction.Core
                     if (ModExt.Equals(fi.Extension, StringComparison.OrdinalIgnoreCase))
                     {
                         string filename = Path.GetFileName(fi.FullName);
-                        if (_plugins.GetPlugin(filename.ToLower()) == null)
+                        if (_plugins.GetPlugin(filename) == null)
                         {
-                            PluginObject plg = _plugins.LoadPlugin(fi.FullName);
+                            Assembly assem = LoadAssembly(fi.FullName);
+                            PluginObject plg = _plugins.CreatePlugin(assem, fi.FullName);
                             if (plg != null)
                             {
                                 tmpPlugins.Add(plg);
@@ -213,19 +231,27 @@ namespace TemplateAction.Core
 
             //开启监控插件更改
             _watcher = new FileSystemWatcher();
-            _watcher.Filter = "*"+ ModExt;
+            _watcher.Filter = "*" + ModExt;
             _watcher.NotifyFilter = NotifyFilters.LastWrite;
             _watcher.Path = _pluginPath;
             _watcher.EnableRaisingEvents = true;
             _watcher.IncludeSubdirectories = true;
             _watcher.Changed += OnPluginListener;
 
-            _timer = new Timer(new TimerCallback(OnWatchedFileChange),
-                             null, Timeout.Infinite, Timeout.Infinite);
+            _timer = new HashedWheelTimer(TimeSpan.FromMilliseconds(400), 100000, 0);
             return;
         }
 
         #region 插件监听代码
+
+        /// <summary>
+        /// 压入同步任务
+        /// </summary>
+        /// <param name="ac"></param>
+        public void PushConcurrentTask(Action ac)
+        {
+            _timer.NewTimeout(new ConcurrentTask(ac), TimeSpan.Zero);
+        }
         private static HashSet<string> _changePaths = new HashSet<string>();
         private void OnPluginListener(object sender, FileSystemEventArgs e)
         {
@@ -236,10 +262,10 @@ namespace TemplateAction.Core
                 {
                     _changePaths.Add(tpath);
                 }
-                _timer.Change(500, Timeout.Infinite);
+                _timer.NewTimeout(new ConcurrentTask(OnWatchedFileChange), TimeSpan.FromMilliseconds(500));
             }
         }
-        private void OnWatchedFileChange(object state)
+        private void OnWatchedFileChange()
         {
             List<string> backup = new List<string>();
             lock (_changePaths)
@@ -249,7 +275,8 @@ namespace TemplateAction.Core
             }
             foreach (string tpath in backup)
             {
-                PluginObject obj = _plugins.LoadPlugin(tpath);
+                Assembly assem = LoadAssembly(tpath);
+                PluginObject obj = _plugins.CreatePlugin(assem, tpath);
                 if (obj != null)
                 {
                     AfterPluginChanged(obj);
