@@ -72,10 +72,15 @@ namespace TemplateAction.Core
         private Assembly LoadEmbeddedAssembly(string name)
         {
             string[] tarr = name.Split(',');
+            if (tarr.Length == 0) return null;
             PluginObject plg = _plugins.GetPlugin(tarr[0]);
             if (plg == null)
             {
                 string filepath = _rootPath + Path.DirectorySeparatorChar + name + ModExt;
+                if (!File.Exists(filepath))
+                {
+                    return null;
+                }
                 Assembly assem = LoadAssembly(filepath);
                 plg = _plugins.CreatePlugin(assem, filepath);
                 if (plg != null)
