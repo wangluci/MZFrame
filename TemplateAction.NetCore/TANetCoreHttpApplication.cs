@@ -61,17 +61,7 @@ namespace TemplateAction.NetCore
                 return ass;
             }
         }
-        /// <summary>
-        /// 同步卸载指定插件
-        /// </summary>
-        /// <param name="ns"></param>
-        public void UnloadPlugin(string ns)
-        {
-            PushConcurrentTask(() =>
-            {
-                _plugins.RemovePlugin(ns);
-            });
-        }
+ 
         public TANetCoreHttpApplication(IApplicationBuilder appbuilder)
         {
             _requestDelegate = appbuilder.Build();

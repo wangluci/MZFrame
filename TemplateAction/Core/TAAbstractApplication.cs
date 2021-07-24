@@ -115,7 +115,17 @@ namespace TemplateAction.Core
             }
         }
 
-
+        /// <summary>
+        /// 同步卸载指定插件
+        /// </summary>
+        /// <param name="ns"></param>
+        public void UnloadPlugin(string ns)
+        {
+            PushConcurrentTask(() =>
+            {
+                _plugins.RemovePlugin(ns);
+            });
+        }
 
         /// <summary>
         /// 获取指定插件的配置文件

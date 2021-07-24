@@ -168,11 +168,11 @@ namespace TemplateAction.Core
         /// </summary>
         public void Unload()
         {
-            TAEventDispatcher.Instance.DispathPluginUnload(this);
             if (_config != null)
             {
                 _config.Unload();
             }
+            TAEventDispatcher.Instance.DispathPluginUnload(this);
         }
     }
 }
