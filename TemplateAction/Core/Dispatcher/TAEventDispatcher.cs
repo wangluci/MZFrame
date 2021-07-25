@@ -81,7 +81,7 @@ namespace TemplateAction.Core
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="ac"></param>
-        public void RegisterPluginUnloadBefore<T>(Action<T> ac) where T : PluginObject
+        public void RegisterPluginUnloadAfter<T>(Action<T> ac) where T : PluginObject
         {
             Register<T, DefaultHandler<T>>(PLUGIN_UNLOAD_AFTER_EVENT, new DefaultHandler<T>(ac));
         }

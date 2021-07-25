@@ -28,18 +28,26 @@ namespace TemplateAction.NetCore
             {
                 _useUnload = true;
                 //监听插件卸载
-                TAEventDispatcher.Instance.RegisterPluginUnloadBefore<PluginObject>(obj =>
-                {
-                    string tkey = Assembly2Key(obj.TargetAssembly);
-                    AssemblyLoadContext asscontext;
-                    if (_assemblyContexts.TryGetValue(tkey, out asscontext))
-                    {
-                        asscontext.Unload();
-                        _assemblyContexts.Remove(tkey);
-                    }
-                });
+                TAEventDispatcher.Instance.RegisterPluginUnloadAfter<PluginObject>(PluginUnloadAfterEvt);
             }
             return this;
+        }
+        /// <summary>
+        /// 插件卸载处理
+        /// </summary>
+        /// <param name="obj"></param>
+        private void PluginUnloadAfterEvt(PluginObject obj)
+        {
+            string tkey = Assembly2Key(obj.TargetAssembly);
+            PushConcurrentTask(() =>
+            {
+                AssemblyLoadContext asscontext;
+                if (_assemblyContexts.TryGetValue(tkey, out asscontext))
+                {
+                    asscontext.Unload();
+                    _assemblyContexts.Remove(tkey);
+                }
+            }, TimeSpan.FromMinutes(1));
         }
         private string Assembly2Key(Assembly assembly)
         {

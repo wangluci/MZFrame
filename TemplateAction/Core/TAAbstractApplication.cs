@@ -265,7 +265,16 @@ namespace TemplateAction.Core
         /// <param name="ac"></param>
         public void PushConcurrentTask(Action ac)
         {
-            _timer.NewTimeout(new ConcurrentTask(ac), TimeSpan.Zero);
+            PushConcurrentTask(ac, TimeSpan.Zero);
+        }
+        /// <summary>
+        /// 压入同步任务
+        /// </summary>
+        /// <param name="ac"></param>
+        /// <param name="ts"></param>
+        public void PushConcurrentTask(Action ac, TimeSpan ts)
+        {
+            _timer.NewTimeout(new ConcurrentTask(ac), ts);
         }
         private static HashSet<string> _changePaths = new HashSet<string>();
         private void OnPluginListener(object sender, FileSystemEventArgs e)

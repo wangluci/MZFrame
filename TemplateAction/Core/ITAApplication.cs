@@ -21,5 +21,16 @@ namespace TemplateAction.Core
         /// <param name="ns"></param>
         /// <returns></returns>
         bool PluginExist(string ns);
+        /// <summary>
+        /// 处理同步任务
+        /// </summary>
+        /// <param name="ac"></param>
+        void PushConcurrentTask(Action ac);
+        /// <summary>
+        /// 处理定时同步任务
+        /// </summary>
+        /// <param name="ac"></param>
+        /// <param name="ts"></param>
+        void PushConcurrentTask(Action ac, TimeSpan ts);
     }
 }
