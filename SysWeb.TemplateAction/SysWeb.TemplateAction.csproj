@@ -38,7 +38,6 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AsyncTimeoutPool.cs" />
     <Compile Include="Crypter.cs" />
     <Compile Include="ErrAsyncResult.cs" />
     <Compile Include="MyCookie.cs" />

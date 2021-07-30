@@ -6,6 +6,5 @@ namespace TemplateAction.Core
     public interface ITAAsyncResult
     {
         void Completed(IResult data);
-        void Timeout();
     }
 }

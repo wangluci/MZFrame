@@ -13,20 +13,19 @@ namespace TemplateAction.Core
             get { return _context; }
         }
 
-        private AsyncAttribute _async;
-        public AsyncAttribute Async
+        private bool _async;
+        public bool Async
         {
             get { return _async; }
         }
         private TARequestHandle _request;
         public TARequestHandleBuilder(ITAContext context, ControllerNode controller, ActionNode action, ITAObjectCollection exparams)
         {
-            _async = null;
+            _async = false;
             _context = context;
             _request = new TARequestHandle(context, controller, action, exparams);
 
             if (_request.ActionNode == null) return;
-            if (_request.ActionNode.Async == null) return;
             _async = _request.ActionNode.Async;
         }
 

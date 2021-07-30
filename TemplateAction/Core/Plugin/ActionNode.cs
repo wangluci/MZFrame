@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace TemplateAction.Core
 {
@@ -12,11 +14,11 @@ namespace TemplateAction.Core
         {
             get { return mMethod; }
         }
-        protected AsyncAttribute _async;
+        protected bool _async;
         /// <summary>
         /// 判断是否为异步方法
         /// </summary>
-        public AsyncAttribute Async
+        public bool Async
         {
             get { return _async; }
         }
@@ -38,11 +40,6 @@ namespace TemplateAction.Core
             get { return mAboutAction; }
         }
 
-        protected bool _isdes;
-        public bool IsDes
-        {
-            get { return _isdes; }
-        }
         protected byte _allowHttpMethod;
         public byte AllowHttpMethod
         {
@@ -83,101 +80,78 @@ namespace TemplateAction.Core
             _allowHttpMethod = 0;
             mKey = method.Name;
             mMethod = method;
-            bool allowget = false;
-            bool allowput = false;
-            bool allowpost = false;
-            bool allowdel = false;
-            bool initabout = false;
-            bool initroute = false;
+   
 
             string tdesact = "";
             string taboutmodule = string.Format("/{0}/{1}", plugin.Name, controller);
             string taboutaction = mKey;
-            _isdes = false;
-            object[] acattrs = method.GetCustomAttributes(false);
-            foreach (object attrobj in acattrs)
+
+            //异步特性
+            Attribute attrib = method.GetCustomAttribute(typeof(AsyncStateMachineAttribute));
+            if (attrib != null)
             {
-                if (!_isdes)
+                _async = true;
+            }
+            else
+            {
+                _async = false;
+            }
+            //描述特性
+            DesAttribute ad = (DesAttribute)method.GetCustomAttribute(typeof(DesAttribute));
+            if (ad != null)
+            {
+                tdesact = ad.Des;
+            }
+
+
+            //关联特性
+            AboutAttribute ab = (AboutAttribute)method.GetCustomAttribute(typeof(AboutAttribute));
+            if (ab != null)
+            {
+                if (!string.IsNullOrEmpty(ab.AbountModule))
                 {
-                    DesAttribute ad = attrobj as DesAttribute;
-                    if (ad != null)
-                    {
-                        tdesact = ad.Des;
-                        _isdes = true;
-                    }
+                    taboutmodule = ab.AbountModule;
                 }
-                if (!initabout && !_isdes)
+                if (!string.IsNullOrEmpty(ab.AbountAction))
                 {
-                    AboutAttribute ab = attrobj as AboutAttribute;
-                    if (ab != null)
-                    {
-                        if (!string.IsNullOrEmpty(ab.AbountModule))
-                        {
-                            taboutmodule = ab.AbountModule;
-                        }
-                        if (!string.IsNullOrEmpty(ab.AbountAction))
-                        {
-                            taboutaction = ab.AbountAction;
-                        }
-                        _isdes = true;
-                        initabout = true;
-                    }
-                }
-                if (!initroute)
-                {
-                    RouteAttribute rtattr = attrobj as RouteAttribute;
-                    if (rtattr != null)
-                    {
-                        //添加插件路由
-                        plugin.RouterBuilder.AddRouter(plugin.Name, controller, mKey, rtattr.Template);
-                        initroute = true;
-                    }
-                }
-                if (_async == null)
-                {
-                    AsyncAttribute rtattr = attrobj as AsyncAttribute;
-                    if (rtattr != null)
-                    {
-                        _async = rtattr;
-                    }
-                }
-                if (!allowget)
-                {
-                    HttpGetAttribute getattr = attrobj as HttpGetAttribute;
-                    if (getattr != null)
-                    {
-                        _allowHttpMethod |= (byte)EHttpMethod.Get;
-                        allowget = true;
-                    }
-                }
-                if (!allowpost)
-                {
-                    HttpPostAttribute postattr = attrobj as HttpPostAttribute;
-                    if (postattr != null)
-                    {
-                        _allowHttpMethod |= (byte)EHttpMethod.Post;
-                        allowpost = true;
-                    }
-                }
-                if (!allowput)
-                {
-                    HttpPutAttribute putattr = attrobj as HttpPutAttribute;
-                    if (putattr != null)
-                    {
-                        _allowHttpMethod |= (byte)EHttpMethod.Put;
-                        allowput = true;
-                    }
-                }
-                if (!allowdel)
-                {
-                    HttpDeleteAttribute delattr = attrobj as HttpDeleteAttribute;
-                    if (delattr != null)
-                    {
-                        _allowHttpMethod |= (byte)EHttpMethod.Delete;
-                        allowdel = true;
-                    }
+                    taboutaction = ab.AbountAction;
                 }
             }
+
+
+            //路由特性
+            RouteAttribute rtattr = (RouteAttribute)method.GetCustomAttribute(typeof(RouteAttribute));
+            if (rtattr != null)
+            {
+                //添加插件路由
+                plugin.RouterBuilder.AddRouter(plugin.Name, controller, mKey, rtattr.Template);
+            }
+
+  
+            Attribute getattr = method.GetCustomAttribute(typeof(HttpGetAttribute));
+            if (getattr != null)
+            {
+                _allowHttpMethod |= (byte)EHttpMethod.Get;
+            }
+
+            Attribute postattr = method.GetCustomAttribute(typeof(HttpPostAttribute));
+            if (postattr != null)
+            {
+                _allowHttpMethod |= (byte)EHttpMethod.Post;
+            }
+
+            Attribute putattr = method.GetCustomAttribute(typeof(HttpPutAttribute));
+            if (putattr != null)
+            {
+                _allowHttpMethod |= (byte)EHttpMethod.Put;
+            }
+
+            Attribute delattr = method.GetCustomAttribute(typeof(HttpDeleteAttribute));
+            if (delattr != null)
+            {
+                _allowHttpMethod |= (byte)EHttpMethod.Delete;
+            }
+
 
             mDescript = tdesact;
             mAboutModule = taboutmodule;

@@ -66,6 +66,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Aop\AsyncDBMan.cs" />
     <Compile Include="Aop\BaseEntity.cs" />
     <Compile Include="Aop\Castle.Core\Core\Internal\AttributesUtil.cs" />
     <Compile Include="Aop\Castle.Core\Core\Internal\CollectionExtensions.cs" />

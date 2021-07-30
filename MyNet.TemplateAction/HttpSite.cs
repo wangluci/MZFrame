@@ -328,20 +328,10 @@ namespace MyNet.TemplateAction
                 response.End404(context);
                 return;
             }
-            if (builder.Async != null)
+            if (builder.Async)
             {
-                MyNetAsyncResult asynrs = new MyNetAsyncResult(builder);
-                if (builder.Async.AsyncTimeout > 0)
-                {
-                    //设定超时
-                    ITriggerRunnable timeoutrun = context.Loop.Schedule(asw =>
-                     {
-                         asw.Timeout();
-                     }, asynrs, builder.Async.AsyncTimeout * 1000);
-                    asynrs.SetRunnable(timeoutrun);
-                }
                 //开始执行异步结果
-                builder.StartAsync(asynrs);
+                builder.StartAsync(new MyNetAsyncResult(httpcontext));
                 return;
             }
             else

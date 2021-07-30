@@ -1,44 +1,24 @@
-﻿using MyNet.Handlers;
-using MyNet.Loop.Scheduler;
-using System.Threading;
-using TemplateAction.Label;
+﻿using TemplateAction.Label;
 using TemplateAction.Core;
 
 namespace MyNet.TemplateAction
 {
     public class MyNetAsyncResult : ITAAsyncResult
     {
-        private TARequestHandleBuilder _builder;
-        private ITriggerRunnable _runnable;
-        public MyNetAsyncResult(TARequestHandleBuilder builder)
+        private HttpContext _context;
+        public MyNetAsyncResult(HttpContext context)
         {
-            _builder = builder;
-        }
-        public void SetRunnable(ITriggerRunnable runnable)
-        {
-            _runnable = runnable;
-        }
-        public void Completed(IResult data)
-        {
-            bool cansuccess = true;
-            if (_runnable != null)
-            {
-                cansuccess = _runnable.Cancel();
-            }
-            if (cansuccess)
-            {
-                if (data != null)
-                {
-                    data.Output();
-                }
-                ((HttpContext)_builder.Context).RequestFinish();
-            }
+            _context = context;
         }
 
-        public void Timeout()
+        public void Completed(IResult data)
         {
-            _builder.Context.Response.StatusCode = 503;
-            ((HttpContext)_builder.Context).RequestFinish();
+            if (data != null)
+            {
+                data.Output();
+            }
+            _context.RequestFinish();
         }
+
     }
 }

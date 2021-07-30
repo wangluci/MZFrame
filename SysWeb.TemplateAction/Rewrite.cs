@@ -63,7 +63,7 @@ namespace SysWeb.TemplateAction
                 TARequestHandleBuilder builder = syscontext.Application.Route(syscontext);
                 if (builder != null)
                 {
-                    if (builder.Async != null)
+                    if (builder.Async)
                     {
                         context.Items["Async"] = builder;
                         return;
@@ -101,7 +101,9 @@ namespace SysWeb.TemplateAction
                 cb(errar);
                 return errar;
             }
-            return new SysWebAsyncResult(cb, builder);
+            SysWebAsyncResult rt = new SysWebAsyncResult(cb, application.Context);
+            builder.StartAsync(rt);
+            return rt;
         }
         /// <summary>
         /// 服务端超时或有结果时执行

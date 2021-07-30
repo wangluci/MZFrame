@@ -76,7 +76,7 @@ namespace TemplateAction.NetCore
                         TARequestHandleBuilder builder = tacontext.Application.Route(tacontext);
                         if (builder != null)
                         {
-                            if (builder.Async != null)
+                            if (builder.Async)
                             {
                                 return builder.StartAsync();
                             }
