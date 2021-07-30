@@ -9,7 +9,7 @@ namespace MyAccess.Aop.DAL
     /// </summary>
     public abstract class DBSupportAsync
     {
-        protected static AsyncLocal<IDbHelp> mDBHelp;
+        protected static AsyncLocal<IDbHelp> mDBHelp = new AsyncLocal<IDbHelp>();
 
         public IDbHelp DBHelp
         {
@@ -22,7 +22,7 @@ namespace MyAccess.Aop.DAL
         }
         public void InitHelp()
         {
-            //mDBHelp = DBMan.Instance().OpenDB(_config);
+            mDBHelp.Value = AsyncDBMan.Instance().OpenDB(_config);
         }
     }
 }
