@@ -1,4 +1,7 @@
 ﻿using Castle.DynamicProxy;
+using System;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace MyAccess.Aop
 {
@@ -18,27 +21,60 @@ namespace MyAccess.Aop
             }
             if (dbtrans != null)
             {
-                try
+                //判断方法是否为异步
+                Type attType = typeof(AsyncStateMachineAttribute);
+                Attribute attrib = invocation.Method.GetCustomAttribute(attType);
+                if (attrib != null)
                 {
-                    DBMan.Instance().BeginTrans();
-                    invocation.Proceed();
-                    ITransReturn tr = invocation.ReturnValue as ITransReturn;
-                    if (tr != null)
+                    //异步
+                    try
                     {
-                        if (tr.IsSuccess())
+                        AsyncDBMan.Instance().BeginTrans();
+                        invocation.Proceed();
+                        ITransReturn tr = invocation.ReturnValue as ITransReturn;
+                        if (tr != null)
+                        {
+                            if (tr.IsSuccess())
+                            {
+                                AsyncDBMan.Instance().Commit();
+                            }
+                        }
+                        else
+                        {
+                            AsyncDBMan.Instance().Commit();
+                        }
+                    }
+                    finally
+                    {
+                        AsyncDBMan.Instance().RollBack();
+                    }
+                }
+                else
+                {
+                    //同步
+                    try
+                    {
+                        DBMan.Instance().BeginTrans();
+                        invocation.Proceed();
+                        ITransReturn tr = invocation.ReturnValue as ITransReturn;
+                        if (tr != null)
+                        {
+                            if (tr.IsSuccess())
+                            {
+                                DBMan.Instance().Commit();
+                            }
+                        }
+                        else
                         {
                             DBMan.Instance().Commit();
                         }
                     }
-                    else
+                    finally
                     {
-                        DBMan.Instance().Commit();
+                        DBMan.Instance().RollBack();
                     }
                 }
-                finally
-                {
-                    DBMan.Instance().RollBack();
-                }
+              
             }
             else
             {

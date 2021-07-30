@@ -4,7 +4,7 @@ using MyAccess.DB;
 namespace MyAccess.Aop
 {
     /// <summary>
-    /// DBHelp管理器，线程相关
+    /// 同步DBHelp管理器
     /// </summary>
     public class DBMan
     {
@@ -31,6 +31,7 @@ namespace MyAccess.Aop
         {
             get { return _store.IsTranslation(); }
         }
+
         public IDbHelp OpenDB(IDBConfig dbconfig)
         {
             return _store.OpenDB(dbconfig);

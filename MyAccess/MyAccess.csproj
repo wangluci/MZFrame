@@ -273,6 +273,7 @@
     <Compile Include="Aop\Castle.Core\DynamicProxy\Tokens\TypeMethods.cs" />
     <Compile Include="Aop\Castle.Core\DynamicProxy\Tokens\TypeUtilMethods.cs" />
     <Compile Include="Aop\DAL\DBSupportAsync.cs" />
+    <Compile Include="Aop\DBStore\AsyncDBStore.cs" />
     <Compile Include="Aop\DBStore\DBStoreItem.cs" />
     <Compile Include="Aop\IBaseEntity.cs" />
     <Compile Include="Aop\DBStore\IDBStore.cs" />
