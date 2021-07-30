@@ -2,6 +2,8 @@
 using MyAccess.DB.Attr;
 using System;
 using System.Reflection;
+using System.Threading.Tasks;
+
 namespace MyAccess.DB
 {
     /// <summary>
@@ -119,6 +121,11 @@ namespace MyAccess.DB
         {
             help.AddParamFrom(mInserted);
             mDo.Excute(help);
+        }
+        public async Task ExcuteAsync(DbHelp help)
+        {
+            help.AddParamFrom(mInserted);
+            await mDo.ExcuteAsync(help);
         }
 
         public void SetSql(string sql)

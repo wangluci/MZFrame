@@ -1,8 +1,13 @@
 ﻿using MyAccess.Core;
 using System;
 using System.Data;
+using System.Threading.Tasks;
+
 namespace MyAccess.DB
 {
+    /// <summary>
+    /// 执行指定存储过程
+    /// </summary>
     public class DoExecStored : IDoCommand
     {
         protected string mName;
@@ -27,6 +32,15 @@ namespace MyAccess.DB
             help.Command.CommandText = mName;
             help.InitParams();
             mRowCount = help.Command.ExecuteNonQuery();
+            help.ClearParams();
+        }
+
+        public virtual async Task ExcuteAsync(DbHelp help)
+        {
+            help.Command.CommandType = CommandType.StoredProcedure;
+            help.Command.CommandText = mName;
+            help.InitParams();
+            mRowCount = await help.Command.ExecuteNonQueryAsync();
             help.ClearParams();
         }
     }

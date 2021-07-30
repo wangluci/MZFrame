@@ -2,9 +2,13 @@
 using MyAccess.DB.Attr;
 using System;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace MyAccess.DB
 {
+    /// <summary>
+    /// 更新数据命令
+    /// </summary>
     public class DoUpdate : DoExecSql
     {
         protected object mUpdated;
@@ -79,6 +83,11 @@ namespace MyAccess.DB
         {
             help.AddParamFrom(mUpdated);
             base.Excute(help);
+        }
+        public override async Task ExcuteAsync(DbHelp help)
+        {
+            help.AddParamFrom(mUpdated);
+            await base.ExcuteAsync(help);
         }
     }
 }

@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MyAccess.DB
 {
-    public class DoQueryInT<T> : DoQuerySql
+    /// <summary>
+    /// 执行In查询
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class DoQueryInT<T,Z> : DoQuerySql<Z>
     {
         protected T[] mInArr;
         protected string mParamName;
@@ -17,14 +22,13 @@ namespace MyAccess.DB
             mInArr = inarr;
             mParamName = paramname;
         }
-        public override void Excute(DbHelp help)
+        private void InitDoQueryInT(DbHelp help)
         {
             string inwhere = string.Empty;
 
             for (int i = 0; i < mInArr.Length; i++)
             {
-                string tmpn = "@inparam_" + i;
-                help.AddParam(tmpn, mInArr[i]);
+                string tmpn = help.AddParam("inparam_" + i, mInArr[i]);
                 inwhere += "," + tmpn;
             }
             if (inwhere.StartsWith(","))
@@ -32,7 +36,16 @@ namespace MyAccess.DB
                 inwhere = inwhere.Substring(1);
             }
             mSql = mSql.Replace(mParamName, inwhere);
+        }
+        public override void Excute(DbHelp help)
+        {
+            InitDoQueryInT(help);
             base.Excute(help);
+        }
+        public override async Task ExcuteAsync(DbHelp help)
+        {
+            InitDoQueryInT(help);
+            await base.ExcuteAsync(help);
         }
     }
 }

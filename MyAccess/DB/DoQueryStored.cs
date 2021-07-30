@@ -4,12 +4,11 @@ using System.Data;
 using System.Data.Common;
 namespace MyAccess.DB
 {
-    public class DoQueryStored : DoQueryBase
+    public class DoQueryStored<T> : DoQuerySql<T>
     {
         private Dictionary<string, object> mOutDict;
-        public DoQueryStored(string name)
+        public DoQueryStored(string name) : base(name)
         {
-            mSql = name;
             mOutDict = new Dictionary<string, object>();
         }
         public int OutInt(string key)
@@ -40,24 +39,25 @@ namespace MyAccess.DB
         /// <returns></returns>
         public object this[string key]
         {
-            get { return mOutDict[key];  }
+            get { return mOutDict[key]; }
         }
-        public override void Excute(DbHelp help)
+        protected override void PreExcute(DbHelp help)
         {
             help.Command.CommandType = CommandType.StoredProcedure;
             help.Command.CommandText = mSql;
             help.InitParams();
-            DbDataAdapter adapter = help.CreateDataAdapter();
-            adapter.SelectCommand = help.Command;
-            adapter.Fill(mData);
-            foreach(DbParameter dbp in help.Command.Parameters)
+        }
+        protected override void AfterExcute(DbHelp help)
+        {
+            foreach (DbParameter dbp in help.Command.Parameters)
             {
-                if(dbp.Direction==ParameterDirection.InputOutput|| dbp.Direction == ParameterDirection.Output)
+                if (dbp.Direction == ParameterDirection.InputOutput || dbp.Direction == ParameterDirection.Output)
                 {
                     mOutDict.Add(dbp.ParameterName, dbp.Value);
                 }
             }
-            help.ClearParams();
+            base.AfterExcute(help);
         }
+
     }
 }

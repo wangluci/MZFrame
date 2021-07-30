@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Data;
+using System.Threading.Tasks;
+
 namespace MyAccess.DB
 {
     /// <summary>
@@ -32,6 +34,15 @@ namespace MyAccess.DB
             help.Command.CommandText = mSqlText;
             help.InitParams();
             mRowCount = help.Command.ExecuteNonQuery();
+            help.ClearParams();
+        }
+
+        public virtual async Task ExcuteAsync(DbHelp help)
+        {
+            help.Command.CommandType = CommandType.Text;
+            help.Command.CommandText = mSqlText;
+            help.InitParams();
+            mRowCount = await help.Command.ExecuteNonQueryAsync();
             help.ClearParams();
         }
 

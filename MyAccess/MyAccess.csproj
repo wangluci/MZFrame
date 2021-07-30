@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MyAccess</RootNamespace>
     <AssemblyName>MyAccess</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>false</SignAssembly>
     <FileUpgradeFlags>
@@ -272,6 +272,7 @@
     <Compile Include="Aop\Castle.Core\DynamicProxy\Tokens\TypeBuilderMethods.cs" />
     <Compile Include="Aop\Castle.Core\DynamicProxy\Tokens\TypeMethods.cs" />
     <Compile Include="Aop\Castle.Core\DynamicProxy\Tokens\TypeUtilMethods.cs" />
+    <Compile Include="Aop\DAL\DBSupportAsync.cs" />
     <Compile Include="Aop\DBStore\DBStoreItem.cs" />
     <Compile Include="Aop\IBaseEntity.cs" />
     <Compile Include="Aop\DBStore\IDBStore.cs" />
@@ -290,10 +291,8 @@
     <Compile Include="Core\RSACrypter.cs" />
     <Compile Include="DB\Attr\IDAttribute.cs" />
     <Compile Include="Aop\DBMan.cs" />
-    <Compile Include="DB\DoExecAndReturnStored.cs" />
     <Compile Include="DB\DoExecSqlIn.cs" />
     <Compile Include="DB\DoInsert.cs" />
-    <Compile Include="DB\DoQueryBase.cs" />
     <Compile Include="DB\DoQueryIn.cs" />
     <Compile Include="DB\DoQueryInT.cs" />
     <Compile Include="DB\DoUpdate.cs" />
@@ -505,10 +504,6 @@
     <Compile Include="DB\DoDelete.cs" />
     <Compile Include="DB\DoExecSql.cs" />
     <Compile Include="DB\DoExecStored.cs" />
-    <Compile Include="DB\DoGetMaxID.cs" />
-    <Compile Include="DB\DoQueryAllTable.cs" />
-    <Compile Include="DB\DoQueryCount.cs" />
-    <Compile Include="DB\DoQueryReader.cs" />
     <Compile Include="DB\DoQueryScalar.cs" />
     <Compile Include="DB\DoQuerySql.cs" />
     <Compile Include="DB\DoQueryStored.cs" />

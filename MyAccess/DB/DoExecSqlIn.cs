@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MyAccess.DB
 {
+    /// <summary>
+    /// 批量条件更新、删除
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class DoExecSqlIn<T> : DoExecSql
     {
         protected T[] mInArr;
@@ -17,14 +22,12 @@ namespace MyAccess.DB
             mInArr = inarr;
             mParamName = paramname;
         }
-        public override void Excute(DbHelp help)
+        private void ExcuteDoExecSqlInInit(DbHelp help)
         {
             string inwhere = string.Empty;
-
             for (int i = 0; i < mInArr.Length; i++)
             {
-                string tmpn = "@inparam_" + i;
-                help.AddParam(tmpn, mInArr[i]);
+                string tmpn = help.AddParam("inparam_" + i, mInArr[i]);
                 inwhere += "," + tmpn;
             }
             if (inwhere.StartsWith(","))
@@ -32,7 +35,16 @@ namespace MyAccess.DB
                 inwhere = inwhere.Substring(1);
             }
             mSqlText = mSqlText.Replace(mParamName, inwhere);
+        }
+        public override void Excute(DbHelp help)
+        {
+            ExcuteDoExecSqlInInit(help);
             base.Excute(help);
+        }
+        public override async Task ExcuteAsync(DbHelp help)
+        {
+            ExcuteDoExecSqlInInit(help);
+            await base.ExcuteAsync(help);
         }
     }
 }

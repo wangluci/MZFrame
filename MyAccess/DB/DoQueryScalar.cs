@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Data;
+using System.Threading.Tasks;
+
 namespace MyAccess.DB
 {
     /// <summary>
@@ -9,6 +11,16 @@ namespace MyAccess.DB
     {
         private string mSql;
         private object mValue;
+        public void SetSql(string sql)
+        {
+            mSql = sql;
+        }
+
+        public string GetSql()
+        {
+            return mSql;
+        }
+
         public double GetValueDouble(double def)
         {
             double rt = def;
@@ -78,14 +90,14 @@ namespace MyAccess.DB
             help.ClearParams();
         }
 
-        public void SetSql(string sql)
+  
+        public async Task ExcuteAsync(DbHelp help)
         {
-            mSql = sql;
-        }
-
-        public string GetSql()
-        {
-            return mSql;
+            help.Command.CommandType = CommandType.Text;
+            help.Command.CommandText = mSql;
+            help.InitParams();
+            mValue = await help.Command.ExecuteScalarAsync();
+            help.ClearParams();
         }
     }
 }

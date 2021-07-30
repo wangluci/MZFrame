@@ -2,6 +2,9 @@
 using System;
 namespace MyAccess.Aop.DAL
 {
+    /// <summary>
+    /// 同步用DAL层
+    /// </summary>
     public abstract class DBSupport
     {
         [ThreadStatic]

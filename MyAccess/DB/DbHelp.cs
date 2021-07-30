@@ -5,6 +5,7 @@ using System.Data.Common;
 using System.Reflection;
 using System.Collections.Generic;
 using MyAccess.Aop;
+using System.Threading.Tasks;
 
 namespace MyAccess.DB
 {
@@ -239,6 +240,39 @@ namespace MyAccess.DB
         }
 
 
+        #region 异步操作
+        public async Task OpenAsync()
+        {
+            mConn = CreateConnection();
+            mConn.ConnectionString = mConnString;
+            mCommand = CreateCommand();
+            mCommand.Connection = mConn;
+            if (mConn.State == ConnectionState.Closed)
+            {
+                await mConn.OpenAsync();
+            }
+        }
+
+        public async Task DoCommandAsync(IDoCommand docommand)
+        {
+            if (!Equals(mDbTrans, null))
+            {
+                await docommand.ExcuteAsync(this);
+            }
+            else
+            {
+                await OpenAsync();
+                try
+                {
+                    await docommand.ExcuteAsync(this);
+                }
+                finally
+                {
+                    Close();
+                }
+            }
+        }
+        #endregion
 
         public void CopyDbParamFrom(DbParameter[] parameters)
         {
@@ -260,7 +294,7 @@ namespace MyAccess.DB
             for (int i = 0; i < myProInfos.Length; i++)
             {
                 PropertyInfo pi = myProInfos[i];
-                AutoDbParam(pi.PropertyType, "@" + pi.Name, pi.GetValue(obj, null), ParameterDirection.Input);
+                AutoDbParam(pi.PropertyType, NameToDbParam(pi.Name), pi.GetValue(obj, null), ParameterDirection.Input);
             }
         }
         /// <summary>
@@ -280,31 +314,36 @@ namespace MyAccess.DB
                 for (int i = 0; i < myProInfos.Length; i++)
                 {
                     PropertyInfo pi = myProInfos[i];
-                    AddParam("@" + pi.Name, pi.GetValue(obj, null));
+                    AddParam(pi.Name, pi.GetValue(obj, null));
                 }
             }
         }
-        public void AddParam(string param, object value)
+        public string AddParam(string param, object value)
         {
+            string rtval = NameToDbParam(param);
             if (value == null)
             {
-                AutoDbParam(typeof(string), param, DBNull.Value, ParameterDirection.Input);
+                AutoDbParam(typeof(string), rtval, DBNull.Value, ParameterDirection.Input);
             }
             else
             {
-                AutoDbParam(value.GetType(), param, value, ParameterDirection.Input);
+                AutoDbParam(value.GetType(), rtval, value, ParameterDirection.Input);
             }
+            return rtval;
         }
-        public void AddReturnParam(Type tp, string param)
-        {
-            AutoDbParam(tp, param, DBNull.Value, ParameterDirection.ReturnValue);
-        }
-
         /// <summary>
         /// C#类型转数据库类型
         /// </summary>
         /// <param name="tp"></param>
         /// <returns></returns>
         protected abstract void AutoDbParam(Type tp, string name, object val, ParameterDirection direct);
+        /// <summary>
+        /// 参数名转为各个数据库所需格式名称
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        protected abstract string NameToDbParam(string param);
+
+
     }
 }

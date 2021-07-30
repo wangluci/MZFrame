@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace MyAccess.DB
 {
@@ -23,7 +24,12 @@ namespace MyAccess.DB
             exSql.Excute(help);
             mRowCount = exSql.RowCount;
         }
-
+        public async Task ExcuteAsync(DbHelp help)
+        {
+            DoExecSql exSql = new DoExecSql(cmdTxt);
+            await exSql.ExcuteAsync(help);
+            mRowCount = exSql.RowCount;
+        }
         public void SetSql(string sql)
         {
             cmdTxt = sql;
@@ -33,5 +39,7 @@ namespace MyAccess.DB
         {
             return cmdTxt;
         }
+
+    
     }
 }
