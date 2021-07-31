@@ -39,7 +39,7 @@ TestService目录为mainweb测试项目的一个模块
 ShareService目录为共享模块目录，这个模块的类可以让其它模块直接引用
 
 #### 安装教程
-需要至少vs2019 v16.10打开项目,  
+需要至少vs2019 v16.10打开项目, .net framework需要4.61，.net core需要.net 5。
 MZFrame.sln项目为.net framework使用示例
 ResumeML/ResumeML.sln项目为.net core使用示例
 
