@@ -72,9 +72,8 @@ namespace SysWeb.TemplateAction
                     {
                         builder.BuildAndExcute().Output();
                     }
+                    application.CompleteRequest();
                 }
-             
-                application.CompleteRequest();
             }
             catch (Exception ex)
             {

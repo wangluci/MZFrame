@@ -75,7 +75,7 @@ namespace TemplateAction.Core
         }
         protected FileResult File(string path)
         {
-            return new FileResult(mRequestHandle, path);
+            return new FileResult(Context, path);
         }
         protected AjaxResult Err(string mess)
         {
@@ -89,15 +89,15 @@ namespace TemplateAction.Core
         /// <returns></returns>
         protected AjaxResult Err(int error, string mess)
         {
-            return new AjaxResult(mRequestHandle, error, mess, null);
+            return new AjaxResult(Context, error, mess, null);
         }
         protected AjaxResult Success(string mess, string jsondata)
         {
-            return new AjaxResult(mRequestHandle, 0, mess, jsondata);
+            return new AjaxResult(Context, 0, mess, jsondata);
         }
         protected AjaxResult Success(int code, string jsondata)
         {
-            return new AjaxResult(mRequestHandle, code, string.Empty, jsondata);
+            return new AjaxResult(Context, code, string.Empty, jsondata);
         }
         protected AjaxResult Success()
         {
@@ -119,7 +119,7 @@ namespace TemplateAction.Core
         /// <returns></returns>
         public virtual IResult Exception(Exception ex)
         {
-            return new ExceptionResult(mRequestHandle, ex);
+            return new ExceptionResult(Context, ex);
         }
         /// <summary>
         /// 路由执行

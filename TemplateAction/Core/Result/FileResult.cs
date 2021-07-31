@@ -11,15 +11,15 @@ namespace TemplateAction.Core
     public class FileResult : IResult
     {
         private string mPath;
-        private IRequestHandle mHandle;
+        private ITAContext mContext;
         public string Path
         {
             get { return mPath; }
         }
 
-        public FileResult(IRequestHandle handle, string path)
+        public FileResult(ITAContext context, string path)
         {
-            mHandle = handle;
+            mContext = context;
             mPath = path;
         }
 
@@ -28,16 +28,16 @@ namespace TemplateAction.Core
             try
             {
                 string ext = System.IO.Path.GetExtension(mPath);
-                mHandle.Context.Response.ContentType = FileContentType.GetMimeType(ext);
+                mContext.Response.ContentType = FileContentType.GetMimeType(ext);
                 using (FileStream fsRead = new FileStream(mPath, FileMode.OpenOrCreate))
                 {
                     byte[] heByte = new byte[fsRead.Length];
                     fsRead.Read(heByte, 0, heByte.Length);
-                    mHandle.Context.Response.BinaryWrite(heByte);
+                    mContext.Response.BinaryWrite(heByte);
                 }
             }
             catch {
-                mHandle.Context.Response.Write("文件异常");
+                mContext.Response.Write("文件异常");
             }
         }
     }

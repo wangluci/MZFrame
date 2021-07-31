@@ -10,7 +10,7 @@ namespace TemplateAction.Core
         protected int mCode;
         protected string mMessage;
         protected string mData;
-        protected IRequestHandle mHandle;
+        protected ITAContext mContext;
         public string Data
         {
             get { return mData; }
@@ -22,24 +22,24 @@ namespace TemplateAction.Core
         /// <param name="isErr">错误代码</param>
         /// <param name="message">提示消息</param>
         /// <param name="jsondata">返回json字符串</param>
-        public AjaxResult(IRequestHandle handle, int code, string message, string jsondata = null)
+        public AjaxResult(ITAContext context, int code, string message, string jsondata = null)
         {
             mCode = code;
             mMessage = message;
             mData = jsondata;
-            mHandle = handle;
+            mContext = context;
         }
     
         public void Output()
         {
-            mHandle.Context.Response.ContentType = "application/json";
+            mContext.Response.ContentType = "application/json";
             if (mData == null)
             {
-                mHandle.Context.Response.Write("{\"Code\":" + mCode + ",\"Message\":\"" + Common.TAUtility.AllFilter(mMessage) + "\"}");
+                mContext.Response.Write("{\"Code\":" + mCode + ",\"Message\":\"" + Common.TAUtility.AllFilter(mMessage) + "\"}");
             }
             else
             {
-                mHandle.Context.Response.Write("{\"Code\":" + mCode + ",\"Message\":\"" + Common.TAUtility.AllFilter(mMessage) + "\",\"Data\":" + mData + "}");
+                mContext.Response.Write("{\"Code\":" + mCode + ",\"Message\":\"" + Common.TAUtility.AllFilter(mMessage) + "\",\"Data\":" + mData + "}");
             }
         }
     }

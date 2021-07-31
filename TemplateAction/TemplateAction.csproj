@@ -95,7 +95,6 @@
     <Compile Include="Common\Converts\TimeConvert.cs" />
     <Compile Include="Common\ITAConvert.cs" />
     <Compile Include="Common\TAConverter.cs" />
-    <Compile Include="Core\Attribute\AsyncAttribute.cs" />
     <Compile Include="Core\Attribute\HttpDeleteAttribute.cs" />
     <Compile Include="Core\Attribute\HttpPutAttribute.cs" />
     <Compile Include="Core\Attribute\HttpGetAttribute.cs" />

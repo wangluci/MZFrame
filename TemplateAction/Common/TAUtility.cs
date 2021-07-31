@@ -2,6 +2,7 @@
 using System.Text;
 using System.IO;
 using System.Security.Cryptography;
+using System.Collections.Generic;
 
 namespace TemplateAction.Common
 {
@@ -21,6 +22,8 @@ namespace TemplateAction.Common
         public const string CONTROLLER_KEY = "controller";
         public const string ACTION_KEY = "action";
         public const string HTML_ENCODE = "html";
+
+
         /// <summary>
         /// 判断是否为静态文件url
         /// </summary>
@@ -237,11 +240,11 @@ namespace TemplateAction.Common
                 {
                     continue;
                 }
-                else if(chr == '\r')
+                else if (chr == '\r')
                 {
                     strbuild.Append("\\r");
                 }
-                else if(chr == '\n')
+                else if (chr == '\n')
                 {
                     strbuild.Append("\\n");
                 }
@@ -249,7 +252,7 @@ namespace TemplateAction.Common
                 {
                     strbuild.Append(chr);
                 }
-           
+
             }
             return strbuild.ToString();
         }
@@ -319,39 +322,65 @@ namespace TemplateAction.Common
             byte[] buffer2 = Encoding.UTF8.GetBytes(key);
             return Convert.ToBase64String(Encrypt(bytes, buffer2));
         }
-        public static string Unicode(string input)
+
+        #region Unicode编码
+        private class UnicodeParseMapping
+        {
+            private Dictionary<char, string> _mapping;
+            private HashSet<char> _chineseSymbol;
+            public bool TryGetMapping(char c, out string value)
+            {
+                return _mapping.TryGetValue(c, out value);
+            }
+            public bool IsChineseSymbol(char c)
+            {
+                return _chineseSymbol.Contains(c);
+            }
+            public UnicodeParseMapping()
+            {
+                _mapping = new Dictionary<char, string>();
+                _mapping.Add('"', "\\\"");
+                _mapping.Add('\\', "\\\\");
+                _mapping.Add('/', "\\/");
+                _mapping.Add('\b', "\\b");
+                _mapping.Add('\f', "\\f");
+                _mapping.Add('\n', "\\n");
+                _mapping.Add('\r', "\\r");
+                _mapping.Add('\t', "\\t");
+                char[] csys = new char[] {'–', '—', '‘', '’', '“', '”',
+    '…', '、', '。', '〈', '〉', '《',
+    '》', '「', '」', '『', '』', '【',
+    '】', '〔', '〕', '！', '（', '）',
+    '，', '．', '：', '；', '？'};
+                _chineseSymbol = new HashSet<char>();
+                foreach (char c in csys)
+                {
+                    _chineseSymbol.Add(c);
+                }
+            }
+        }
+        private static readonly UnicodeParseMapping ParseMapping = new UnicodeParseMapping();
+        /// <summary>
+        /// Unicode编码
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="allUnicode"></param>
+        /// <returns></returns>
+        public static string Unicode(string input, bool allUnicode = false)
         {
             StringBuilder parsed = new StringBuilder();
             foreach (char c in input)
             {
-                switch (c)
+                string otstr;
+                if (ParseMapping.TryGetMapping(c, out otstr))
                 {
-                    case '"':
-                        parsed.Append("\\\"");
-                        break;
-                    case '\\':
-                        parsed.Append("\\\\");
-                        break;
-                    case '/':
-                        parsed.Append("\\/");
-                        break;
-                    case '\b':
-                        parsed.Append("\\b");
-                        break;
-                    case '\f':
-                        parsed.Append("\\f");
-                        break;
-                    case '\n':
-                        parsed.Append("\\n");
-                        break;
-                    case '\r':
-                        parsed.Append("\\r");
-                        break;
-                    case '\t':
-                        parsed.Append("\\t");
-                        break;
-                    default:
-                        if (c < ' ' || c > 127)
+                    parsed.Append(otstr);
+                }
+                else
+                {
+                    if (allUnicode)
+                    {
+                        if (c < 32 || c >= 127)
                         {
                             parsed.Append("\\u" + ((uint)c).ToString("X4"));
                         }
@@ -359,11 +388,33 @@ namespace TemplateAction.Common
                         {
                             parsed.Append(c);
                         }
-                        break;
+                    }
+                    else
+                    {
+                        if (c < 32 || c >= 127)
+                        {
+                            if (ParseMapping.IsChineseSymbol(c) || (c >= 0x4e00 && c <= 0x9fbb))
+                            {
+                                parsed.Append(c);
+                            }
+                            else
+                            {
+                                parsed.Append("\\u" + ((uint)c).ToString("X4"));
+                            }
+                        }
+                        else
+                        {
+                            parsed.Append(c);
+                        }
+                      
+                    }
+
                 }
             }
+
             return parsed.ToString();
         }
+        #endregion
 
 
     }

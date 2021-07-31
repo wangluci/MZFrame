@@ -35,35 +35,36 @@ namespace TemplateAction.Core
         /// <param name="res"></param>
         public void StartAsync(ITAAsyncResult res)
         {
-            if (_request.ActionNode.Method.ReturnType.IsAssignableFrom(typeof(Task)))
+            Task rt = _request.Excute() as Task;
+            if (rt == null)
             {
-                Task rt = _request.Excute() as Task;
-                if (rt == null)
-                {
-                    res.Completed(new V404Result(_context));
-                }
-                else
-                {
-                    rt.ContinueWith((t) =>
-                    {
-                        IResult irt = t.GetType().GetProperty("Result").GetValue(t, null) as IResult;
-                        if (irt == null)
-                        {
-                            res.Completed(new V404Result(_context));
-                        }
-                        else
-                        {
-                            res.Completed(irt);
-                        }
-                    }, TaskContinuationOptions.ExecuteSynchronously);
-                }
+                res.Completed(new V404Result(_context));
             }
             else
             {
-                Task.Run(() =>
+                rt.ContinueWith((t) =>
                 {
-                    res.Completed(this.BuildAndExcute());
-                });
+                    if (t.Exception != null)
+                    {
+                        Exception ex = t.Exception;
+                        if (t.Exception.InnerExceptions.Count > 0)
+                        {
+                            ex = t.Exception.InnerExceptions[0];
+                        }
+                        res.Completed(new ExceptionResult(_context, ex));
+                        return;
+                    }
+                  
+                    IResult irt = t.GetType().GetProperty("Result").GetValue(t, null) as IResult;
+                    if (irt == null)
+                    {
+                        res.Completed(new V404Result(_context));
+                    }
+                    else
+                    {
+                        res.Completed(irt);
+                    }
+                }, TaskContinuationOptions.ExecuteSynchronously);
             }
         }
         /// <summary>
@@ -72,23 +73,16 @@ namespace TemplateAction.Core
         /// <returns></returns>
         public Task StartAsync()
         {
-            if (_request.ActionNode.Method.ReturnType.IsAssignableFrom(typeof(Task)))
+            Task rt = _request.Excute() as Task;
+            if (rt != null)
             {
-                Task rt = _request.Excute() as Task;
-                if (rt != null)
-                {
-                    return rt;
-                }
-                else
-                {
-                    TaskCompletionSource<IResult> taskSource = new TaskCompletionSource<IResult>();
-                    taskSource.SetResult(new V404Result(_context));
-                    return taskSource.Task;
-                }
+                return rt;
             }
             else
             {
-                return Task.Run(this.BuildAndExcute);
+                TaskCompletionSource<IResult> taskSource = new TaskCompletionSource<IResult>();
+                taskSource.SetResult(new V404Result(_context));
+                return taskSource.Task;
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using TemplateAction.Label;
 
 namespace TemplateAction.Core
@@ -26,18 +27,15 @@ namespace TemplateAction.Core
         {
             mKey = type.Name;
             mPluginName = plugin.Name;
-            object[] attrs = type.GetCustomAttributes(typeof(DesAttribute), false);
-            mType = type;
-            foreach (object attrobj in attrs)
+            DesAttribute ad = (DesAttribute)type.GetCustomAttribute(typeof(DesAttribute));
+            if (ad != null)
             {
-                DesAttribute ad = attrobj as DesAttribute;
-                if (ad != null)
-                {
-                    mDescript = ad.Des;
-                }
+                mDescript = ad.Des;
             }
+            mType = type;
             InitActions(plugin);
         }
+      
         /// <summary>
         /// 初始化动作节点
         /// </summary>
@@ -49,7 +47,30 @@ namespace TemplateAction.Core
                 //判断方法返回值是否继承IResult
                 if (!typeof(IResult).IsAssignableFrom(method.ReturnType))
                 {
-                    continue;
+                    bool iacontinue = true;
+                    if (method.ReturnType == typeof(Task))
+                    {
+                        iacontinue = false;
+             
+                    }
+                    else if (method.ReturnType.IsGenericType)
+                    {
+                        if(method.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
+                        {
+                            if (method.ReturnType.GenericTypeArguments.Length > 0)
+                            {
+                                Type gtype = method.ReturnType.GenericTypeArguments[0];
+                                if (typeof(IResult).IsAssignableFrom(gtype))
+                                {
+                                    iacontinue = false;
+                                }
+                            }
+                        }
+                    }
+                    if (iacontinue)
+                    {
+                        continue;
+                    }
                 }
                 if (method.IsVirtual || method.IsStatic || method.DeclaringType.Name.Equals("Object"))
                 {

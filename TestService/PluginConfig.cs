@@ -16,6 +16,8 @@ namespace TestService
             services.AddSingleton<AuthMiddleware>();
             //添加监听实例
             services.AddSingleton<TestListener>();
+            //添加服务
+            services.AddSingleton<TestService>();
         }
         public void Loaded(ITAApplication app, IEventRegister register) {
             //新增一个事件监听
