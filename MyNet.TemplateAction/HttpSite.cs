@@ -101,7 +101,7 @@ namespace MyNet.TemplateAction
             {
                 _filterext.Add(s.ToLower());
             }
-            _workThread = 10;
+            _workThread = 20;
             _workerState = WORKER_STATE_SHUTDOWN;
             _gzip = false;
             _ip = ip;
