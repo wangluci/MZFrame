@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
-    <Authors>MyNet</Authors>
+    <Authors>重新读取</Authors>
     <Company>重新读取</Company>
     <Copyright>版权所有(C)重新读取 2021</Copyright>
   </PropertyGroup>
