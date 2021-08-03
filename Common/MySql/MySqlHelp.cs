@@ -33,58 +33,8 @@ namespace Common.MySql
 
         protected override void AutoDbParam(Type tp, string name, object val, ParameterDirection direct)
         {
-            MySqlParameter dbParameter = new MySqlParameter();
-            dbParameter.ParameterName = name;
-            dbParameter.Value = val;
+            MySqlParameter dbParameter = new MySqlParameter(name, val);
             dbParameter.Direction = direct;
-            if (tp == typeof(string))
-            {
-                dbParameter.MySqlDbType = MySqlDbType.VarChar;
-            }
-            else if (tp == typeof(int))
-            {
-                dbParameter.MySqlDbType = MySqlDbType.Int32;
-            }
-            else if (tp == typeof(long))
-            {
-                dbParameter.MySqlDbType = MySqlDbType.Int64;
-            }
-            else if (tp == typeof(float))
-            {
-                dbParameter.MySqlDbType = MySqlDbType.Float;
-            }
-            else if (tp == typeof(double))
-            {
-                dbParameter.MySqlDbType = MySqlDbType.Double;
-            }
-            else if (tp == typeof(Int16))
-            {
-                dbParameter.MySqlDbType = MySqlDbType.Int16;
-            }
-            else if (tp == typeof(bool))
-            {
-                dbParameter.MySqlDbType = MySqlDbType.Bit;
-            }
-            else if (tp == typeof(decimal))
-            {
-                dbParameter.MySqlDbType = MySqlDbType.Decimal;
-            }
-            else if (tp == typeof(DateTime))
-            {
-                dbParameter.MySqlDbType = MySqlDbType.DateTime;
-            }
-            else if (tp == typeof(byte))
-            {
-                dbParameter.MySqlDbType = MySqlDbType.UByte;
-            }
-            else if (tp.IsEnum)
-            {
-                dbParameter.MySqlDbType = MySqlDbType.Int16;
-            }
-            else
-            {
-                dbParameter.MySqlDbType = MySqlDbType.VarString;
-            }
             mDbParamters.Add(dbParameter);
         }
 
