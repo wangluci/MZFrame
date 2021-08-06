@@ -36,7 +36,7 @@ namespace Common.MSSql
         protected override void AutoDbParam(Type tp, string name, object val, ParameterDirection direct)
         {
             SqlParameter dbParameter = new SqlParameter();
-            dbParameter.ParameterName = name;
+            dbParameter.ParameterName = "@" + name;
             dbParameter.Value = val;
             dbParameter.Direction = direct;
 
@@ -85,13 +85,13 @@ namespace Common.MSSql
 
         public void AddOutParam(string parameterName, SqlDbType dbType)
         {
-            SqlParameter dbParameter = new SqlParameter(parameterName, dbType);
+            SqlParameter dbParameter = new SqlParameter("@" + parameterName, dbType);
             dbParameter.Direction = ParameterDirection.Output;
             mDbParamters.Add(dbParameter);
         }
         public void AddInParam(string parameterName, SqlDbType dbType, object value)
         {
-            SqlParameter dbParameter = new SqlParameter(parameterName, dbType);
+            SqlParameter dbParameter = new SqlParameter("@" + parameterName, dbType);
             dbParameter.Value = value;
             dbParameter.Direction = ParameterDirection.Input;
             mDbParamters.Add(dbParameter);

@@ -33,7 +33,7 @@ namespace Common.MySql
 
         protected override void AutoDbParam(Type tp, string name, object val, ParameterDirection direct)
         {
-            MySqlParameter dbParameter = new MySqlParameter(name, val);
+            MySqlParameter dbParameter = new MySqlParameter("@" + name, val);
             dbParameter.Direction = direct;
             mDbParamters.Add(dbParameter);
         }
@@ -46,17 +46,18 @@ namespace Common.MySql
 
         public void AddOutParam(string parameterName, MySqlDbType dbType)
         {
-            MySqlParameter dbParameter = new MySqlParameter(parameterName, dbType);
+            MySqlParameter dbParameter = new MySqlParameter("@" + parameterName, dbType);
             dbParameter.Direction = ParameterDirection.Output;
             mDbParamters.Add(dbParameter);
         }
         public void AddInParam(string parameterName, MySqlDbType dbType, object value)
         {
-            MySqlParameter dbParameter = new MySqlParameter(parameterName, dbType);
+            MySqlParameter dbParameter = new MySqlParameter("@" + parameterName, dbType);
             dbParameter.Value = value;
             dbParameter.Direction = ParameterDirection.Input;
             mDbParamters.Add(dbParameter);
         }
+
         protected override string NameToDbParam(string param)
         {
             return "@" + param;

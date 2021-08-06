@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\MyAccess\MyAccess.csproj" />
     <ProjectReference Include="..\ShareService\ShareService.csproj" />
     <ProjectReference Include="..\TemplateAction\TemplateAction.csproj" />

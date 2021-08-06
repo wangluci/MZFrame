@@ -28,8 +28,7 @@ namespace MyAccess.DB
 
             for (int i = 0; i < mInArr.Length; i++)
             {
-                string tmpn = help.AddParam("inparam_" + i, mInArr[i]);
-                inwhere += "," + tmpn;
+                inwhere += "," + help.AddParamAndReturn("inparam_" + i, mInArr[i]);
             }
             if (inwhere.StartsWith(","))
             {

@@ -46,6 +46,7 @@
     <Reference Include="System">
       <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.dll</HintPath>
     </Reference>
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -75,8 +76,13 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestDBConfig.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{66a85eaa-626e-435a-9b76-76551aae8b25}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MyAccess\MyAccess.csproj">
       <Project>{41f576d9-01d6-4df8-b1f2-c3ae4c75ca61}</Project>
       <Name>MyAccess</Name>

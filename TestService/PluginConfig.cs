@@ -18,6 +18,11 @@ namespace TestService
             services.AddSingleton<TestListener>();
             //添加服务
             services.AddSingleton<TestService>();
+            //注册异步DAL
+            services.AddSingleton<TestDALAsync>();
+            //注册同步DAL
+            services.AddSingleton<TestDAL>();
+
         }
         public void Loaded(ITAApplication app, IEventRegister register) {
             //新增一个事件监听
