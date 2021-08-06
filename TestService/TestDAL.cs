@@ -10,6 +10,6 @@ namespace TestService
     /// </summary>
     public class TestDAL : MySqlSupport
     {
-        public TestDAL(ITAServices services) : base(services.GetService<IDBConfig>() { }
+        public TestDAL(IDBConfig config) : base(config) { }
     }
 }
