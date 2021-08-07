@@ -10,6 +10,6 @@ namespace TestService
     /// </summary>
     public class TestDAL : MySqlSupport
     {
-        public TestDAL(IDBConfig config) : base(config) { }
+        public TestDAL() : base("server=127.0.0.1;user id=root;password=测试密码;database=test;") { }
     }
 }

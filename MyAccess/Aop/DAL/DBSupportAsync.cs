@@ -7,22 +7,28 @@ namespace MyAccess.Aop.DAL
     /// <summary>
     /// 异步用DAL层
     /// </summary>
-    public abstract class DBSupportAsync
+    public abstract class DBSupportAsync : IDBFactory
     {
         protected static AsyncLocal<IDbHelp> mDBHelp = new AsyncLocal<IDbHelp>();
-
+        protected string _connectionStr;
         public IDbHelp DBHelp
         {
             get { return mDBHelp.Value; }
         }
-        protected IDBConfig _config;
-        public DBSupportAsync(IDBConfig config)
+
+        public string Key
         {
-            _config = config;
+            get { return _connectionStr; }
+        }
+        public DBSupportAsync(string connectionStr)
+        {
+            _connectionStr = connectionStr;
         }
         public void InitHelp()
         {
-            mDBHelp.Value = AsyncDBMan.Instance().OpenDB(_config);
+            mDBHelp.Value = DBManAsync.Instance().OpenDB(this);
         }
+
+        public abstract IDbHelp CreateHelp();
     }
 }

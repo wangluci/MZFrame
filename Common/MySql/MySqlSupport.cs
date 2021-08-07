@@ -1,4 +1,5 @@
 ﻿using MyAccess.Aop.DAL;
+using MyAccess.DB;
 
 namespace Common.MySql
 {
@@ -7,10 +8,14 @@ namespace Common.MySql
     /// </summary>
     public abstract class MySqlSupport : DBSupport
     {
-        public MySqlSupport(IDBConfig config) : base(config) { }
+        public MySqlSupport(string connectionStr) : base(connectionStr) { }
         protected MySqlHelp help
         {
             get { return (MySqlHelp)mDBHelp; }
+        }
+        public override IDbHelp CreateHelp()
+        {
+            return new MySqlHelp(this._connectionStr);
         }
     }
 }

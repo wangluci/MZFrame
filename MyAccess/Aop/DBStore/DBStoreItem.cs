@@ -13,13 +13,13 @@ namespace MyAccess.Aop
         {
             return _openTrans;
         }
-        public virtual IDbHelp OpenDB(IDBConfig dbconfig)
+        public virtual IDbHelp OpenDB(IDBFactory factory)
         {
             IDbHelp tdb;
-            if (!mHelpStoreList.TryGetValue(dbconfig.Key, out tdb))
+            if (!mHelpStoreList.TryGetValue(factory.Key, out tdb))
             {
-                tdb = dbconfig.CreateHelp();
-                mHelpStoreList.Add(dbconfig.Key, tdb);
+                tdb = factory.CreateHelp();
+                mHelpStoreList.Add(factory.Key, tdb);
             }
             if (_openTrans)
             {

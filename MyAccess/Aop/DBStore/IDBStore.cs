@@ -10,7 +10,7 @@ namespace MyAccess.Aop
         /// 是否已启用事务
         /// </summary>
         bool IsTranslation();
-        IDbHelp OpenDB(IDBConfig dbconfig);
+        IDbHelp OpenDB(IDBFactory factory);
         void BeginTrans(Isolation level);
         void Commit();
         void RollBack();

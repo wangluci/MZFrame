@@ -29,24 +29,24 @@ namespace MyAccess.Aop
                     //异步
                     try
                     {
-                        AsyncDBMan.Instance().BeginTrans();
+                        DBManAsync.Instance().BeginTrans();
                         invocation.Proceed();
                         ITransReturn tr = invocation.ReturnValue as ITransReturn;
                         if (tr != null)
                         {
                             if (tr.IsSuccess())
                             {
-                                AsyncDBMan.Instance().Commit();
+                                DBManAsync.Instance().Commit();
                             }
                         }
                         else
                         {
-                            AsyncDBMan.Instance().Commit();
+                            DBManAsync.Instance().Commit();
                         }
                     }
                     finally
                     {
-                        AsyncDBMan.Instance().RollBack();
+                        DBManAsync.Instance().RollBack();
                     }
                 }
                 else

@@ -13,7 +13,7 @@ namespace MyAccess.Aop
 
         private IDBStore _store;
         private DBMan() {
-            _store = new ThreadDBStore();
+            _store = new DBStoreThread();
         }
         public static DBMan Instance()
         {
@@ -32,9 +32,9 @@ namespace MyAccess.Aop
             get { return _store.IsTranslation(); }
         }
 
-        public IDbHelp OpenDB(IDBConfig dbconfig)
+        public IDbHelp OpenDB(IDBFactory factory)
         {
-            return _store.OpenDB(dbconfig);
+            return _store.OpenDB(factory);
         }
         public void BeginTrans()
         {

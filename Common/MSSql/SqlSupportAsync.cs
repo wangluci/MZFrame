@@ -1,4 +1,5 @@
 ﻿using MyAccess.Aop.DAL;
+using MyAccess.DB;
 
 namespace Common.MSSql
 {
@@ -7,10 +8,14 @@ namespace Common.MSSql
     /// </summary>
     public abstract class SqlSupportAsync : DBSupportAsync
     {
-        public SqlSupportAsync(IDBConfig config) : base(config) { }
+        public SqlSupportAsync(string connectionStr) : base(connectionStr) { }
         protected SqlDbHelp help
         {
             get { return (SqlDbHelp)mDBHelp.Value; }
+        }
+        public override IDbHelp CreateHelp()
+        {
+            return new SqlDbHelp(this._connectionStr);
         }
     }
 }

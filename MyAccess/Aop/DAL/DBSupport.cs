@@ -5,23 +5,31 @@ namespace MyAccess.Aop.DAL
     /// <summary>
     /// 同步用DAL层
     /// </summary>
-    public abstract class DBSupport
+    public abstract class DBSupport : IDBFactory
     {
         [ThreadStatic]
         protected static IDbHelp mDBHelp;
-
+        protected string _connectionStr;
         public IDbHelp DBHelp
         {
             get { return mDBHelp; }
         }
-        protected IDBConfig _config;
-        public DBSupport(IDBConfig config)
+
+        public string Key
         {
-            _config = config;
+            get { return _connectionStr; }
         }
-        public void InitHelp()
+
+        public DBSupport(string connectionStr)
         {
-            mDBHelp = DBMan.Instance().OpenDB(_config);
+            _connectionStr = connectionStr;
         }
+
+        internal void InitHelp()
+        {
+            mDBHelp = DBMan.Instance().OpenDB(this);
+        }
+
+        public abstract IDbHelp CreateHelp();
     }
 }
