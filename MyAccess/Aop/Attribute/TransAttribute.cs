@@ -22,10 +22,10 @@ namespace MyAccess.Aop
         {
             _isolation = level;
         }
-        public override bool InterceptDeal(DBSupport support, IInvocation invocation)
+        public override bool InterceptDeal(IDBSupport support, IInvocation invocation)
         {
             //事务已开启，则不执行事务
-            if (DBMan.Instance().IsTranslation)
+            if (support.IsTranslation)
             {
                 invocation.Proceed();
             }

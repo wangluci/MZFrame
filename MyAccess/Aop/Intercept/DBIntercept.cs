@@ -11,7 +11,7 @@ namespace MyAccess.Aop
     {
         public void Intercept(IInvocation invocation)
         {
-            DBSupport support = invocation.InvocationTarget as DBSupport;
+            IDBSupport support = invocation.InvocationTarget as IDBSupport;
             if (support != null)
             {
                 support.InitHelp();

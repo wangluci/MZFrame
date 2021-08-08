@@ -7,7 +7,7 @@ namespace MyAccess.Aop.DAL
     /// <summary>
     /// 异步用DAL层
     /// </summary>
-    public abstract class DBSupportAsync : IDBFactory
+    public abstract class DBSupportAsync : IDBSupport, IDBFactory
     {
         protected static AsyncLocal<IDbHelp> mDBHelp = new AsyncLocal<IDbHelp>();
         protected string _connectionStr;
@@ -19,6 +19,10 @@ namespace MyAccess.Aop.DAL
         public string Key
         {
             get { return _connectionStr; }
+        }
+        public bool IsTranslation
+        {
+            get { return DBManAsync.Instance().IsTranslation; }
         }
         public DBSupportAsync(string connectionStr)
         {

@@ -5,7 +5,7 @@ namespace MyAccess.Aop.DAL
     /// <summary>
     /// 同步用DAL层
     /// </summary>
-    public abstract class DBSupport : IDBFactory
+    public abstract class DBSupport : IDBSupport, IDBFactory
     {
         [ThreadStatic]
         protected static IDbHelp mDBHelp;
@@ -20,12 +20,17 @@ namespace MyAccess.Aop.DAL
             get { return _connectionStr; }
         }
 
+        public bool IsTranslation
+        {
+            get { return DBMan.Instance().IsTranslation; }
+        }
+
         public DBSupport(string connectionStr)
         {
             _connectionStr = connectionStr;
         }
 
-        internal void InitHelp()
+        public void InitHelp()
         {
             mDBHelp = DBMan.Instance().OpenDB(this);
         }

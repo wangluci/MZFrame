@@ -12,18 +12,11 @@ namespace MyAccess.Aop
     {
         public void Intercept(IInvocation invocation)
         {
-            TransAttribute dbtrans = null;
-            object[] Attributes = invocation.MethodInvocationTarget.GetCustomAttributes(true);
-            foreach (object attribute in Attributes)
-            {
-                dbtrans = attribute as TransAttribute;
-                if (dbtrans != null) break;
-            }
+            TransAttribute dbtrans = (TransAttribute)invocation.MethodInvocationTarget.GetCustomAttribute(typeof(TransAttribute));
             if (dbtrans != null)
             {
                 //判断方法是否为异步
-                Type attType = typeof(AsyncStateMachineAttribute);
-                Attribute attrib = invocation.Method.GetCustomAttribute(attType);
+                Attribute attrib = invocation.Method.GetCustomAttribute(typeof(AsyncStateMachineAttribute));
                 if (attrib != null)
                 {
                     //异步

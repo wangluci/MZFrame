@@ -12,6 +12,6 @@ namespace MyAccess.Aop
         /// <param name="support"></param>
         /// <param name="invocation"></param>
         /// <returns>是否调用了invocation的Proceed函数</returns>
-        public abstract bool InterceptDeal(DBSupport support, IInvocation invocation);
+        public abstract bool InterceptDeal(IDBSupport support, IInvocation invocation);
     }
 }
