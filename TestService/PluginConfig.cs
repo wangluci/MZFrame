@@ -17,11 +17,20 @@ namespace TestService
             //添加监听实例
             services.AddSingleton<TestListener>();
             //添加服务
-            services.AddSingleton<TestService>();
+            services.AddSingleton<TestService>((object[] arguments) =>
+            {
+                return MyAccess.Aop.InterceptFactory.CreateBLL(typeof(TestService), arguments);
+            });
             //注册异步DAL
-            services.AddSingleton<TestDALAsync>();
+            services.AddSingleton<TestDALAsync>((object[] arguments) =>
+            {
+                return MyAccess.Aop.InterceptFactory.CreateDAL(typeof(TestDALAsync), arguments);
+            });
             //注册同步DAL
-            services.AddSingleton<TestDAL>();
+            services.AddSingleton<TestDAL>((object[] arguments) =>
+            {
+                return MyAccess.Aop.InterceptFactory.CreateDAL(typeof(TestDAL), arguments);
+            });
 
         }
         public void Loaded(ITAApplication app, IEventRegister register) {
