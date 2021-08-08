@@ -1,8 +1,5 @@
 ﻿using Castle.DynamicProxy;
 using System;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-
 namespace MyAccess.Aop
 {
     /// <summary>
@@ -12,64 +9,22 @@ namespace MyAccess.Aop
     {
         public void Intercept(IInvocation invocation)
         {
-            TransAttribute dbtrans = (TransAttribute)invocation.MethodInvocationTarget.GetCustomAttribute(typeof(TransAttribute));
-            if (dbtrans != null)
+            object[] Attributes = invocation.MethodInvocationTarget.GetCustomAttributes(true);
+            bool hasProceed = false;
+
+            foreach (object attribute in Attributes)
             {
-                //判断方法是否为异步
-                Attribute attrib = invocation.Method.GetCustomAttribute(typeof(AsyncStateMachineAttribute));
-                if (attrib != null)
+                AbstractAopAttr dbtrans = attribute as AbstractAopAttr;
+                if (dbtrans != null)
                 {
-                    //异步
-                    try
+                    if (dbtrans.InterceptDeal(invocation))
                     {
-                        DBManAsync.Instance().BeginTrans();
-                        invocation.Proceed();
-                        ITransReturn tr = invocation.ReturnValue as ITransReturn;
-                        if (tr != null)
-                        {
-                            if (tr.IsSuccess())
-                            {
-                                DBManAsync.Instance().Commit();
-                            }
-                        }
-                        else
-                        {
-                            DBManAsync.Instance().Commit();
-                        }
-                    }
-                    finally
-                    {
-                        DBManAsync.Instance().RollBack();
+                        hasProceed = true;
                     }
                 }
-                else
-                {
-                    //同步
-                    try
-                    {
-                        DBMan.Instance().BeginTrans();
-                        invocation.Proceed();
-                        ITransReturn tr = invocation.ReturnValue as ITransReturn;
-                        if (tr != null)
-                        {
-                            if (tr.IsSuccess())
-                            {
-                                DBMan.Instance().Commit();
-                            }
-                        }
-                        else
-                        {
-                            DBMan.Instance().Commit();
-                        }
-                    }
-                    finally
-                    {
-                        DBMan.Instance().RollBack();
-                    }
-                }
-              
             }
-            else
+
+            if (!hasProceed)
             {
                 invocation.Proceed();
             }

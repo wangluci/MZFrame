@@ -22,10 +22,10 @@ namespace MyAccess.Aop
 
                     foreach (object attribute in Attributes)
                     {
-                        DBAbstractAttr dbtrans = attribute as DBAbstractAttr;
+                        AbstractAopAttr dbtrans = attribute as AbstractAopAttr;
                         if (dbtrans != null)
                         {
-                            if (dbtrans.InterceptDeal(support, invocation))
+                            if (dbtrans.InterceptDeal(invocation))
                             {
                                 hasProceed = true;
                             }

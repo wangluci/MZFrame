@@ -2,12 +2,14 @@
 using System;
 using MyAccess.Aop.DAL;
 using MyAccess.DB;
+using System.Runtime.CompilerServices;
+using System.Reflection;
 
 namespace MyAccess.Aop
 {
 
     [AttributeUsage(AttributeTargets.Method)]
-    public class TransAttribute : DBAbstractAttr
+    public class TransAttribute : AbstractAopAttr
     {
         private Isolation _isolation;
         public Isolation IsolatioinLevel
@@ -22,38 +24,99 @@ namespace MyAccess.Aop
         {
             _isolation = level;
         }
-        public override bool InterceptDeal(IDBSupport support, IInvocation invocation)
+        public override bool InterceptDeal(IInvocation invocation)
         {
-            //事务已开启，则不执行事务
-            if (support.IsTranslation)
+            IDBSupport support = invocation.InvocationTarget as IDBSupport;
+            //判断是否为DAL层的拦截器
+            if (support != null)
             {
-                invocation.Proceed();
-            }
-            else
-            {
-                try
+                //事务已开启，则不执行事务
+                if (support.IsTranslation)
                 {
-                    support.DBHelp.BeginTran(_isolation);
                     invocation.Proceed();
-                    ITransReturn tr = invocation.ReturnValue as ITransReturn;
-                    if (tr != null)
+                }
+                else
+                {
+                    try
                     {
-                        if (tr.IsSuccess())
+                        support.DBHelp.BeginTran(_isolation);
+                        invocation.Proceed();
+                        ITransReturn tr = invocation.ReturnValue as ITransReturn;
+                        if (tr != null)
+                        {
+                            if (tr.IsSuccess())
+                            {
+                                support.DBHelp.Commit();
+                            }
+                        }
+                        else
                         {
                             support.DBHelp.Commit();
                         }
                     }
-                    else
+                    finally
                     {
-                        support.DBHelp.Commit();
+                        support.DBHelp.RollBack();
                     }
                 }
-                finally
+
+            
+            }
+            else
+            {
+                //判断方法是否为异步
+                Attribute attrib = invocation.Method.GetCustomAttribute(typeof(AsyncStateMachineAttribute));
+                if (attrib != null)
                 {
-                    support.DBHelp.RollBack();
+                    //异步
+                    try
+                    {
+                        DBManAsync.Instance().BeginTrans();
+                        invocation.Proceed();
+                        ITransReturn tr = invocation.ReturnValue as ITransReturn;
+                        if (tr != null)
+                        {
+                            if (tr.IsSuccess())
+                            {
+                                DBManAsync.Instance().Commit();
+                            }
+                        }
+                        else
+                        {
+                            DBManAsync.Instance().Commit();
+                        }
+                    }
+                    finally
+                    {
+                        DBManAsync.Instance().RollBack();
+                    }
+                }
+                else
+                {
+                    //同步
+                    try
+                    {
+                        DBMan.Instance().BeginTrans();
+                        invocation.Proceed();
+                        ITransReturn tr = invocation.ReturnValue as ITransReturn;
+                        if (tr != null)
+                        {
+                            if (tr.IsSuccess())
+                            {
+                                DBMan.Instance().Commit();
+                            }
+                        }
+                        else
+                        {
+                            DBMan.Instance().Commit();
+                        }
+                    }
+                    finally
+                    {
+                        DBMan.Instance().RollBack();
+                    }
                 }
             }
-
             return true;
         }
 
