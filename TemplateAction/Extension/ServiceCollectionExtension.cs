@@ -1,4 +1,5 @@
 ﻿using System;
+using TemplateAction.Common;
 using TemplateAction.Core;
 
 namespace TemplateAction.Extension
@@ -14,7 +15,8 @@ namespace TemplateAction.Extension
         /// <returns></returns>
         public static IServiceCollection AddString(this IServiceCollection collection, string name, string val)
         {
-            collection.Add(name, new ServiceDescriptor(typeof(string), ServiceLifetime.Other, (object[] arguments) =>
+            Type strType = typeof(string);
+            collection.Add(TAUtility.TypeName2ServiceKey(strType, name), new ServiceDescriptor(strType, ServiceLifetime.Other, (object[] arguments) =>
             {
                 return val;
             }, StringLifetimeFactory));

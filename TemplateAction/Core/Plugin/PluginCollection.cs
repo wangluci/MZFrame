@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading;
 using System.Collections.Concurrent;
 using System.IO;
+using TemplateAction.Common;
 
 namespace TemplateAction.Core
 {
@@ -388,7 +389,8 @@ namespace TemplateAction.Core
                     }
                     else if (parameterType.IsPrimitive || parameterType == typeof(string))
                     {
-                        parameters[i] = GetService(parameter.Name);
+                        ;
+                        parameters[i] = GetService(TAUtility.TypeName2ServiceKey(parameterType, parameter.Name));
                     }
                     else
                     {

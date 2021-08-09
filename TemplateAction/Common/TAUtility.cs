@@ -22,8 +22,18 @@ namespace TemplateAction.Common
         public const string CONTROLLER_KEY = "controller";
         public const string ACTION_KEY = "action";
         public const string HTML_ENCODE = "html";
+        public const string TYPE_NAME_SYMBOL = "$$";
 
-
+        /// <summary>
+        /// 类型与名称合并成Key
+        /// </summary>
+        /// <param name="serviceType"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static string TypeName2ServiceKey(Type serviceType, string name)
+        {
+            return serviceType.FullName + TYPE_NAME_SYMBOL + name;
+        }
         /// <summary>
         /// 判断是否为静态文件url
         /// </summary>
