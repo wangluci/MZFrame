@@ -27,6 +27,9 @@ namespace TemplateAction.Core
             get { return _dispatcher; }
         }
         private ConcurrentStorer _storer;
+        /// <summary>
+        /// 插件单例存储
+        /// </summary>
         public ConcurrentStorer Storer
         {
             get { return _storer; }

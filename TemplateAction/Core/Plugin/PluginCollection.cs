@@ -20,11 +20,6 @@ namespace TemplateAction.Core
         /// </summary>
         private ConcurrentStorer _singletonServices;
         /// <summary>
-        /// 线程服务实例
-        /// </summary>
-        [ThreadStatic]
-        private static SimpleStorer _threadServices = null;
-        /// <summary>
         /// 全局服务
         /// </summary>
         private IServiceCollection _services;
@@ -288,13 +283,7 @@ namespace TemplateAction.Core
             }
 
         }
-        public void ClearThreadService()
-        {
-            if (!Equals(_threadServices, null))
-            {
-                _threadServices = null;
-            }
-        }
+
         /// <summary>
         /// 获取服务实例
         /// </summary>
@@ -339,20 +328,6 @@ namespace TemplateAction.Core
                                 ConcurrentProxy proxy = pobj.Storer.GetOrAdd(sd.ServiceType.FullName);
                                 result = proxy.GetValue(sd);
                             }
-                        }
-                    }
-                    break;
-                case ServiceLifetime.Thread:
-                    {
-                        if (Equals(_threadServices, null))
-                        {
-                            _threadServices = new SimpleStorer();
-                        }
-                        result = _threadServices.GetInstance(sd.ServiceType.FullName);
-                        if (Equals(result, null))
-                        {
-                            result = CreateServiceInstance(sd.ServiceType, sd.Factory);
-                            _threadServices.AddInstance(sd.ServiceType.FullName, result);
                         }
                     }
                     break;

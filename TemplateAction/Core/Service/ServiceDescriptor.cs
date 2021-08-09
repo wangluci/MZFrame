@@ -36,10 +36,6 @@ namespace TemplateAction.Core
         /// </summary>
         Singleton,
         /// <summary>
-        /// 同一个线程获取多次会得到相同的实例
-        /// </summary>
-        Thread,
-        /// <summary>
         /// 每次都获取一个新的实例
         /// </summary>
         Transient

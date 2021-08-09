@@ -99,8 +99,6 @@ namespace TemplateAction.Core
                             break;
                     }
                 }
-                //清除线程服务
-                _plugins.ClearThreadService();
                 return CreateTARequestHandleBuilder(context, tns, tcontroller, taction, exparams);
             }
             return null;

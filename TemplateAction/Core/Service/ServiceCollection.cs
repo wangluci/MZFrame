@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
-
 namespace TemplateAction.Core
 {
     public class ServiceCollection : IServiceCollection
@@ -29,7 +27,13 @@ namespace TemplateAction.Core
                 return null;
             }
         }
-
+        public void Add(ServiceDescriptor des)
+        {
+            if (des != null)
+            {
+                _services[des.ImplementationType.FullName] = des;
+            }
+        }
         public void AddTransient<T1, T2>()
         {
             Type imp = typeof(T1);
@@ -44,21 +48,7 @@ namespace TemplateAction.Core
             tmp.PluginName = PluginName;
             _services[imp.FullName] = tmp;
         }
-        public void AddThread<T1, T2>()
-        {
-            Type imp = typeof(T1);
-            ServiceDescriptor tmp = new ServiceDescriptor(typeof(T2), imp, ServiceLifetime.Thread, null);
-            tmp.PluginName = PluginName;
-            _services[imp.FullName] = tmp;
-        }
-        public void AddThread<T1, T2>(ProxyFactory factory)
-        {
-            Type imp = typeof(T1);
-            ServiceDescriptor tmp = new ServiceDescriptor(typeof(T2), imp, ServiceLifetime.Thread, factory);
-            tmp.PluginName = PluginName;
-            _services[imp.FullName] = tmp;
-        }
-
+  
         public void AddSingleton<T1, T2>()
         {
             Type imp = typeof(T1);
