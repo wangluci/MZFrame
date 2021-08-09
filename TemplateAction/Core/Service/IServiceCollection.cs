@@ -9,8 +9,9 @@ namespace TemplateAction.Core
         /// <summary>
         /// 注入服务
         /// </summary>
+        /// <param name="key"></param>
         /// <param name="des"></param>
-        void Add(ServiceDescriptor des);
+        void Add(string key, ServiceDescriptor des);
         void AddTransient<T1, T2>();
         void AddTransient<T1, T2>(ProxyFactory factory);
         void AddSingleton<T1>();

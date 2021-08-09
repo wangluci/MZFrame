@@ -9,24 +9,35 @@ namespace TemplateAction.Core
     /// <returns></returns>
     public delegate object ProxyFactory(object[] constructorArguments);
     /// <summary>
+    /// 生命期处理工厂
+    /// </summary>
+    /// <param name="collection"></param>
+    /// <param name="sd"></param>
+    /// <returns></returns>
+
+    public delegate object LifetimeFactory(PluginCollection collection, ServiceDescriptor sd);
+    /// <summary>
     /// 服务描述信息
     /// </summary>
     public class ServiceDescriptor
     {
         public ServiceLifetime Lifetime { get; }
         public Type ServiceType { get; }
-        public Type ImplementationType { get; }
         public ProxyFactory Factory { get; }
         /// <summary>
         /// 所属插件
         /// </summary>
         public string PluginName { get; set; }
-        public ServiceDescriptor(Type serviceType, Type implementationType, ServiceLifetime lifetime, ProxyFactory factory)
+        /// <summary>
+        /// 当Lifetime为Other时,使用
+        /// </summary>
+        public LifetimeFactory LifetimeFactory { get; set; }
+        public ServiceDescriptor(Type serviceType, ServiceLifetime lifetime, ProxyFactory factory, LifetimeFactory lifetimeFactory = null)
         {
             ServiceType = serviceType;
-            ImplementationType = implementationType;
             Lifetime = lifetime;
             Factory = factory;
+            LifetimeFactory = lifetimeFactory;
         }
     }
     public enum ServiceLifetime
@@ -38,6 +49,10 @@ namespace TemplateAction.Core
         /// <summary>
         /// 每次都获取一个新的实例
         /// </summary>
-        Transient
+        Transient,
+        /// <summary>
+        /// 其它自定义
+        /// </summary>
+        Other
     }
 }

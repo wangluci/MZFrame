@@ -6,6 +6,11 @@ namespace TestService
 {
     public class TestService
     {
+        private TestDAL _dal;
+        public TestService(TestDAL dal)
+        {
+            _dal = dal;
+        }
         public async Task<string> TestTask()
         {
             string str1 = string.Format("TestTask测试异步:ThreadId{0}", Thread.CurrentThread.ManagedThreadId.ToString());

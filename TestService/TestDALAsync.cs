@@ -9,6 +9,6 @@ namespace TestService
     /// </summary>
     public class TestDALAsync: MySqlSupportAsync
     {
-        public TestDALAsync() : base("server=127.0.0.1;user id=root;password=测试密码;database=test;") { }
+        public TestDALAsync(string testconnstr) : base(testconnstr) { }
     }
 }

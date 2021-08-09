@@ -20,41 +20,40 @@ namespace TemplateAction.Core
             get
             {
                 ServiceDescriptor sd;
-                if(_services.TryGetValue(key,out sd))
+                if (_services.TryGetValue(key, out sd))
                 {
                     return sd;
                 }
                 return null;
             }
         }
-        public void Add(ServiceDescriptor des)
+        public void Add(string key, ServiceDescriptor des)
         {
             if (des != null)
             {
-                _services[des.ImplementationType.FullName] = des;
+                des.PluginName = _pluginName;
+                _services[key] = des;
             }
         }
         public void AddTransient<T1, T2>()
         {
             Type imp = typeof(T1);
-            ServiceDescriptor tmp = new ServiceDescriptor(typeof(T2), imp, ServiceLifetime.Transient, null);
+            ServiceDescriptor tmp = new ServiceDescriptor(typeof(T2), ServiceLifetime.Transient, null);
             tmp.PluginName = PluginName;
             _services[imp.FullName] = tmp;
         }
         public void AddTransient<T1, T2>(ProxyFactory factory)
         {
-            Type imp = typeof(T1);
-            ServiceDescriptor tmp = new ServiceDescriptor(typeof(T2), imp, ServiceLifetime.Transient, factory);
+            ServiceDescriptor tmp = new ServiceDescriptor(typeof(T2), ServiceLifetime.Transient, factory);
             tmp.PluginName = PluginName;
-            _services[imp.FullName] = tmp;
+            _services[typeof(T1).FullName] = tmp;
         }
-  
+
         public void AddSingleton<T1, T2>()
         {
-            Type imp = typeof(T1);
-            ServiceDescriptor tmp = new ServiceDescriptor(typeof(T2), imp, ServiceLifetime.Singleton, null);
+            ServiceDescriptor tmp = new ServiceDescriptor(typeof(T2), ServiceLifetime.Singleton, null);
             tmp.PluginName = PluginName;
-            _services[imp.FullName] = tmp;
+            _services[typeof(T1).FullName] = tmp;
         }
 
         public void AddSingleton<T1>()
@@ -64,10 +63,9 @@ namespace TemplateAction.Core
 
         public void AddSingleton<T1, T2>(ProxyFactory factory)
         {
-            Type imp = typeof(T1);
-            ServiceDescriptor tmp = new ServiceDescriptor(typeof(T2), imp, ServiceLifetime.Singleton, factory);
+            ServiceDescriptor tmp = new ServiceDescriptor(typeof(T2), ServiceLifetime.Singleton, factory);
             tmp.PluginName = PluginName;
-            _services[imp.FullName] = tmp;
+            _services[typeof(T1).FullName] = tmp;
         }
 
         public void AddSingleton<T1>(ProxyFactory factory)

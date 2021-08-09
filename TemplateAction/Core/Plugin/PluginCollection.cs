@@ -43,6 +43,7 @@ namespace TemplateAction.Core
         {
             get { return _routerBuilder; }
         }
+
         public PluginCollection()
         {
             _singletonServices = new ConcurrentStorer(this);
@@ -336,6 +337,14 @@ namespace TemplateAction.Core
                         result = CreateServiceInstance(sd.ServiceType, sd.Factory);
                     }
                     break;
+                case ServiceLifetime.Other:
+                    {
+                        if (sd != null)
+                        {
+                            result = sd.LifetimeFactory?.Invoke(this, sd);
+                        }
+                    }
+                    break;
             }
             return result;
         }
@@ -372,9 +381,14 @@ namespace TemplateAction.Core
                 {
                     ParameterInfo parameter = parameterInfos[i];
                     Type parameterType = parameter.ParameterType;
+
                     if (parameterType == typeof(ITAServices))
                     {
                         parameters[i] = this;
+                    }
+                    else if (parameterType.IsPrimitive || parameterType == typeof(string))
+                    {
+                        parameters[i] = GetService(parameter.Name);
                     }
                     else
                     {

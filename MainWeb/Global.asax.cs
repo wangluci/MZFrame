@@ -2,9 +2,9 @@
 using System.IO;
 using TemplateAction.Core;
 using TemplateAction.Route;
+using TemplateAction.Extension;
 using System.Web;
-using MyAccess.WordSegment;
-using MyAccess.Aop.DAL;
+using System.Configuration;
 
 namespace MainWeb
 {
@@ -19,6 +19,8 @@ namespace MainWeb
                 app.UseRouterBuilder(new RouterBuilder().UsePlugin().UseDefault("TestService"));
                 //使用身份认证
                 app.UseFilterMiddleware("TestService.AuthMiddleware");
+                //注册字符串
+                app.Services.AddString("testconnstr", ConfigurationManager.AppSettings["testconnstr"]);
             });
             MyAccess.log4net.Config.XmlConfigurator.ConfigureAndWatch(new FileInfo(Server.MapPath("log4net.config")));
         }
