@@ -6,8 +6,6 @@ namespace TemplateAction.Core
 {
     public class MvcMiddleware : IFilterMiddleware
     {
-        protected const string CONTROLLER_PRE = "CONTR_STORE_$$";
-
         public object Excute(TARequestHandle request, FilterMiddlewareNode next)
         {
             if (request.ControllerNode == null) return null;
@@ -15,27 +13,7 @@ namespace TemplateAction.Core
             ITAContext context = request.Context;
             Type ct = request.ControllerNode.ControllerType;
             //创建控制器
-            //string tmpcontrollkey = CONTROLLER_PRE + ct.FullName;
-            //IController c = context.Items[tmpcontrollkey] as IController;
-            //if (c == null)
-            //{
-
-            //    context.Items[tmpcontrollkey] = c;
-            //}
-            IController c = context.Application.ServiceProvider.CreateExtOtherService(ct, (PluginCollection collection, ServiceDescriptor sd, LifetimeFactory extFactory) => {
-                string tkey = CONTROLLER_PRE + sd.ServiceType.FullName;
-                if (context.Items.Contains(tkey))
-                {
-                    return context.Items[tkey];
-                }
-                else
-                {
-                    object target = collection.CreateServiceInstance(sd.ServiceType, sd.Factory, extFactory);
-                    context.Items[tkey] = target;
-                    return target;
-                }
-
-            }) as IController;
+            IController c = context.Application.ServiceProvider.CreateExtOtherService(ct, request) as IController;
             if (c == null)
             {
                 return null;

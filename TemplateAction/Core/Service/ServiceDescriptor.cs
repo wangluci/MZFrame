@@ -9,14 +9,6 @@ namespace TemplateAction.Core
     /// <returns></returns>
     public delegate object ProxyFactory(object[] constructorArguments);
     /// <summary>
-    /// 生命期处理工厂
-    /// </summary>
-    /// <param name="collection"></param>
-    /// <param name="sd"></param>
-    /// <returns></returns>
-
-    public delegate object LifetimeFactory(PluginCollection collection, ServiceDescriptor sd, LifetimeFactory extFactory);
-    /// <summary>
     /// 服务描述信息
     /// </summary>
     public class ServiceDescriptor
@@ -31,8 +23,8 @@ namespace TemplateAction.Core
         /// <summary>
         /// 当Lifetime为Other时,使用
         /// </summary>
-        public LifetimeFactory LifetimeFactory { get; set; }
-        public ServiceDescriptor(Type serviceType, ServiceLifetime lifetime, ProxyFactory factory, LifetimeFactory lifetimeFactory = null)
+        public ILifetimeFactory LifetimeFactory { get; set; }
+        public ServiceDescriptor(Type serviceType, ServiceLifetime lifetime, ProxyFactory factory, ILifetimeFactory lifetimeFactory = null)
         {
             ServiceType = serviceType;
             Lifetime = lifetime;

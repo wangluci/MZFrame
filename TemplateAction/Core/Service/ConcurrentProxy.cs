@@ -9,7 +9,7 @@ namespace TemplateAction.Core
         internal ConcurrentProxy()
         {
         }
-        public object GetValue(Func<Type, ProxyFactory, LifetimeFactory, object> fun, ServiceDescriptor desc, LifetimeFactory extOtherFactory)
+        public object GetValue(Func<Type, ProxyFactory, ILifetimeFactory, object> fun, ServiceDescriptor desc, ILifetimeFactory extOtherFactory)
         {
             if (_target == null)
             {

@@ -6,6 +6,14 @@ namespace TemplateAction.Extension
 {
     public static class ServiceCollectionExtension
     {
+        public class StringLifetimeFactory : ILifetimeFactory
+        {
+            public object GetValue(PluginCollection collection, ServiceDescriptor sd, ILifetimeFactory extFactory)
+            {
+                return collection.CreateServiceInstance(sd.ServiceType, sd.Factory, extFactory);
+            }
+        }
+        private static StringLifetimeFactory _strLifeFactory = new StringLifetimeFactory();
         /// <summary>
         /// 注册字符串依赖
         /// </summary>
@@ -19,12 +27,8 @@ namespace TemplateAction.Extension
             collection.Add(TAUtility.TypeName2ServiceKey(strType, name), new ServiceDescriptor(strType, ServiceLifetime.Other, (object[] arguments) =>
             {
                 return val;
-            }, StringLifetimeFactory));
+            }, _strLifeFactory));
             return collection;
-        }
-        public static object StringLifetimeFactory(PluginCollection collection, ServiceDescriptor sd, LifetimeFactory extFactory)
-        {
-            return collection.CreateServiceInstance(sd.ServiceType, sd.Factory, extFactory);
         }
     }
 }

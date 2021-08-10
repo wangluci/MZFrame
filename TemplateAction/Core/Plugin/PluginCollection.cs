@@ -185,7 +185,7 @@ namespace TemplateAction.Core
         {
             return GetService(typeof(T).FullName) as T;
         }
-        public object GetService(Type tp, LifetimeFactory extOtherFactory = null)
+        public object GetService(Type tp, ILifetimeFactory extOtherFactory = null)
         {
             return GetService(tp.FullName, extOtherFactory);
         }
@@ -195,7 +195,7 @@ namespace TemplateAction.Core
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public object GetService(string key, LifetimeFactory extOtherFactory = null)
+        public object GetService(string key, ILifetimeFactory extOtherFactory = null)
         {
             ServiceDescriptor sd = FindService(key);
             return Des2Instance(sd, extOtherFactory);
@@ -206,10 +206,10 @@ namespace TemplateAction.Core
         /// <param name="serviceType"></param>
         /// <param name="extOtherFactory"></param>
         /// <returns></returns>
-        public object CreateExtOtherService(Type serviceType, LifetimeFactory extOtherFactory)
+        public object CreateExtOtherService(Type serviceType, ILifetimeFactory extOtherFactory)
         {
             ServiceDescriptor sd = new ServiceDescriptor(serviceType, ServiceLifetime.Other, null, extOtherFactory);
-            return extOtherFactory.Invoke(this, sd, extOtherFactory);
+            return extOtherFactory.GetValue(this, sd, extOtherFactory);
         }
 
         /// <summary>
@@ -217,7 +217,7 @@ namespace TemplateAction.Core
         /// </summary>
         /// <param name="sd"></param>
         /// <returns></returns>
-        private object Des2Instance(ServiceDescriptor sd, LifetimeFactory extOtherFactory)
+        private object Des2Instance(ServiceDescriptor sd, ILifetimeFactory extOtherFactory)
         {
             object result = null;
             if (Equals(sd, null))
@@ -253,7 +253,7 @@ namespace TemplateAction.Core
                     {
                         if (sd.LifetimeFactory != null)
                         {
-                            result = sd.LifetimeFactory.Invoke(this, sd, extOtherFactory);
+                            result = sd.LifetimeFactory.GetValue(this, sd, extOtherFactory);
                         }
                     }
                     break;
@@ -266,7 +266,7 @@ namespace TemplateAction.Core
         /// </summary>
         /// <param name="serviceType"></param>
         /// <returns></returns>
-        public object CreateServiceInstance(Type serviceType, ProxyFactory factory, LifetimeFactory extOtherFactory)
+        public object CreateServiceInstance(Type serviceType, ProxyFactory factory, ILifetimeFactory extOtherFactory)
         {
             //接口则直接调用factory无参构造
             if (serviceType.IsInterface && factory != null)

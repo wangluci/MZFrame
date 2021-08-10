@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using TemplateAction.Label;
 
 namespace TemplateAction.Core
 {
-    public class TARequestHandle : AbstractTemplateContext, IRequestHandle
+    public class TARequestHandle : AbstractTemplateContext, IRequestHandle, ILifetimeFactory
     {
 
         protected string mNameSpace;
@@ -102,6 +101,21 @@ namespace TemplateAction.Core
                 return "视图不存在";
             }
             return indexTemp.MakeHtml(this);
+        }
+        protected const string CONTROLLER_PRE = "CONTR_STORE_$$";
+        public object GetValue(PluginCollection collection, ServiceDescriptor sd, ILifetimeFactory extFactory)
+        {
+            string tkey = CONTROLLER_PRE + sd.ServiceType.FullName;
+            if (mContext.Items.Contains(tkey))
+            {
+                return mContext.Items[tkey];
+            }
+            else
+            {
+                object target = collection.CreateServiceInstance(sd.ServiceType, sd.Factory, extFactory);
+                mContext.Items[tkey] = target;
+                return target;
+            }
         }
     }
 }

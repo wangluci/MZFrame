@@ -5,7 +5,6 @@ using TemplateAction.Route;
 using TemplateAction.Extension;
 using System.Web;
 using System.Configuration;
-
 namespace MainWeb
 {
     public class Global : System.Web.HttpApplication
