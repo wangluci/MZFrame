@@ -6,12 +6,10 @@ namespace TemplateAction.Core
     {
         private volatile object _target;
         private object _lock = new object();
-        private PluginCollection _collection;
-        internal ConcurrentProxy(PluginCollection collection)
+        internal ConcurrentProxy()
         {
-            _collection = collection;
         }
-        public object GetValue(ServiceDescriptor desc)
+        public object GetValue(Func<Type, ProxyFactory, LifetimeFactory, object> fun, ServiceDescriptor desc, LifetimeFactory extOtherFactory)
         {
             if (_target == null)
             {
@@ -19,7 +17,10 @@ namespace TemplateAction.Core
                 {
                     if (_target == null)
                     {
-                        _target = _collection.CreateServiceInstance(desc.ServiceType, desc.Factory);
+                        if (fun != null)
+                        {
+                            _target = fun.Invoke(desc.ServiceType, desc.Factory, extOtherFactory);
+                        }
                     }
                 }
             }

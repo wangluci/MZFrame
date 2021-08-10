@@ -12,6 +12,10 @@ namespace TemplateAction.Core
             _pluginPath = path;
             return this;
         }
+        protected override IPluginFactory NewPluginFactory()
+        {
+            return new PluginFactory();
+        }
         public TAApplication Init(string rootpath)
         {
             InitApplication(rootpath);

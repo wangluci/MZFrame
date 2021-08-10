@@ -3,7 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using TemplateAction.Common;
 using TemplateAction.Label;
-
+using TemplateAction.Extension.Site;
 namespace TemplateAction.Core
 {
     /// <summary>
@@ -29,15 +29,11 @@ namespace TemplateAction.Core
             _filterCenter = new FilterCenter();
             _readAssetsFromPlugin = true;
         }
-        /// <summary>
-        /// 创建实例并自动创建引用的参数实例
-        /// </summary>
-        /// <param name="serviceType"></param>
-        /// <returns></returns>
-        internal object CreateInstance(Type serviceType)
+        protected override IPluginFactory NewPluginFactory()
         {
-            return _plugins.CreateServiceInstance(serviceType);
+            return new SitePluginFactory();
         }
+
         /// <summary>
         /// 使用指定中间件，需要先AddSingle注册
         /// </summary>

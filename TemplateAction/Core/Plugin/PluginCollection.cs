@@ -11,7 +11,7 @@ namespace TemplateAction.Core
     /// <summary>
     /// 插件集合
     /// </summary>
-    public class PluginCollection : IRouter, ITAServices, IDispatcher
+    public class PluginCollection : ITAServices, IDispatcher
     {
         private ConcurrentDictionary<string, string> _keycache = new ConcurrentDictionary<string, string>();
         private Dictionary<string, PluginObject> mPluginList = new Dictionary<string, PluginObject>();
@@ -35,137 +35,19 @@ namespace TemplateAction.Core
         {
             get { return _singletonServices; }
         }
-        private IRouterCollection _routerCollection;
-        /// <summary>
-        /// 路由创建工厂
-        /// </summary>
-        private IRouterBuilder _routerBuilder;
-        internal IRouterBuilder RouterBuilder
+        private IPluginFactory _pluginFactory;
+        public IPluginFactory PluginFactory
         {
-            get { return _routerBuilder; }
+            get { return _pluginFactory; }
         }
 
-        public PluginCollection()
+        public PluginCollection(IPluginFactory factory)
         {
-            _singletonServices = new ConcurrentStorer(this);
+            _pluginFactory = factory;
+            _singletonServices = new ConcurrentStorer();
             _services = new ServiceCollection(string.Empty);
         }
-        public List<T> GetServices<T>() where T : class
-        {
-            Type listType = typeof(List<>).MakeGenericType(typeof(T));
-            object list = Activator.CreateInstance(listType);
-            MethodInfo addMethod = listType.GetMethod("Add");
-            List<ServiceDescriptor> deslist = FindServices(typeof(T).FullName);
-            foreach (ServiceDescriptor sd in deslist)
-            {
-                addMethod.Invoke(list, new object[] { Des2Instance(sd) });
-            }
 
-            return list as List<T>;
-        }
-
-        public T GetService<T>() where T : class
-        {
-            return GetService(typeof(T).FullName) as T;
-        }
-        public object GetService(Type tp)
-        {
-            return GetService(tp.FullName);
-        }
-        public void UseRouter(IRouterBuilder builder)
-        {
-            _routerBuilder = builder;
-            _routerCollection = _routerBuilder.Build();
-        }
-        /// <summary>
-        /// 路由
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        public IDictionary<string, object> Route(ITAContext context)
-        {
-            if (_routerCollection == null)
-            {
-                return null;
-            }
-            //先路由全局
-            IDictionary<string, object> rt = _routerCollection.Route(context);
-            if (rt != null)
-            {
-                return rt;
-            }
-            //再路由插件
-            PluginObject[] tarr = null;
-            _lockslim.EnterReadLock();
-            try
-            {
-                tarr = new PluginObject[mPluginList.Count];
-                mPluginList.Values.CopyTo(tarr, 0);
-            }
-            finally
-            {
-                _lockslim.ExitReadLock();
-            }
-            if (tarr == null)
-            {
-                tarr = new PluginObject[0];
-            }
-            foreach (PluginObject plg in tarr)
-            {
-                rt = plg.Route(context);
-                if (rt != null)
-                {
-                    return rt;
-                }
-            }
-            return rt;
-        }
-        /// <summary>
-        /// 获取控制器和动作的描述信息
-        /// </summary>
-        /// <returns></returns>
-        public List<AnnotationInfo> ViewAnnList()
-        {
-            _lockslim.EnterReadLock();
-            try
-            {
-                List<AnnotationInfo> rtlist = new List<AnnotationInfo>();
-                foreach (KeyValuePair<string, PluginObject> kvp in mPluginList)
-                {
-                    Dictionary<string, ControllerNode> ml = kvp.Value.GetControllerList();
-                    foreach (KeyValuePair<string, ControllerNode> kpcn in ml)
-                    {
-                        if (!string.IsNullOrEmpty(kpcn.Value.Descript))
-                        {
-                            AnnotationInfo ai = new AnnotationInfo();
-                            ai.Name = kpcn.Value.Descript;
-                            ai.Code = string.Format("/{0}/{1}", kvp.Key, kpcn.Key);
-                            ai.ParentCode = string.Empty;
-                            rtlist.Add(ai);
-                            foreach (KeyValuePair<string, Node> kpn in kpcn.Value.Childrens)
-                            {
-                                ActionNode an = kpn.Value as ActionNode;
-                                if (an == null) continue;
-                                if (!string.IsNullOrEmpty(kpn.Value.Descript))
-                                {
-                                    AnnotationInfo aii = new AnnotationInfo();
-                                    aii.Name = kpn.Value.Descript;
-                                    aii.Code = string.Format("{0}/{1}", ai.Code, kpn.Key);
-                                    aii.ParentCode = kpcn.Key;
-                                    rtlist.Add(aii);
-                                }
-                            }
-                        }
-                    }
-                }
-                return rtlist;
-            }
-            finally
-            {
-                _lockslim.ExitReadLock();
-            }
-
-        }
         /// <summary>
         /// 通过接口查找多个服务
         /// </summary>
@@ -285,20 +167,49 @@ namespace TemplateAction.Core
             }
 
         }
+        public List<T> GetServices<T>() where T : class
+        {
+            Type listType = typeof(List<>).MakeGenericType(typeof(T));
+            object list = Activator.CreateInstance(listType);
+            MethodInfo addMethod = listType.GetMethod("Add");
+            List<ServiceDescriptor> deslist = FindServices(typeof(T).FullName);
+            foreach (ServiceDescriptor sd in deslist)
+            {
+                addMethod.Invoke(list, new object[] { Des2Instance(sd, null) });
+            }
+
+            return list as List<T>;
+        }
+
+        public T GetService<T>() where T : class
+        {
+            return GetService(typeof(T).FullName) as T;
+        }
+        public object GetService(Type tp, LifetimeFactory extOtherFactory = null)
+        {
+            return GetService(tp.FullName, extOtherFactory);
+        }
 
         /// <summary>
         /// 获取服务实例
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public object GetService(string key)
+        public object GetService(string key, LifetimeFactory extOtherFactory = null)
         {
             ServiceDescriptor sd = FindService(key);
-            return Des2Instance(sd);
+            return Des2Instance(sd, extOtherFactory);
         }
-        public object CreateServiceInstance(Type serviceType)
+        /// <summary>
+        /// 创建外部注入服务
+        /// </summary>
+        /// <param name="serviceType"></param>
+        /// <param name="extOtherFactory"></param>
+        /// <returns></returns>
+        public object CreateExtOtherService(Type serviceType, LifetimeFactory extOtherFactory)
         {
-            return CreateServiceInstance(serviceType, null);
+            ServiceDescriptor sd = new ServiceDescriptor(serviceType, ServiceLifetime.Other, null, extOtherFactory);
+            return extOtherFactory.Invoke(this, sd, extOtherFactory);
         }
 
         /// <summary>
@@ -306,7 +217,7 @@ namespace TemplateAction.Core
         /// </summary>
         /// <param name="sd"></param>
         /// <returns></returns>
-        private object Des2Instance(ServiceDescriptor sd)
+        private object Des2Instance(ServiceDescriptor sd, LifetimeFactory extOtherFactory)
         {
             object result = null;
             if (Equals(sd, null))
@@ -320,7 +231,7 @@ namespace TemplateAction.Core
                         if (string.IsNullOrEmpty(sd.PluginName))
                         {
                             ConcurrentProxy proxy = this._singletonServices.GetOrAdd(sd.ServiceType.FullName);
-                            result = proxy.GetValue(sd);
+                            result = proxy.GetValue(this.CreateServiceInstance, sd, extOtherFactory);
                         }
                         else
                         {
@@ -328,21 +239,21 @@ namespace TemplateAction.Core
                             if (!Equals(pobj, null))
                             {
                                 ConcurrentProxy proxy = pobj.Storer.GetOrAdd(sd.ServiceType.FullName);
-                                result = proxy.GetValue(sd);
+                                result = proxy.GetValue(this.CreateServiceInstance, sd, extOtherFactory);
                             }
                         }
                     }
                     break;
                 case ServiceLifetime.Transient:
                     {
-                        result = CreateServiceInstance(sd.ServiceType, sd.Factory);
+                        result = CreateServiceInstance(sd.ServiceType, sd.Factory, extOtherFactory);
                     }
                     break;
                 case ServiceLifetime.Other:
                     {
                         if (sd != null)
                         {
-                            result = sd.LifetimeFactory?.Invoke(this, sd);
+                            result = sd.LifetimeFactory.Invoke(this, sd, extOtherFactory);
                         }
                     }
                     break;
@@ -355,7 +266,7 @@ namespace TemplateAction.Core
         /// </summary>
         /// <param name="serviceType"></param>
         /// <returns></returns>
-        public object CreateServiceInstance(Type serviceType, ProxyFactory factory)
+        public object CreateServiceInstance(Type serviceType, ProxyFactory factory, LifetimeFactory extOtherFactory)
         {
             //接口则直接调用factory无参构造
             if (serviceType.IsInterface && factory != null)
@@ -390,11 +301,11 @@ namespace TemplateAction.Core
                     else if (parameterType.IsPrimitive || parameterType == typeof(string))
                     {
                         ;
-                        parameters[i] = GetService(TAUtility.TypeName2ServiceKey(parameterType, parameter.Name));
+                        parameters[i] = GetService(TAUtility.TypeName2ServiceKey(parameterType, parameter.Name), extOtherFactory);
                     }
                     else
                     {
-                        parameters[i] = GetService(parameterType);
+                        parameters[i] = GetService(parameterType, extOtherFactory);
                     }
                 }
                 if (factory != null)
@@ -419,57 +330,6 @@ namespace TemplateAction.Core
             }
         }
 
-        /// <summary>
-        /// 获取Controller节点
-        /// </summary>
-        /// <param name="ns"></param>
-        /// <param name="controller"></param>
-        /// <returns></returns>
-        public ControllerNode GetControllerByKeyInPlugin(string ns, string controller)
-        {
-            PluginObject pobj = GetPlugin(ns);
-            if (pobj != null)
-            {
-                return pobj.GetControllerNodeByKey(controller);
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// 获取Action节点
-        /// </summary>
-        /// <param name="ns"></param>
-        /// <param name="controller"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public ActionNode GetMethodByKeyInPlugin(string ns, string controller, string action)
-        {
-            PluginObject pobj = GetPlugin(ns);
-            if (pobj != null)
-            {
-                return pobj.GetMethodByKey(controller, action);
-            }
-            return null;
-        }
-        public bool ContainController(string key)
-        {
-            _lockslim.EnterReadLock();
-            try
-            {
-                foreach (KeyValuePair<string, PluginObject> kvp in mPluginList)
-                {
-                    if (kvp.Value.ContainController(key))
-                    {
-                        return true;
-                    }
-                }
-                return false;
-            }
-            finally
-            {
-                _lockslim.ExitReadLock();
-            }
-        }
         public bool ContainPlugin(string ns)
         {
             _lockslim.EnterReadLock();
@@ -482,6 +342,34 @@ namespace TemplateAction.Core
                 _lockslim.ExitReadLock();
             }
         }
+        /// <summary>
+        /// 获取所有插件
+        /// </summary>
+        /// <returns></returns>
+        public PluginObject[] GetAllPlugin()
+        {
+            PluginObject[] tarr = null;
+            _lockslim.EnterReadLock();
+            try
+            {
+                tarr = new PluginObject[mPluginList.Count];
+                mPluginList.Values.CopyTo(tarr, 0);
+            }
+            finally
+            {
+                _lockslim.ExitReadLock();
+            }
+            if (tarr == null)
+            {
+                tarr = new PluginObject[0];
+            }
+            return tarr;
+        }
+        /// <summary>
+        /// 获取指定插件
+        /// </summary>
+        /// <param name="ns"></param>
+        /// <returns></returns>
         public PluginObject GetPlugin(string ns)
         {
             _lockslim.EnterReadLock();
@@ -504,7 +392,7 @@ namespace TemplateAction.Core
             Assembly ass = Assembly.GetEntryAssembly();
             if (ass != null)
             {
-                PluginObject newObj = PluginObject.Create(this, ass, string.Empty);
+                PluginObject newObj = _pluginFactory.Create(ass, string.Empty);
                 if (newObj != null)
                 {
                     mPluginList[newObj.Name.ToLower()] = newObj;
@@ -548,7 +436,7 @@ namespace TemplateAction.Core
         public PluginObject CreatePlugin(Assembly tAssembly, string filepath)
         {
             if (tAssembly == null) return null;
-            PluginObject newObj = PluginObject.Create(this, tAssembly, filepath);
+            PluginObject newObj = _pluginFactory.Create(tAssembly, filepath);
             if (newObj != null)
             {
                 PluginObject oldPlugin;
@@ -569,6 +457,7 @@ namespace TemplateAction.Core
                     oldPlugin.Unload();
                 }
             }
+
             return newObj;
         }
 

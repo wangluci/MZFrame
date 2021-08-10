@@ -75,7 +75,7 @@ namespace TemplateAction.Core
                     return false;
             }
         }
-        public ActionNode(PluginObject plugin, string controller, MethodInfo method)
+        public ActionNode(string pluginName, IExtentionData data, string controller, MethodInfo method)
         {
             _allowHttpMethod = 0;
             mKey = method.Name;
@@ -83,7 +83,7 @@ namespace TemplateAction.Core
    
 
             string tdesact = "";
-            string taboutmodule = string.Format("/{0}/{1}", plugin.Name, controller);
+            string taboutmodule = string.Format("/{0}/{1}", pluginName, controller);
             string taboutaction = mKey;
 
             //异步特性
@@ -124,7 +124,7 @@ namespace TemplateAction.Core
             if (rtattr != null)
             {
                 //添加插件路由
-                plugin.RouterBuilder.AddRouter(plugin.Name, controller, mKey, rtattr.Template);
+                ((SiteExtentionData)data).RouterBuilder.AddRouter(pluginName, controller, mKey, rtattr.Template);
             }
 
   

@@ -22,9 +22,9 @@ namespace TemplateAction.Extension
             }, StringLifetimeFactory));
             return collection;
         }
-        public static object StringLifetimeFactory(PluginCollection collection, ServiceDescriptor sd)
+        public static object StringLifetimeFactory(PluginCollection collection, ServiceDescriptor sd, LifetimeFactory extFactory)
         {
-            return collection.CreateServiceInstance(sd.ServiceType, sd.Factory);
+            return collection.CreateServiceInstance(sd.ServiceType, sd.Factory, extFactory);
         }
     }
 }

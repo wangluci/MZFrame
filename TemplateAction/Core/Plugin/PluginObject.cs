@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
 using TemplateAction.Cache;
 
 namespace TemplateAction.Core
 {
-    public class PluginObject : IRouter
+    public class PluginObject
     {
         private string mName;
         public string Name
@@ -16,7 +15,7 @@ namespace TemplateAction.Core
         /// 当前插件版本
         /// </summary>
         private Version mVersion;
-        private Dictionary<string, ControllerNode> mControllerList;
+
         private IServiceCollection _services;
         /// <summary>
         /// 插件的局部事件分发器
@@ -35,15 +34,7 @@ namespace TemplateAction.Core
             get { return _storer; }
         }
 
-        /// <summary>
-        /// 路由创建工厂
-        /// </summary>
-        private IPluginRouterBuilder _routerBuilder;
-        internal IPluginRouterBuilder RouterBuilder
-        {
-            get { return _routerBuilder; }
-        }
-        private IRouterCollection _routerCollection;
+
         private IPluginConfig _config;
         public IPluginConfig Config
         {
@@ -65,62 +56,77 @@ namespace TemplateAction.Core
         {
             get { return _plgPath; }
         }
-        public static PluginObject Create(PluginCollection collection, Assembly assembly, string pluginpath)
-        {
-            PluginObject pluginObj = new PluginObject();
-            pluginObj._assembly = assembly;
-            pluginObj._plgPath = pluginpath;
-            if (collection.RouterBuilder != null)
-            {
-                pluginObj._routerBuilder = collection.RouterBuilder.NewPluginBuilder();
-            }
+        private IExtentionData _data;
+        public IExtentionData Data { get { return _data; } }
 
-            pluginObj._cacheDependency = new FileDependency();
-            pluginObj._storer = new ConcurrentStorer(collection);
-            pluginObj.mControllerList = new Dictionary<string, ControllerNode>();
-            pluginObj._dispatcher = new PluginEventDispatcher();
-            string myControllerName = typeof(IController).FullName;
-            string myPluginConfigName = typeof(IPluginConfig).FullName;
-            pluginObj.mName = assembly.GetName().Name;
-            pluginObj._services = new ServiceCollection(pluginObj.mName);
-            pluginObj.mVersion = assembly.GetName().Version;
-            Type[] exports = assembly.GetExportedTypes();
-            foreach (Type t in exports)
+        public PluginObject(IPluginFactory factory, IExtentionData data, Assembly assembly, string pluginpath)
+        {
+            this._data = data;
+            this._assembly = assembly;
+            this._plgPath = pluginpath;
+
+            this._cacheDependency = new FileDependency();
+            this._storer = new ConcurrentStorer();
+            this._dispatcher = new PluginEventDispatcher();
+            this.mName = assembly.GetName().Name;
+            this._services = new ServiceCollection(this.mName);
+            this.mVersion = assembly.GetName().Version;
+
+            if (data != null)
             {
-                //判断非抽像
-                if (!t.IsAbstract)
+                data.LoadBefore(factory, assembly, pluginpath);
+                string myPluginConfigName = typeof(IPluginConfig).FullName;
+
+                Type[] exports = this._assembly.GetExportedTypes();
+                foreach (Type t in exports)
                 {
-                    if (t.GetInterface(myControllerName) != null)
+                    //判断非抽像
+                    if (!t.IsAbstract)
                     {
-                        //获取插件的控制器节点数据
-                        ControllerNode n = new ControllerNode(pluginObj, t);
-                        pluginObj.mControllerList[n.Key.ToLower()] = n;
-                    }
-                    else if (t.GetInterface(myPluginConfigName) != null)
-                    {
-                        //执行插件配置文件
-                        pluginObj._config = Activator.CreateInstance(t) as IPluginConfig;
-                        if (pluginObj._config != null)
+                        if (!data.LoadItem(this.mName, t))
                         {
-                            pluginObj._config.Configure(pluginObj._services);
+                            if (t.GetInterface(myPluginConfigName) != null)
+                            {
+                                //执行插件配置文件
+                                this._config = Activator.CreateInstance(t) as IPluginConfig;
+                                if (this._config != null)
+                                {
+                                    this._config.Configure(this._services);
+                                }
+                            }
+                        }
+
+                    }
+
+                }
+                data.LoadAfter(factory, assembly, pluginpath);
+            }
+            else
+            {
+                string myPluginConfigName = typeof(IPluginConfig).FullName;
+
+                Type[] exports = this._assembly.GetExportedTypes();
+                foreach (Type t in exports)
+                {
+                    //判断非抽像
+                    if (!t.IsAbstract)
+                    {
+                        if (t.GetInterface(myPluginConfigName) != null)
+                        {
+                            //执行插件配置文件
+                            this._config = Activator.CreateInstance(t) as IPluginConfig;
+                            if (this._config != null)
+                            {
+                                this._config.Configure(this._services);
+                            }
                         }
                     }
-                }
 
+                }
             }
-            if (pluginObj.mControllerList.Count == 0 && pluginObj._config == null)
-                return null;
-            if (pluginObj._routerBuilder != null)
-            {
-                pluginObj._routerCollection = pluginObj._routerBuilder.Build();
-            }
-            return pluginObj;
+
         }
-        private PluginObject() { }
-        public Dictionary<string, ControllerNode> GetControllerList()
-        {
-            return mControllerList;
-        }
+
         /// <summary>
         /// 查找服务
         /// </summary>
@@ -130,42 +136,7 @@ namespace TemplateAction.Core
         {
             return _services[key];
         }
-        public bool ContainController(string key)
-        {
-            return mControllerList.ContainsKey(key);
-        }
-        public ControllerNode GetControllerNodeByKey(string controller)
-        {
-            ControllerNode rtVal = null;
 
-            if (mControllerList.TryGetValue(controller.ToLower(), out rtVal))
-            {
-                return rtVal;
-            }
-            return null;
-        }
-        public ActionNode GetMethodByKey(string controller, string action)
-        {
-            ControllerNode rtVal = null;
-            if (mControllerList.TryGetValue(controller.ToLower(), out rtVal))
-            {
-                ActionNode an = rtVal.GetChildNode(action) as ActionNode;
-                if (an != null)
-                {
-                    return an;
-                }
-            }
-            return null;
-        }
-
-        public IDictionary<string, object> Route(ITAContext context)
-        {
-            if (_routerCollection == null)
-            {
-                return null;
-            }
-            return _routerCollection.Route(context);
-        }
         /// <summary>
         /// 插件御载
         /// </summary>

@@ -15,7 +15,7 @@ namespace TemplateAction.Core
     /// <param name="sd"></param>
     /// <returns></returns>
 
-    public delegate object LifetimeFactory(PluginCollection collection, ServiceDescriptor sd);
+    public delegate object LifetimeFactory(PluginCollection collection, ServiceDescriptor sd, LifetimeFactory extFactory);
     /// <summary>
     /// 服务描述信息
     /// </summary>

@@ -9,17 +9,15 @@ namespace TemplateAction.Core
     public class ConcurrentStorer
     {
         private ConcurrentDictionary<string, ConcurrentProxy> _instances;
-        private PluginCollection _collection;
-        internal ConcurrentStorer(PluginCollection collection)
+        internal ConcurrentStorer()
         {
-            _collection = collection;
             _instances = new ConcurrentDictionary<string, ConcurrentProxy>();
         }
         public ConcurrentProxy GetOrAdd(string key)
         {
             return _instances.GetOrAdd(key, (k) =>
             {
-                return new ConcurrentProxy(_collection);
+                return new ConcurrentProxy();
             });
         }
     }

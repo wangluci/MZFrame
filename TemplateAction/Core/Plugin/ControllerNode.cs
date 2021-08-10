@@ -23,23 +23,23 @@ namespace TemplateAction.Core
         {
             get { return mPluginName; }
         }
-        public ControllerNode(PluginObject plugin, Type type)
+        public ControllerNode(string pluginName, IExtentionData data, Type type)
         {
             mKey = type.Name;
-            mPluginName = plugin.Name;
+            mPluginName = pluginName;
             DesAttribute ad = (DesAttribute)type.GetCustomAttribute(typeof(DesAttribute));
             if (ad != null)
             {
                 mDescript = ad.Des;
             }
             mType = type;
-            InitActions(plugin);
+            InitActions(pluginName, data);
         }
-      
+
         /// <summary>
         /// 初始化动作节点
         /// </summary>
-        private void InitActions(PluginObject plugin)
+        private void InitActions(string pluginName, IExtentionData data)
         {
             MethodInfo[] methodArray = mType.GetMethods(BindingFlags.Public | BindingFlags.Instance);
             foreach (MethodInfo method in methodArray)
@@ -51,11 +51,11 @@ namespace TemplateAction.Core
                     if (method.ReturnType == typeof(Task))
                     {
                         iacontinue = false;
-             
+
                     }
                     else if (method.ReturnType.IsGenericType)
                     {
-                        if(method.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
+                        if (method.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
                         {
                             if (method.ReturnType.GenericTypeArguments.Length > 0)
                             {
@@ -76,7 +76,7 @@ namespace TemplateAction.Core
                 {
                     continue;
                 }
-                ActionNode an = new ActionNode(plugin, mKey, method);
+                ActionNode an = new ActionNode(pluginName, data, mKey, method);
                 AddChildNode(an.Key, an);
             }
         }
