@@ -251,7 +251,7 @@ namespace TemplateAction.Core
                     break;
                 case ServiceLifetime.Other:
                     {
-                        if (sd != null)
+                        if (sd.LifetimeFactory != null)
                         {
                             result = sd.LifetimeFactory.Invoke(this, sd, extOtherFactory);
                         }
