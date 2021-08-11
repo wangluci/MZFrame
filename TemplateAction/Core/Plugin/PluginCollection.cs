@@ -206,12 +206,14 @@ namespace TemplateAction.Core
         /// <param name="serviceType"></param>
         /// <param name="extOtherFactory"></param>
         /// <returns></returns>
+        public object CreateExtOtherService(Type serviceType, ProxyFactory factory, ILifetimeFactory extOtherFactory)
+        {
+            return extOtherFactory.GetValue(this, serviceType, factory, extOtherFactory);
+        }
         public object CreateExtOtherService(Type serviceType, ILifetimeFactory extOtherFactory)
         {
-            ServiceDescriptor sd = new ServiceDescriptor(serviceType, ServiceLifetime.Other, null, extOtherFactory);
-            return extOtherFactory.GetValue(this, sd, extOtherFactory);
+            return CreateExtOtherService(serviceType, null, extOtherFactory);
         }
-
         /// <summary>
         /// ServiceDescriptor转实例
         /// </summary>
@@ -231,7 +233,7 @@ namespace TemplateAction.Core
                         if (string.IsNullOrEmpty(sd.PluginName))
                         {
                             ConcurrentProxy proxy = this._singletonServices.GetOrAdd(sd.ServiceType.FullName);
-                            result = proxy.GetValue(this.CreateServiceInstance, sd, extOtherFactory);
+                            result = proxy.GetValue(this, sd, extOtherFactory);
                         }
                         else
                         {
@@ -239,7 +241,7 @@ namespace TemplateAction.Core
                             if (!Equals(pobj, null))
                             {
                                 ConcurrentProxy proxy = pobj.Storer.GetOrAdd(sd.ServiceType.FullName);
-                                result = proxy.GetValue(this.CreateServiceInstance, sd, extOtherFactory);
+                                result = proxy.GetValue(this, sd, extOtherFactory);
                             }
                         }
                     }
@@ -253,7 +255,7 @@ namespace TemplateAction.Core
                     {
                         if (sd.LifetimeFactory != null)
                         {
-                            result = sd.LifetimeFactory.GetValue(this, sd, extOtherFactory);
+                            result = sd.LifetimeFactory.GetValue(this, sd.ServiceType, sd.Factory, extOtherFactory);
                         }
                     }
                     break;

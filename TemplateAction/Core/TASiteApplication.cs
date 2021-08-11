@@ -29,7 +29,7 @@ namespace TemplateAction.Core
             _filterCenter = new FilterCenter();
             _readAssetsFromPlugin = true;
         }
-        protected override IPluginFactory NewPluginFactory()
+        protected override IPluginFactory CreatePluginFactory()
         {
             return new SitePluginFactory();
         }

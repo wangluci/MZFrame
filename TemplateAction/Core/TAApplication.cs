@@ -12,7 +12,7 @@ namespace TemplateAction.Core
             _pluginPath = path;
             return this;
         }
-        protected override IPluginFactory NewPluginFactory()
+        protected override IPluginFactory CreatePluginFactory()
         {
             return new PluginFactory();
         }

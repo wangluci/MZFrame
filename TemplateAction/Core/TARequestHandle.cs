@@ -103,16 +103,16 @@ namespace TemplateAction.Core
             return indexTemp.MakeHtml(this);
         }
         protected const string CONTROLLER_PRE = "CONTR_STORE_$$";
-        public object GetValue(PluginCollection collection, ServiceDescriptor sd, ILifetimeFactory extFactory)
+        public object GetValue(PluginCollection collection, Type serviceType, ProxyFactory factory, ILifetimeFactory extFactory)
         {
-            string tkey = CONTROLLER_PRE + sd.ServiceType.FullName;
+            string tkey = CONTROLLER_PRE + serviceType.FullName;
             if (mContext.Items.Contains(tkey))
             {
                 return mContext.Items[tkey];
             }
             else
             {
-                object target = collection.CreateServiceInstance(sd.ServiceType, sd.Factory, extFactory);
+                object target = collection.CreateServiceInstance(serviceType, factory, extFactory);
                 mContext.Items[tkey] = target;
                 return target;
             }

@@ -8,9 +8,9 @@ namespace TemplateAction.Extension
     {
         public class StringLifetimeFactory : ILifetimeFactory
         {
-            public object GetValue(PluginCollection collection, ServiceDescriptor sd, ILifetimeFactory extFactory)
+            public object GetValue(PluginCollection collection, Type serviceType, ProxyFactory factory, ILifetimeFactory extFactory)
             {
-                return collection.CreateServiceInstance(sd.ServiceType, sd.Factory, extFactory);
+                return collection.CreateServiceInstance(serviceType, factory, extFactory);
             }
         }
         private static StringLifetimeFactory _strLifeFactory = new StringLifetimeFactory();

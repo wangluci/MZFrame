@@ -10,9 +10,9 @@ namespace TemplateAction.Extension.Site
     {
         public class ScopeLifetimeFactory : ILifetimeFactory
         {
-            public object GetValue(PluginCollection collection, ServiceDescriptor sd, ILifetimeFactory extFactory)
+            public object GetValue(PluginCollection collection, Type serviceType, ProxyFactory factory, ILifetimeFactory extFactory)
             {
-                return extFactory.GetValue(collection, sd, extFactory);
+                return extFactory.GetValue(collection, serviceType, factory, extFactory);
             }
         }
         private static ScopeLifetimeFactory _lifetimeFactory = new ScopeLifetimeFactory();
