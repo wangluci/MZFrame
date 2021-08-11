@@ -10,9 +10,9 @@ namespace Common.Oracle
         {
             get { return (OracleHelp)mDBHelp.Value; }
         }
-        public override IDbHelp CreateHelp()
+        protected override IDBFactory CreateDBFactory(string connstr)
         {
-            return new OracleHelp(this._connectionStr);
+            return new OracelDBFactory(connstr);
         }
     }
 }

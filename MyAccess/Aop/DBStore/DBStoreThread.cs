@@ -29,10 +29,11 @@ namespace MyAccess.Aop
         }
         public void BeginTrans(Isolation level)
         {
-            if (_storeItem != null)
+            if (_storeItem == null)
             {
-                _storeItem.BeginTrans(level);
+                _storeItem = new DBStoreItem();
             }
+            _storeItem.BeginTrans(level);
         }
         public void Commit()
         {

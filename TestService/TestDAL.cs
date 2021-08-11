@@ -1,5 +1,6 @@
 ﻿using Common.MySql;
-
+using TestService.Model;
+using MyAccess.DB;
 namespace TestService
 {
     /// <summary>
@@ -8,5 +9,11 @@ namespace TestService
     public class TestDAL : MySqlSupport
     {
         public TestDAL(string testconnstr) : base(testconnstr) { }
+        public virtual int AddTestRow(testtb tb)
+        {
+            DoInsert di = new DoInsert(tb);
+            help.DoCommand(di);
+            return di.RowCount;
+        }
     }
 }

@@ -1,17 +1,25 @@
 ﻿
 using System.Threading;
 using System.Threading.Tasks;
-
+using TestService.Model;
 namespace TestService
 {
     public class TestService
     {
         private TestDAL _dal;
-        public TestService(TestDAL dal)
+        private TestDALAsync _dalAsync;
+        public TestService(TestDAL dal, TestDALAsync dalAsync)
         {
             _dal = dal;
+            _dalAsync = dalAsync;
         }
-        public async Task<string> TestTask()
+        public virtual int TestSyncDAL()
+        {
+            testtb tb = MyAccess.Aop.InterceptFactory.CreateEntityOp<testtb>();
+            tb.testdes = "测试同步添加";
+            return _dal.AddTestRow(tb);
+        }
+        public virtual async Task<string> TestTask()
         {
             string str1 = string.Format("TestTask测试异步:ThreadId{0}", Thread.CurrentThread.ManagedThreadId.ToString());
             System.Diagnostics.Debug.WriteLine(str1);

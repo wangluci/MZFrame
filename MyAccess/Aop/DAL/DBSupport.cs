@@ -5,20 +5,16 @@ namespace MyAccess.Aop.DAL
     /// <summary>
     /// 同步用DAL层
     /// </summary>
-    public abstract class DBSupport : IDBSupport, IDBFactory
+    public abstract class DBSupport : IDBSupport
     {
         [ThreadStatic]
         protected static IDbHelp mDBHelp;
-        protected string _connectionStr;
+        protected IDBFactory _dbFactory;
         public IDbHelp DBHelp
         {
             get { return mDBHelp; }
         }
 
-        public string Key
-        {
-            get { return _connectionStr; }
-        }
 
         public bool IsTranslation
         {
@@ -27,14 +23,14 @@ namespace MyAccess.Aop.DAL
 
         public DBSupport(string connectionStr)
         {
-            _connectionStr = connectionStr;
+            _dbFactory = CreateDBFactory(connectionStr);
         }
 
         public void InitHelp()
         {
-            mDBHelp = DBMan.Instance().OpenDB(this);
+            mDBHelp = DBMan.Instance().OpenDB(_dbFactory);
         }
 
-        public abstract IDbHelp CreateHelp();
+        protected abstract IDBFactory CreateDBFactory(string connstr);
     }
 }

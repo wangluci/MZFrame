@@ -36,11 +36,14 @@ namespace MyAccess.DB
             }
         }
 
+
         /// <summary>
         /// 反射出要插入的数据
         /// </summary>
         /// <param name="inserted"></param>
-        /// <returns></returns>
+        /// <param name="tablename"></param>
+        /// <param name="rtfields"></param>
+        /// <param name="rtvalues"></param>
         public static void ObjToStr(object inserted, out string rtfields, out string rtvalues)
         {
             Type curObjType = inserted.GetType();
@@ -91,19 +94,7 @@ namespace MyAccess.DB
             ObjToStr(inserted, out fields, out values);
             mDo = new DoExecSql(string.Format("{0}{1}{2}{3}{4}", intosql, fields, middsql, values, lastsql));
         }
-        public DoInsert(object inserted, string tablename)
-        {
-            mInserted = inserted;
-            string fields;
-            string values;
-            if (string.IsNullOrEmpty(tablename))
-            {
-                tablename = inserted.GetType().Name;
-            }
-            ObjToStr(inserted, out fields, out values);
-            mDo = new DoExecSql(string.Format("insert into {0} ({1}) values ({2})", tablename, fields, values));
-        }
-        public DoInsert(object inserted, string tablename, string lastsql)
+        public DoInsert(object inserted, string tablename = "", string lastsql = "")
         {
             mInserted = inserted;
             string fields;
@@ -111,7 +102,7 @@ namespace MyAccess.DB
             ObjToStr(inserted, out fields, out values);
             if (string.IsNullOrEmpty(tablename))
             {
-                tablename = inserted.GetType().Name;
+                tablename = InterceptFactory.GetProxyTypeName(inserted);
             }
             mDo = new DoQueryScalar(string.Format("insert into {0} ({1}) values ({2}){3}", tablename, fields, values, lastsql));
         }

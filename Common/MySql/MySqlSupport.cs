@@ -13,9 +13,9 @@ namespace Common.MySql
         {
             get { return (MySqlHelp)mDBHelp; }
         }
-        public override IDbHelp CreateHelp()
+        protected override IDBFactory CreateDBFactory(string connstr)
         {
-            return new MySqlHelp(this._connectionStr);
+            return new MySqlDBFactory(connstr);
         }
     }
 }

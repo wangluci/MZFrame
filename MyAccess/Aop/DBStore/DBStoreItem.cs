@@ -34,6 +34,7 @@ namespace MyAccess.Aop
         {
             _level = level;
             _openTrans = true;
+            mHelpStoreList.Clear();
         }
         public virtual void Commit()
         {

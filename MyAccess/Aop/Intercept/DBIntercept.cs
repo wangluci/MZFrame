@@ -11,6 +11,12 @@ namespace MyAccess.Aop
     {
         public void Intercept(IInvocation invocation)
         {
+            //排公有方法不拦截
+            if (!invocation.MethodInvocationTarget.IsPublic)
+            {
+                invocation.Proceed();
+                return;
+            }
             IDBSupport support = invocation.InvocationTarget as IDBSupport;
             if (support != null)
             {

@@ -13,9 +13,9 @@ namespace Common.MSSql
         {
             get { return (SqlDbHelp)mDBHelp; }
         }
-        public override IDbHelp CreateHelp()
+        protected override IDBFactory CreateDBFactory(string connstr)
         {
-            return new SqlDbHelp(this._connectionStr);
+            return new MSSqlDBFactory(connstr);
         }
     }
 }

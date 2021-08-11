@@ -4,6 +4,7 @@ using MyAccess.Aop.DAL;
 using MyAccess.DB;
 using System.Runtime.CompilerServices;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace MyAccess.Aop
 {
@@ -26,77 +27,149 @@ namespace MyAccess.Aop
         }
         public override bool InterceptDeal(IInvocation invocation)
         {
-            IDBSupport support = invocation.InvocationTarget as IDBSupport;
-            //判断是否为DAL层的拦截器
-            if (support != null)
+
+            //判断方法是否为异步
+            Attribute attrib = invocation.MethodInvocationTarget.GetCustomAttribute(typeof(AsyncStateMachineAttribute));
+            if (attrib != null)
             {
-                //事务已开启，则不执行事务
-                if (support.IsTranslation)
+                //异步
+                IDBSupport support = invocation.InvocationTarget as IDBSupport;
+                //判断是否为DAL层的拦截器
+                if (support != null)
                 {
-                    invocation.Proceed();
+                    //事务已开启，则不执行事务
+                    if (support.IsTranslation)
+                    {
+                        invocation.Proceed();
+                    }
+                    else
+                    {
+                        try
+                        {
+                            support.DBHelp.BeginTran(_isolation);
+                            invocation.Proceed();
+                            Task rt = invocation.ReturnValue as Task;
+                            rt.ContinueWith((t) =>
+                            {
+                                if (t.Status == TaskStatus.RanToCompletion)
+                                {
+
+                                    ITransReturn irt = t.GetType().GetProperty("Result").GetValue(t, null) as ITransReturn;
+                                    if (irt == null)
+                                    {
+                                        support.DBHelp.Commit();
+                                    }
+                                    else
+                                    {
+                                        if (irt.IsSuccess())
+                                        {
+                                            support.DBHelp.Commit();
+                                        }
+                                        else
+                                        {
+                                            support.DBHelp.RollBack();
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    support.DBHelp.RollBack();
+                                }
+ 
+                            }, TaskContinuationOptions.ExecuteSynchronously);
+                        }
+                        catch
+                        {
+                            support.DBHelp.RollBack();
+                        }
+                    }
                 }
                 else
                 {
                     try
                     {
-                        support.DBHelp.BeginTran(_isolation);
+                        DBManAsync.Instance().BeginTrans(_isolation);
                         invocation.Proceed();
-                        ITransReturn tr = invocation.ReturnValue as ITransReturn;
-                        if (tr != null)
+                        Task rt = invocation.ReturnValue as Task;
+                        rt.ContinueWith((t) =>
                         {
-                            if (tr.IsSuccess())
+                            if (t.Status == TaskStatus.RanToCompletion)
+                            {
+
+                                ITransReturn irt = t.GetType().GetProperty("Result").GetValue(t, null) as ITransReturn;
+                                if (irt == null)
+                                {
+                                    DBManAsync.Instance().Commit();
+                                }
+                                else
+                                {
+                                    if (irt.IsSuccess())
+                                    {
+                                        DBManAsync.Instance().Commit();
+                                    }
+                                    else
+                                    {
+                                        DBManAsync.Instance().RollBack();
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                DBManAsync.Instance().RollBack();
+                            }
+
+                        }, TaskContinuationOptions.ExecuteSynchronously);
+                    }
+                    catch
+                    {
+                        DBManAsync.Instance().RollBack();
+                    }
+
+                }
+                
+            }
+            else
+            {
+                //同步
+                IDBSupport support = invocation.InvocationTarget as IDBSupport;
+                //判断是否为DAL层的拦截器
+                if (support != null)
+                {
+                    //事务已开启，则不执行事务
+                    if (support.IsTranslation)
+                    {
+                        invocation.Proceed();
+                    }
+                    else
+                    {
+                        try
+                        {
+                            support.DBHelp.BeginTran(_isolation);
+                            invocation.Proceed();
+                            ITransReturn tr = invocation.ReturnValue as ITransReturn;
+                            if (tr != null)
+                            {
+                                if (tr.IsSuccess())
+                                {
+                                    support.DBHelp.Commit();
+                                }
+                            }
+                            else
                             {
                                 support.DBHelp.Commit();
                             }
                         }
-                        else
+                        finally
                         {
-                            support.DBHelp.Commit();
+                            support.DBHelp.RollBack();
                         }
-                    }
-                    finally
-                    {
-                        support.DBHelp.RollBack();
-                    }
-                }
-
-            
-            }
-            else
-            {
-                //判断方法是否为异步
-                Attribute attrib = invocation.Method.GetCustomAttribute(typeof(AsyncStateMachineAttribute));
-                if (attrib != null)
-                {
-                    //异步
-                    try
-                    {
-                        DBManAsync.Instance().BeginTrans();
-                        invocation.Proceed();
-                        ITransReturn tr = invocation.ReturnValue as ITransReturn;
-                        if (tr != null)
-                        {
-                            if (tr.IsSuccess())
-                            {
-                                DBManAsync.Instance().Commit();
-                            }
-                        }
-                        else
-                        {
-                            DBManAsync.Instance().Commit();
-                        }
-                    }
-                    finally
-                    {
-                        DBManAsync.Instance().RollBack();
                     }
                 }
                 else
                 {
-                    //同步
                     try
                     {
-                        DBMan.Instance().BeginTrans();
+                        DBMan.Instance().BeginTrans(_isolation);
                         invocation.Proceed();
                         ITransReturn tr = invocation.ReturnValue as ITransReturn;
                         if (tr != null)
@@ -116,7 +189,9 @@ namespace MyAccess.Aop
                         DBMan.Instance().RollBack();
                     }
                 }
+                
             }
+
             return true;
         }
 

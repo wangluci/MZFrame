@@ -97,5 +97,21 @@ namespace MyAccess.Aop
             ProxyGenerator tpg = GetProxyGenerator(interfaceT);
             return tpg.CreateInterfaceProxyWithoutTarget<T>(new ListenerIntercept(callFun));
         }
+        /// <summary>
+        /// 获取代理的实际类名
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static string GetProxyTypeName(object obj)
+        {
+            if (ProxyUtil.IsProxy(obj))
+            {
+                return ProxyUtil.GetUnproxiedType(obj).Name;
+            }
+            else
+            {
+                return obj.GetType().Name;
+            }
+        }
     }
 }

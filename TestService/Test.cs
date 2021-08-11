@@ -23,6 +23,10 @@ namespace TestService
             SetGlobal("Hx", "<a href='xxx'>你好啊</a>");
             return View();
         }
+        public TextResult TestAdd()
+        {
+            return Content(_service.TestSyncDAL().ToString());
+        }
         public async Task<TextResult> TestAsync()
         {
             string str1 = string.Format("TestAsync测试异步:ThreadId{0}", Thread.CurrentThread.ManagedThreadId.ToString());
