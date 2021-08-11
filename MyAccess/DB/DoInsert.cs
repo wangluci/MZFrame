@@ -94,7 +94,25 @@ namespace MyAccess.DB
             ObjToStr(inserted, out fields, out values);
             mDo = new DoExecSql(string.Format("{0}{1}{2}{3}{4}", intosql, fields, middsql, values, lastsql));
         }
-        public DoInsert(object inserted, string tablename = "", string lastsql = "")
+        public DoInsert(object inserted, string tablename = "")
+        {
+            mInserted = inserted;
+            string fields;
+            string values;
+            ObjToStr(inserted, out fields, out values);
+            if (string.IsNullOrEmpty(tablename))
+            {
+                tablename = InterceptFactory.GetProxyTypeName(inserted);
+            }
+            mDo = new DoExecSql(string.Format("insert into {0} ({1}) values ({2})", tablename, fields, values));
+        }
+        /// <summary>
+        /// 添加并获取自动id
+        /// </summary>
+        /// <param name="inserted"></param>
+        /// <param name="tablename"></param>
+        /// <param name="lastsql"></param>
+        public DoInsert(object inserted, string tablename, string lastsql)
         {
             mInserted = inserted;
             string fields;
