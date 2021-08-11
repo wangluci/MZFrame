@@ -1,17 +1,4 @@
-/*
-Navicat MySQL Data Transfer
 
-Source Server         : helloword
-Source Server Version : 50713
-Source Host           : localhost:3306
-Source Database       : test
-
-Target Server Type    : MYSQL
-Target Server Version : 50713
-File Encoding         : 65001
-
-Date: 2021-08-11 10:56:04
-*/
 
 SET FOREIGN_KEY_CHECKS=0;
 
