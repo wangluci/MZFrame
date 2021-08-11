@@ -18,6 +18,7 @@ namespace MyAccess.Aop
                 return new ProxyGenerator();
             });
         }
+        private static readonly IProxyGenerationHook _pubHook = new PublicGenerationHook();
         /// <summary>
         /// 创建DAL代理
         /// </summary>
@@ -27,9 +28,10 @@ namespace MyAccess.Aop
         /// <returns></returns>
         public static object CreateDAL(Type interfaceToProxy, Type t, object[] constructorArguments)
         {
+            ProxyGenerationOptions option = new ProxyGenerationOptions(_pubHook);
             ProxyGenerator tpg = GetProxyGenerator(t);
             object target = Activator.CreateInstance(t, constructorArguments);
-            return tpg.CreateInterfaceProxyWithTarget(interfaceToProxy, target, new DBIntercept());
+            return tpg.CreateInterfaceProxyWithTarget(interfaceToProxy, target, option, new DBIntercept());
         }
 
         /// <summary>
@@ -40,8 +42,9 @@ namespace MyAccess.Aop
         /// <returns></returns>
         public static object CreateDAL(Type t, object[] constructorArguments)
         {
+            ProxyGenerationOptions option = new ProxyGenerationOptions(_pubHook);
             ProxyGenerator tpg = GetProxyGenerator(t);
-            return tpg.CreateClassProxy(t, constructorArguments, new DBIntercept());
+            return tpg.CreateClassProxy(t, option, constructorArguments, new DBIntercept());
         }
 
         /// <summary>
@@ -53,9 +56,10 @@ namespace MyAccess.Aop
         /// <returns></returns>
         public static object CreateBLL(Type interfaceToProxy, Type t, object[] constructorArguments)
         {
+            ProxyGenerationOptions option = new ProxyGenerationOptions(_pubHook);
             ProxyGenerator tpg = GetProxyGenerator(t);
             object target = Activator.CreateInstance(t, constructorArguments);
-            return tpg.CreateInterfaceProxyWithTarget(interfaceToProxy, target, new BLLIntercept());
+            return tpg.CreateInterfaceProxyWithTarget(interfaceToProxy, target, option, new BLLIntercept());
         }
         /// <summary>
         /// 无接口创建BLL代理
@@ -64,9 +68,11 @@ namespace MyAccess.Aop
         /// <returns></returns>
         public static object CreateBLL(Type t, object[] constructorArguments)
         {
+            ProxyGenerationOptions option = new ProxyGenerationOptions(_pubHook);
             ProxyGenerator tpg = GetProxyGenerator(t);
-            return tpg.CreateClassProxy(t, constructorArguments, new BLLIntercept());
+            return tpg.CreateClassProxy(t, option, constructorArguments, new BLLIntercept());
         }
+        private static readonly IProxyGenerationHook _entityHook = new EntityGenerationHook();
 
         /// <summary>
         /// 创建实体
@@ -75,7 +81,7 @@ namespace MyAccess.Aop
         /// <returns></returns>
         public static T CreateEntityOp<T>() where T : class
         {
-            ProxyGenerationOptions option = new ProxyGenerationOptions();
+            ProxyGenerationOptions option = new ProxyGenerationOptions(_entityHook);
             BaseEntity be = new BaseEntity();
             option.AddMixinInstance(be);
             ProxyGenerator tpg = GetProxyGenerator(typeof(T));

@@ -1,4 +1,5 @@
 ﻿using Castle.DynamicProxy;
+using System;
 using System.Reflection;
 
 namespace MyAccess.Aop
@@ -11,10 +12,10 @@ namespace MyAccess.Aop
         public void Intercept(IInvocation invocation)
         {
             MethodInfo mi = invocation.MethodInvocationTarget;
-            IBaseEntity be = invocation.Proxy as IBaseEntity;
-            if (be != null && mi.Name.StartsWith("set_"))
+            IBaseEntity be = invocation.InvocationTarget as IBaseEntity;
+            if (be != null)
             {
-                if(be.EnableRecord())
+                if (be.EnableRecord())
                 {
                     PropertyInfo pi = invocation.TargetType.GetProperty(mi.Name.Substring(4));
                     if (pi != null)
