@@ -1,6 +1,10 @@
 ﻿using Castle.DynamicProxy;
 using MyAccess.Aop.DAL;
 using MyAccess.DB;
+using System;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace MyAccess.Aop
 {
@@ -17,7 +21,7 @@ namespace MyAccess.Aop
                 invocation.Proceed();
                 return;
             }
-            IDBSupport support = invocation.InvocationTarget as IDBSupport;
+            DBSupportBase support = invocation.InvocationTarget as DBSupportBase;
             if (support != null)
             {
                 support.InitHelp();
@@ -45,12 +49,32 @@ namespace MyAccess.Aop
                 }
                 finally
                 {
-                    //结束后自动清参数
-                    IDbHelp help = support.DBHelp;
-                    if (help != null)
+                    Attribute attrib = invocation.MethodInvocationTarget.GetCustomAttribute(typeof(AsyncStateMachineAttribute));
+                    if (attrib != null)
                     {
-                        help.EnableAndClearParam();
+                        //异步
+                        Task rt = invocation.ReturnValue as Task;
+                        rt.ContinueWith((t) =>
+                        {
+                            IDbHelp help = support.DBHelp;
+                            if (help != null)
+                            {
+                                help.EnableAndClearParam();
+                            }
+
+                        }, TaskContinuationOptions.ExecuteSynchronously);
                     }
+                    else
+                    {
+                        //同步
+                        //结束后自动清参数
+                        IDbHelp help = support.DBHelp;
+                        if (help != null)
+                        {
+                            help.EnableAndClearParam();
+                        }
+                    }
+
                 }
             }
             else

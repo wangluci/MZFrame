@@ -33,7 +33,7 @@ namespace MyAccess.Aop
             if (attrib != null)
             {
                 //异步
-                IDBSupport support = invocation.InvocationTarget as IDBSupport;
+                DBSupportBase support = invocation.InvocationTarget as DBSupportBase;
                 //判断是否为DAL层的拦截器
                 if (support != null)
                 {
@@ -131,7 +131,7 @@ namespace MyAccess.Aop
             else
             {
                 //同步
-                IDBSupport support = invocation.InvocationTarget as IDBSupport;
+                DBSupportBase support = invocation.InvocationTarget as DBSupportBase;
                 //判断是否为DAL层的拦截器
                 if (support != null)
                 {
