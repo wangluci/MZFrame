@@ -60,7 +60,7 @@ namespace MyAccess.Aop
                             help.EnableAndClearParam();
                         }
 
-                    }).ConfigureAwait(false);
+                    }, TaskContinuationOptions.ExecuteSynchronously);
                 }
                 else
                 {

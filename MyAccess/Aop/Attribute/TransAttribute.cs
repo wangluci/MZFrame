@@ -73,7 +73,7 @@ namespace MyAccess.Aop
                                     support.DBHelp.RollBack();
                                 }
  
-                            }).ConfigureAwait(false);
+                            });
                         }
                         catch
                         {
@@ -115,7 +115,7 @@ namespace MyAccess.Aop
                                 DBManAsync.Instance().RollBack();
                             }
 
-                        }).ConfigureAwait(false);
+                        });
                     }
                     catch
                     {
