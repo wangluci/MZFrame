@@ -1,6 +1,9 @@
 ﻿using Common.MySql;
-using MyAccess.Aop.DAL;
+using MyAccess.DB;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
+using TestService.Model;
 
 namespace TestService
 {
@@ -10,5 +13,11 @@ namespace TestService
     public class TestDALAsync: MySqlSupportAsync
     {
         public TestDALAsync(string testconnstr) : base(testconnstr) { }
+        public virtual async Task<int> AddTestRow(testtb tb)
+        {
+            DoInsert di = new DoInsert(tb);
+            await help.DoCommandAsync(di);
+            return di.RowCount;
+        }
     }
 }

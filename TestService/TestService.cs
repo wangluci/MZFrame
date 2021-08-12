@@ -13,11 +13,17 @@ namespace TestService
             _dal = dal;
             _dalAsync = dalAsync;
         }
-        public virtual int TestSyncDAL()
+        public virtual int TestDAL()
         {
             testtb tb = MyAccess.Aop.InterceptFactory.CreateEntityOp<testtb>();
             tb.testdes = "测试同步添加";
             return _dal.AddTestRow(tb);
+        }
+        public virtual async Task<int> TestDALAsync()
+        {
+            testtb tb = MyAccess.Aop.InterceptFactory.CreateEntityOp<testtb>();
+            tb.testdes = "测试同步添加";
+            return await _dalAsync.AddTestRow(tb);
         }
         public virtual async Task<string> TestTask()
         {

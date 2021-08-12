@@ -25,7 +25,11 @@ namespace TestService
         }
         public TextResult TestAdd()
         {
-            return Content(_service.TestSyncDAL().ToString());
+            return Content(_service.TestDAL().ToString());
+        }
+        public async Task<TextResult> TestAddAsync()
+        {
+            return Content((await _service.TestDALAsync()).ToString());
         }
         public async Task<TextResult> TestAsync()
         {
