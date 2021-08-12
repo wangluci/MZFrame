@@ -1,5 +1,8 @@
 ﻿using Castle.DynamicProxy;
 using System;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+
 namespace MyAccess.Aop
 {
     /// <summary>
@@ -9,21 +12,23 @@ namespace MyAccess.Aop
     {
         public void Intercept(IInvocation invocation)
         {
-            //排公有方法不拦截
-            if (!invocation.MethodInvocationTarget.IsPublic)
+            //判断是否为异步
+            Attribute attrib = invocation.MethodInvocationTarget.GetCustomAttribute(typeof(AsyncStateMachineAttribute));
+            bool isasync = false;
+            if (attrib != null)
             {
-                invocation.Proceed();
-                return;
+                isasync = true;
             }
-            object[] Attributes = invocation.MethodInvocationTarget.GetCustomAttributes(true);
+
+            object[] Attributes = invocation.MethodInvocationTarget.GetCustomAttributes(typeof(AbstractAopAttr), true);
             bool hasProceed = false;
 
             foreach (object attribute in Attributes)
             {
-                AbstractAopAttr dbtrans = attribute as AbstractAopAttr;
+                AbstractAopAttr dbtrans = (AbstractAopAttr)attribute;
                 if (dbtrans != null)
                 {
-                    if (dbtrans.InterceptDeal(invocation))
+                    if (dbtrans.InterceptDeal(isasync, invocation))
                     {
                         hasProceed = true;
                     }

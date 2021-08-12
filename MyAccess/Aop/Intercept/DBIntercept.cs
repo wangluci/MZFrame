@@ -15,66 +15,62 @@ namespace MyAccess.Aop
     {
         public void Intercept(IInvocation invocation)
         {
-            //排公有方法不拦截
-            if (!invocation.MethodInvocationTarget.IsPublic)
+            //判断是否为异步
+            Attribute attrib = invocation.MethodInvocationTarget.GetCustomAttribute(typeof(AsyncStateMachineAttribute));
+            bool isasync = false;
+            if (attrib != null)
             {
-                invocation.Proceed();
-                return;
+                isasync = true;
             }
+
             DBSupportBase support = invocation.InvocationTarget as DBSupportBase;
             if (support != null)
             {
                 support.InitHelp();
-                try
-                {
-                    object[] Attributes = invocation.MethodInvocationTarget.GetCustomAttributes(true);
-                    bool hasProceed = false;
 
-                    foreach (object attribute in Attributes)
+                object[] Attributes = invocation.MethodInvocationTarget.GetCustomAttributes(typeof(AbstractAopAttr), true);
+                bool hasProceed = false;
+
+                foreach (object attribute in Attributes)
+                {
+                    AbstractAopAttr dbtrans = (AbstractAopAttr)attribute;
+                    if (dbtrans != null)
                     {
-                        AbstractAopAttr dbtrans = attribute as AbstractAopAttr;
-                        if (dbtrans != null)
+                        if (dbtrans.InterceptDeal(isasync, invocation))
                         {
-                            if (dbtrans.InterceptDeal(invocation))
-                            {
-                                hasProceed = true;
-                            }
+                            hasProceed = true;
                         }
                     }
-
-                    if (!hasProceed)
-                    {
-                        invocation.Proceed();
-                    }
                 }
-                finally
-                {
-                    Attribute attrib = invocation.MethodInvocationTarget.GetCustomAttribute(typeof(AsyncStateMachineAttribute));
-                    if (attrib != null)
-                    {
-                        //异步
-                        Task rt = invocation.ReturnValue as Task;
-                        rt.ContinueWith((t) =>
-                        {
-                            IDbHelp help = support.DBHelp;
-                            if (help != null)
-                            {
-                                help.EnableAndClearParam();
-                            }
 
-                        }, TaskContinuationOptions.ExecuteSynchronously);
-                    }
-                    else
+                if (!hasProceed)
+                {
+                    invocation.Proceed();
+                }
+
+                if (isasync)
+                {
+                    //异步
+                    Task rt = invocation.ReturnValue as Task;
+                    rt.ContinueWith((t) =>
                     {
-                        //同步
-                        //结束后自动清参数
                         IDbHelp help = support.DBHelp;
                         if (help != null)
                         {
                             help.EnableAndClearParam();
                         }
-                    }
 
+                    }).ConfigureAwait(false);
+                }
+                else
+                {
+                    //同步
+                    //结束后自动清参数
+                    IDbHelp help = support.DBHelp;
+                    if (help != null)
+                    {
+                        help.EnableAndClearParam();
+                    }
                 }
             }
             else

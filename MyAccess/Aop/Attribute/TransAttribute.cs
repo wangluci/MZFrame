@@ -25,12 +25,9 @@ namespace MyAccess.Aop
         {
             _isolation = level;
         }
-        public override bool InterceptDeal(IInvocation invocation)
+        public override bool InterceptDeal(bool isAsync, IInvocation invocation)
         {
-
-            //判断方法是否为异步
-            Attribute attrib = invocation.MethodInvocationTarget.GetCustomAttribute(typeof(AsyncStateMachineAttribute));
-            if (attrib != null)
+            if (isAsync)
             {
                 //异步
                 DBSupportBase support = invocation.InvocationTarget as DBSupportBase;
@@ -76,7 +73,7 @@ namespace MyAccess.Aop
                                     support.DBHelp.RollBack();
                                 }
  
-                            }, TaskContinuationOptions.ExecuteSynchronously);
+                            }).ConfigureAwait(false);
                         }
                         catch
                         {
@@ -118,7 +115,7 @@ namespace MyAccess.Aop
                                 DBManAsync.Instance().RollBack();
                             }
 
-                        }, TaskContinuationOptions.ExecuteSynchronously);
+                        }).ConfigureAwait(false);
                     }
                     catch
                     {
