@@ -322,7 +322,7 @@ namespace MyNet.TemplateAction
 
             HttpContext httpcontext = new HttpContext(context, request, response, this);
             TAEventDispatcher.Instance.Dispatch(new ContextCreatedEvent(httpcontext));
-            TARequestHandleBuilder builder = _app.Route(httpcontext);
+            TAActionBuilder builder = _app.Route(httpcontext);
             if (builder == null)
             {
                 response.End404(context);

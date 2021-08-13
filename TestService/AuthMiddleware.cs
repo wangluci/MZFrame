@@ -5,7 +5,7 @@ namespace TestService
 {
     public class AuthMiddleware : IFilterMiddleware
     {
-        public object Excute(TARequestHandle request, FilterMiddlewareNode next)
+        public object Excute(TAAction request, FilterMiddlewareNode next)
         {
             if (request.NameSpace == "TestService" && request.Controller == "Home" && request.Action == "Test")
             {

@@ -6,7 +6,7 @@ namespace TemplateAction.Core
 {
     public class MvcMiddleware : IFilterMiddleware
     {
-        public object Excute(TARequestHandle request, FilterMiddlewareNode next)
+        public object Excute(TAAction request, FilterMiddlewareNode next)
         {
             if (request.ControllerNode == null) return null;
             if (request.ActionNode == null) return null;

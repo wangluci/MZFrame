@@ -60,7 +60,7 @@ namespace SysWeb.TemplateAction
 
                 SysWebContext syscontext = new SysWebContext(context);
                 TAEventDispatcher.Instance.Dispatch(new ContextCreatedEvent(syscontext));
-                TARequestHandleBuilder builder = syscontext.Application.Route(syscontext);
+                TAActionBuilder builder = syscontext.Application.Route(syscontext);
                 if (builder != null)
                 {
                     if (builder.Async)
@@ -93,7 +93,7 @@ namespace SysWeb.TemplateAction
         public IAsyncResult ASyn_BeginRequest(Object sender, EventArgs e, AsyncCallback cb, Object extraData)
         {
             HttpApplication application = (HttpApplication)sender;
-            TARequestHandleBuilder builder = application.Context.Items["Async"] as TARequestHandleBuilder;
+            TAActionBuilder builder = application.Context.Items["Async"] as TAActionBuilder;
             if (builder == null)
             {
                 IAsyncResult errar = new ErrAsyncResult();

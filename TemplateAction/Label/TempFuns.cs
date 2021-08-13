@@ -14,7 +14,7 @@ namespace TemplateAction.Label
         /// </summary>
         /// <param name="handle"></param>
         /// <returns></returns>
-        public static bool NotNS(IRequestHandle handle)
+        public static bool NotNS(ITAAction handle)
         {
             if (!handle.Context.Request.Path.ToLower().StartsWith("/" + handle.NameSpace))
             {

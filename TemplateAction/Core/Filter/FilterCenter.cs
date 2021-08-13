@@ -21,7 +21,7 @@ namespace TemplateAction.Core
                 _first = nextnode;
             }
         }
-        public object Excute(TARequestHandle request)
+        public object Excute(TAAction request)
         {
             return _first.Excute(request);
         }

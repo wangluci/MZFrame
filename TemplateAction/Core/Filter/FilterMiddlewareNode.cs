@@ -22,7 +22,7 @@ namespace TemplateAction.Core
             _filter = filter;
         }
 
-        public object Excute(TARequestHandle request)
+        public object Excute(TAAction request)
         {
             return _filter.Excute(request, _next);
         }

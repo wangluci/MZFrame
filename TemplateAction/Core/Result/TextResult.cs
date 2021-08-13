@@ -4,7 +4,7 @@ namespace TemplateAction.Core
 {
     public class TextResult : IResult
     {
-        private IRequestHandle mHandle;
+        private ITAAction mHandle;
         private string mContentType;
         private string mContent;
         public string ContentType
@@ -18,7 +18,7 @@ namespace TemplateAction.Core
         /// <param name="isErr">错误代码</param>
         /// <param name="message">提示消息</param>
         /// <param name="jsondata">返回json字符串</param>
-        public TextResult(IRequestHandle handle, string content)
+        public TextResult(ITAAction handle, string content)
         {
             mContentType = "text/plain";
             mHandle = handle;

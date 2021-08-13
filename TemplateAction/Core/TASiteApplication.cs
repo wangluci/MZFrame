@@ -68,7 +68,7 @@ namespace TemplateAction.Core
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public TARequestHandleBuilder Route(ITAContext context)
+        public TAActionBuilder Route(ITAContext context)
         {
             IDictionary<string, object> dict = _plugins.Route(context);
             if (!Equals(dict, null))
@@ -99,7 +99,7 @@ namespace TemplateAction.Core
             }
             return null;
         }
-        public TARequestHandleBuilder CreateTARequestHandleBuilder(ITAContext context, string ns, string controller, string action, ITAObjectCollection ext = null)
+        public TAActionBuilder CreateTARequestHandleBuilder(ITAContext context, string ns, string controller, string action, ITAObjectCollection ext = null)
         {
             ControllerNode controllerNode = _plugins.GetControllerByKeyInPlugin(ns, controller);
             if (controllerNode == null)
@@ -107,7 +107,7 @@ namespace TemplateAction.Core
             ActionNode node = _plugins.GetMethodByKeyInPlugin(ns, controller, action);
             if (node == null)
                 return null;
-            return new TARequestHandleBuilder(context, controllerNode, node, ext);
+            return new TAActionBuilder(context, controllerNode, node, ext);
         }
         /// <summary>
         /// 使用指定路由创建工厂并加载全局路由

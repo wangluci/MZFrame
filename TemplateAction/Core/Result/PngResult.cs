@@ -9,13 +9,13 @@ namespace TemplateAction.Core
     public class PngResult : IResult
     {
         private byte[] mData;
-        protected IRequestHandle mHandle;
+        protected ITAAction mHandle;
         public byte[] Data
         {
             get { return mData; }
         }
 
-        public PngResult(IRequestHandle handle, byte[] pngdata)
+        public PngResult(ITAAction handle, byte[] pngdata)
         {
             mHandle = handle;
             mData = pngdata;

@@ -5,12 +5,12 @@ namespace TemplateAction.Core
 {
     public interface IController
     {
-        IRequestHandle RequestHandle { get; }
+        ITAAction RequestHandle { get; }
         /// <summary>
         /// 初始化控制器
         /// </summary>
         /// <param name="controller"></param>
-        void Init(IRequestHandle handle);
+        void Init(ITAAction handle);
         /// <summary>
         /// 执行动作
         /// </summary>

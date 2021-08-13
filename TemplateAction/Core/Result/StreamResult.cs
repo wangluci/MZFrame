@@ -5,12 +5,12 @@ namespace TemplateAction.Core
 {
     public class StreamResult : IResult
     {
-        private IRequestHandle mHandle;
+        private ITAAction mHandle;
         private byte[] mdata;
         private string mfilename;
 
 
-        public StreamResult(IRequestHandle handle,string filename, byte[] data)
+        public StreamResult(ITAAction handle,string filename, byte[] data)
         {
             mHandle = handle;
             mfilename = filename;

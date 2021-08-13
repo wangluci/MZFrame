@@ -73,7 +73,7 @@ namespace TemplateAction.NetCore
                             return next(context);
                         }
                         TANetCoreHttpContext tacontext = new TANetCoreHttpContext(taapp, context);
-                        TARequestHandleBuilder builder = tacontext.Application.Route(tacontext);
+                        TAActionBuilder builder = tacontext.Application.Route(tacontext);
                         if (builder != null)
                         {
                             if (builder.Async)

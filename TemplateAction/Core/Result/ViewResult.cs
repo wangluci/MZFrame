@@ -6,23 +6,23 @@ namespace TemplateAction.Core
 {
     public class ViewResult : IResult
     {
-        protected IRequestHandle mHandle;
+        protected ITAAction mHandle;
         protected string mHtml;
         public override string ToString()
         {
             return mHtml;
         }
-        public ViewResult(IRequestHandle handle, string html)
+        public ViewResult(ITAAction handle, string html)
         {
             mHandle = handle;
             mHtml = html;
         }
-        public ViewResult(IRequestHandle handle)
+        public ViewResult(ITAAction handle)
         {
             mHandle = handle;
             mHtml = ModuleToString(handle.Controller, handle.Action);
         }
-        public ViewResult(IRequestHandle handle, string module, string node)
+        public ViewResult(ITAAction handle, string module, string node)
         {
             mHandle = handle;
             mHtml = ModuleToString(module, node);

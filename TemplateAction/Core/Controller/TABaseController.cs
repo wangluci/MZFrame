@@ -8,11 +8,11 @@ namespace TemplateAction.Core
     /// </summary>
     public abstract class TABaseController : IController
     {
-        protected IRequestHandle mRequestHandle;
+        protected ITAAction mRequestHandle;
         protected ITAContext Context { get { return mRequestHandle.Context; } }
         protected ITARequest Request { get { return mRequestHandle.Context.Request; } }
         protected ITAResponse Response { get { return mRequestHandle.Context.Response; } }
-        public virtual void Init(IRequestHandle handle)
+        public virtual void Init(ITAAction handle)
         {
             mRequestHandle = handle;
         }
@@ -36,7 +36,7 @@ namespace TemplateAction.Core
             {
                 ns = mRequestHandle.NameSpace;
             }
-            TARequestHandleBuilder builder = mRequestHandle.Context.Application.CreateTARequestHandleBuilder(mRequestHandle.Context, ns, controller, action);
+            TAActionBuilder builder = mRequestHandle.Context.Application.CreateTARequestHandleBuilder(mRequestHandle.Context, ns, controller, action);
             return builder.BuildAndExcute();
         }
         /// <summary>
@@ -129,7 +129,7 @@ namespace TemplateAction.Core
         {
             return method.Invoke(this, parameters);
         }
-        public IRequestHandle RequestHandle
+        public ITAAction RequestHandle
         {
             get { return mRequestHandle; }
         }

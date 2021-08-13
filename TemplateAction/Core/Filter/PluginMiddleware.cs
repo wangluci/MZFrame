@@ -12,7 +12,7 @@ namespace TemplateAction.Core
         {
             _key = key;
         }
-        public object Excute(TARequestHandle request, FilterMiddlewareNode next)
+        public object Excute(TAAction request, FilterMiddlewareNode next)
         {
             IFilterMiddleware filter = request.Context.Application.ServiceProvider.GetService(_key) as IFilterMiddleware;
             if (filter != null)

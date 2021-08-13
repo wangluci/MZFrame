@@ -6,13 +6,13 @@ namespace TemplateAction.Core
     public class GifResult : IResult
     {
         private byte[] mData;
-        protected IRequestHandle mHandle;
+        protected ITAAction mHandle;
         public byte[] Data
         {
             get { return mData; }
         }
 
-        public GifResult(IRequestHandle handle, byte[] pngdata)
+        public GifResult(ITAAction handle, byte[] pngdata)
         {
             mHandle = handle;
             mData = pngdata;
