@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using TemplateAction.Label;
 namespace TemplateAction.Core
 {
@@ -8,17 +9,17 @@ namespace TemplateAction.Core
     /// </summary>
     public abstract class TABaseController : IController
     {
-        protected ITAAction mRequestHandle;
-        protected ITAContext Context { get { return mRequestHandle.Context; } }
-        protected ITARequest Request { get { return mRequestHandle.Context.Request; } }
-        protected ITAResponse Response { get { return mRequestHandle.Context.Response; } }
+        protected ITAAction mAction;
+        protected ITAContext Context { get { return mAction.Context; } }
+        protected ITARequest Request { get { return mAction.Context.Request; } }
+        protected ITAResponse Response { get { return mAction.Context.Response; } }
         public virtual void Init(ITAAction handle)
         {
-            mRequestHandle = handle;
+            mAction = handle;
         }
         protected void Define(string key)
         {
-            mRequestHandle.AddGlobal(key, string.Empty);
+            mAction.AddGlobal(key, string.Empty);
         }
         /// <summary>
         /// 设置全局变量
@@ -27,17 +28,39 @@ namespace TemplateAction.Core
         /// <param name="val"></param>
         protected void SetGlobal(string key, object val)
         {
-            mRequestHandle.AddGlobal(key, val);
+            mAction.AddGlobal(key, val);
         }
-
+        /// <summary>
+        /// 同步重定向
+        /// </summary>
+        /// <param name="controller"></param>
+        /// <param name="action"></param>
+        /// <param name="ns"></param>
+        /// <returns></returns>
         protected virtual IResult Redirect(string controller, string action, string ns = "")
         {
             if (string.IsNullOrEmpty(ns))
             {
-                ns = mRequestHandle.NameSpace;
+                ns = mAction.NameSpace;
             }
-            TAActionBuilder builder = mRequestHandle.Context.Application.CreateTARequestHandleBuilder(mRequestHandle.Context, ns, controller, action);
-            return builder.BuildAndExcute();
+            TAActionBuilder builder = mAction.Context.Application.CreateTARequestHandleBuilder(mAction.Context, ns, controller, action);
+            return builder.Start();
+        }
+        /// <summary>
+        /// 异步重定向
+        /// </summary>
+        /// <param name="controller"></param>
+        /// <param name="action"></param>
+        /// <param name="ns"></param>
+        /// <returns></returns>
+        protected virtual Task RedirectAsync(string controller, string action, string ns = "")
+        {
+            if (string.IsNullOrEmpty(ns))
+            {
+                ns = mAction.NameSpace;
+            }
+            TAActionBuilder builder = mAction.Context.Application.CreateTARequestHandleBuilder(mAction.Context, ns, controller, action);
+            return builder.StartAsync();
         }
         /// <summary>
         /// 返回默认视图
@@ -45,11 +68,11 @@ namespace TemplateAction.Core
         /// <returns></returns>
         protected virtual ViewResult View()
         {
-            return View(mRequestHandle.Controller, mRequestHandle.Action);
+            return View(mAction.Controller, mAction.Action);
         }
         protected StreamResult Stream(string filename, byte[] data)
         {
-            return new StreamResult(mRequestHandle, filename, data);
+            return new StreamResult(mAction, filename, data);
         }
         /// <summary>
         /// 返回指定视图
@@ -59,19 +82,19 @@ namespace TemplateAction.Core
         /// <returns></returns>
         protected ViewResult View(string moduleName, string moduleNode)
         {
-            return new ViewResult(mRequestHandle, moduleName, moduleNode);
+            return new ViewResult(mAction, moduleName, moduleNode);
         }
         protected virtual ViewResult View(string moduleNode)
         {
-            return new ViewResult(mRequestHandle, mRequestHandle.Controller, moduleNode);
+            return new ViewResult(mAction, mAction.Controller, moduleNode);
         }
         protected PngResult Png(byte[] data)
         {
-            return new PngResult(mRequestHandle, data);
+            return new PngResult(mAction, data);
         }
         protected GifResult Gif(byte[] data)
         {
-            return new GifResult(mRequestHandle, data);
+            return new GifResult(mAction, data);
         }
         protected FileResult File(string path)
         {
@@ -109,7 +132,7 @@ namespace TemplateAction.Core
         }
         protected TextResult Content(string content)
         {
-            return new TextResult(mRequestHandle, content);
+            return new TextResult(mAction, content);
         }
 
         /// <summary>
@@ -131,7 +154,7 @@ namespace TemplateAction.Core
         }
         public ITAAction RequestHandle
         {
-            get { return mRequestHandle; }
+            get { return mAction; }
         }
     }
 }

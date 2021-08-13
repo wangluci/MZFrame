@@ -30,7 +30,7 @@ namespace TemplateAction.Core
         }
 
         /// <summary>
-        /// .net framework 异步执行
+        /// 回调用异步执行
         /// </summary>
         /// <param name="res"></param>
         public void StartAsync(ITAAsyncResult res)
@@ -68,7 +68,7 @@ namespace TemplateAction.Core
             }
         }
         /// <summary>
-        /// .net core 异步执行
+        /// Task异步执行
         /// </summary>
         /// <returns></returns>
         public Task StartAsync()
@@ -90,7 +90,7 @@ namespace TemplateAction.Core
         /// 同步执行
         /// </summary>
         /// <returns></returns>
-        public IResult BuildAndExcute()
+        public IResult Start()
         {
             IResult rt = _request.Excute() as IResult;
             if (rt == null)

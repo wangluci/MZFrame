@@ -70,7 +70,7 @@ namespace SysWeb.TemplateAction
                     }
                     else
                     {
-                        builder.BuildAndExcute().Output();
+                        builder.Start().Output();
                     }
                     application.CompleteRequest();
                 }

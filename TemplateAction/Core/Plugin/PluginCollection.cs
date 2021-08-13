@@ -167,7 +167,7 @@ namespace TemplateAction.Core
             }
 
         }
-        public List<T> GetServices<T>() where T : class
+        public List<T> GetServices<T>(ILifetimeFactory extOtherFactory = null) where T : class
         {
             Type listType = typeof(List<>).MakeGenericType(typeof(T));
             object list = Activator.CreateInstance(listType);
@@ -175,15 +175,15 @@ namespace TemplateAction.Core
             List<ServiceDescriptor> deslist = FindServices(typeof(T).FullName);
             foreach (ServiceDescriptor sd in deslist)
             {
-                addMethod.Invoke(list, new object[] { Des2Instance(sd, null) });
+                addMethod.Invoke(list, new object[] { Des2Instance(sd, extOtherFactory) });
             }
 
             return list as List<T>;
         }
 
-        public T GetService<T>() where T : class
+        public T GetService<T>(ILifetimeFactory extOtherFactory = null) where T : class
         {
-            return GetService(typeof(T).FullName) as T;
+            return GetService(typeof(T).FullName, extOtherFactory) as T;
         }
         public object GetService(Type tp, ILifetimeFactory extOtherFactory = null)
         {

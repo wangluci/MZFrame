@@ -336,7 +336,7 @@ namespace MyNet.TemplateAction
             }
             else
             {
-                builder.BuildAndExcute().Output();
+                builder.Start().Output();
             }
             response.End(context);
         }

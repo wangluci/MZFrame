@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using TemplateAction.Label;
 
 namespace TemplateAction.Core
@@ -9,22 +10,22 @@ namespace TemplateAction.Core
     public class TAAction : AbstractTemplateContext, ITAAction, ILifetimeFactory
     {
 
-        protected string mNameSpace;
+        private string mNameSpace;
         public string NameSpace
         {
             get { return mNameSpace; }
         }
-        protected string mController;
+        private string mController;
         public string Controller
         {
             get { return mController; }
         }
-        protected string mAction;
+        private string mAction;
         public string Action
         {
             get { return mAction; }
         }
-        protected ITAContext mContext;
+        private ITAContext mContext;
         public ITAContext Context
         {
             get
@@ -32,25 +33,35 @@ namespace TemplateAction.Core
                 return mContext;
             }
         }
-        protected ITemplateContext mTemplateContext;
+        private ITemplateContext mTemplateContext;
         public ITemplateContext TemplateContext { get { return mTemplateContext; } }
 
-        protected ITAObjectCollection _extparams;
+        private ITAObjectCollection _extparams;
         public ITAObjectCollection ExtParams
         {
             get { return _extparams; }
         }
-        protected ControllerNode _controllerNode;
+        private ControllerNode _controllerNode;
         public ControllerNode ControllerNode
         {
             get { return _controllerNode; }
         }
-        protected ActionNode _node;
+        private ActionNode _node;
         public ActionNode ActionNode
         {
             get { return _node; }
         }
-
+        private static AsyncLocal<TAAction> _current = new AsyncLocal<TAAction>();
+        /// <summary>
+        /// 当前Action
+        /// </summary>
+        public static TAAction Current
+        {
+            get
+            {
+                return _current.Value;
+            }
+        }
         public TAAction(ITAContext context, ControllerNode controller, ActionNode action, ITAObjectCollection ext)
         {
             mContext = context;
@@ -61,6 +72,7 @@ namespace TemplateAction.Core
             mNameSpace = controller.PluginName;
             mController = controller.Key;
             mAction = action.Key;
+            _current.Value = this;
         }
         public void AddGlobal(string key, object value)
         {
@@ -105,7 +117,7 @@ namespace TemplateAction.Core
             }
             return indexTemp.MakeHtml(this);
         }
-        protected const string CONTROLLER_PRE = "CONTR_STORE_$$";
+        private const string CONTROLLER_PRE = "CONTR_STORE_$$";
         public object GetValue(PluginCollection collection, Type serviceType, ProxyFactory factory, ILifetimeFactory extFactory)
         {
             string tkey = CONTROLLER_PRE + serviceType.FullName;

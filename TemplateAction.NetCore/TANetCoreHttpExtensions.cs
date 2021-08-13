@@ -82,7 +82,7 @@ namespace TemplateAction.NetCore
                             }
                             else
                             {
-                                builder.BuildAndExcute().Output();
+                                builder.Start().Output();
                                 return Task.CompletedTask;
                             }
                         }
