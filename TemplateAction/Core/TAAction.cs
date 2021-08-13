@@ -3,7 +3,10 @@ using TemplateAction.Label;
 
 namespace TemplateAction.Core
 {
-    public class TARequestHandle : AbstractTemplateContext, IRequestHandle, ILifetimeFactory
+    /// <summary>
+    /// 代表Action
+    /// </summary>
+    public class TAAction : AbstractTemplateContext, ITAAction, ILifetimeFactory
     {
 
         protected string mNameSpace;
@@ -48,7 +51,7 @@ namespace TemplateAction.Core
             get { return _node; }
         }
 
-        public TARequestHandle(ITAContext context, ControllerNode controller, ActionNode action, ITAObjectCollection ext)
+        public TAAction(ITAContext context, ControllerNode controller, ActionNode action, ITAObjectCollection ext)
         {
             mContext = context;
             mTemplateContext = this;

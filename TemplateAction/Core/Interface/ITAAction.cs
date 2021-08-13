@@ -3,7 +3,7 @@ using TemplateAction.Label;
 
 namespace TemplateAction.Core
 {
-    public interface IRequestHandle: ITemplatePath
+    public interface ITAAction: ITemplatePath
     {
         ITAObjectCollection ExtParams { get; }
         void AddGlobal(string key, object value);

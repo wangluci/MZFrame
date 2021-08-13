@@ -5,7 +5,7 @@ using TemplateAction.Label;
 
 namespace TemplateAction.Core
 {
-    public class TARequestHandleBuilder
+    public class TAActionBuilder
     {
         private ITAContext _context;
         public ITAContext Context
@@ -18,12 +18,12 @@ namespace TemplateAction.Core
         {
             get { return _async; }
         }
-        private TARequestHandle _request;
-        public TARequestHandleBuilder(ITAContext context, ControllerNode controller, ActionNode action, ITAObjectCollection exparams)
+        private TAAction _request;
+        public TAActionBuilder(ITAContext context, ControllerNode controller, ActionNode action, ITAObjectCollection exparams)
         {
             _async = false;
             _context = context;
-            _request = new TARequestHandle(context, controller, action, exparams);
+            _request = new TAAction(context, controller, action, exparams);
 
             if (_request.ActionNode == null) return;
             _async = _request.ActionNode.Async;
