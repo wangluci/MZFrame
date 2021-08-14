@@ -1,10 +1,9 @@
 ﻿using Castle.DynamicProxy;
 using System;
-using MyAccess.Aop.DAL;
 using MyAccess.DB;
-using System.Runtime.CompilerServices;
-using System.Reflection;
 using System.Threading.Tasks;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace MyAccess.Aop
 {
@@ -25,172 +24,115 @@ namespace MyAccess.Aop
         {
             _isolation = level;
         }
-        public override bool InterceptDeal(bool isAsync, IInvocation invocation)
+        public override async Task ProceedBefore(object state, IInvocation invocation)
         {
-            if (isAsync)
+            Attribute attrib = invocation.MethodInvocationTarget.GetCustomAttribute(typeof(AsyncStateMachineAttribute));
+            bool isasync = false;
+            if (attrib != null)
             {
-                //异步
-                DBSupportBase support = invocation.InvocationTarget as DBSupportBase;
-                //判断是否为DAL层的拦截器
-                if (support != null)
-                {
-                    //事务已开启，则不执行事务
-                    if (support.IsTranslation)
-                    {
-                        invocation.Proceed();
-                    }
-                    else
-                    {
-                        try
-                        {
-                            support.DBHelp.BeginTran(_isolation);
-                            invocation.Proceed();
-                            Task rt = invocation.ReturnValue as Task;
-                            rt.ContinueWith((t) =>
-                            {
-                                if (t.Status == TaskStatus.RanToCompletion)
-                                {
+                isasync = true;
+            }
 
-                                    ITransReturn irt = t.GetType().GetProperty("Result").GetValue(t, null) as ITransReturn;
-                                    if (irt == null)
-                                    {
-                                        support.DBHelp.Commit();
-                                    }
-                                    else
-                                    {
-                                        if (irt.IsSuccess())
-                                        {
-                                            support.DBHelp.Commit();
-                                        }
-                                        else
-                                        {
-                                            support.DBHelp.RollBack();
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    support.DBHelp.RollBack();
-                                }
- 
-                            });
-                        }
-                        catch
-                        {
-                            support.DBHelp.RollBack();
-                        }
-                    }
+            if (state != null)
+            {
+                IDbHelp dbHelp = (IDbHelp)state;
+                if (isasync)
+                {
+                    await DBTransMan.Instance().OpenDBAsync(dbHelp, _isolation);
                 }
                 else
                 {
-                    try
-                    {
-                        DBManAsync.Instance().BeginTrans(_isolation);
-                        invocation.Proceed();
-                        Task rt = invocation.ReturnValue as Task;
-                        rt.ContinueWith((t) =>
-                        {
-                            if (t.Status == TaskStatus.RanToCompletion)
-                            {
-
-                                ITransReturn irt = t.GetType().GetProperty("Result").GetValue(t, null) as ITransReturn;
-                                if (irt == null)
-                                {
-                                    DBManAsync.Instance().Commit();
-                                }
-                                else
-                                {
-                                    if (irt.IsSuccess())
-                                    {
-                                        DBManAsync.Instance().Commit();
-                                    }
-                                    else
-                                    {
-                                        DBManAsync.Instance().RollBack();
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                DBManAsync.Instance().RollBack();
-                            }
-
-                        });
-                    }
-                    catch
-                    {
-                        DBManAsync.Instance().RollBack();
-                    }
-
+                    DBTransMan.Instance().OpenDB(dbHelp, _isolation);
                 }
-                
             }
             else
             {
-                //同步
-                DBSupportBase support = invocation.InvocationTarget as DBSupportBase;
-                //判断是否为DAL层的拦截器
-                if (support != null)
+                DBTransMan.Instance().BeginTrans();
+            }
+        }
+        public override Task ProceedAfter(object state, Exception ex, IInvocation invocation)
+        {
+            if (state != null)
+            {
+                if (DBTransMan.Instance().IsOpenTrans())
                 {
-                    //事务已开启，则不执行事务
-                    if (support.IsTranslation)
+                    return Task.CompletedTask;
+                }
+                IDbHelp dbHelp = (IDbHelp)state;
+                if (ex != null)
+                {
+                    dbHelp.RollBack();
+                    return Task.CompletedTask;
+                }
+                Task rt = invocation.ReturnValue as Task;
+                if (rt != null)
+                {
+                    ITransReturn irt = rt.GetType().GetProperty("Result").GetValue(rt, null) as ITransReturn;
+                    if (irt != null)
                     {
-                        invocation.Proceed();
-                    }
-                    else
-                    {
-                        try
+                        if (!irt.IsSuccess())
                         {
-                            support.DBHelp.BeginTran(_isolation);
-                            invocation.Proceed();
-                            ITransReturn tr = invocation.ReturnValue as ITransReturn;
-                            if (tr != null)
-                            {
-                                if (tr.IsSuccess())
-                                {
-                                    support.DBHelp.Commit();
-                                }
-                            }
-                            else
-                            {
-                                support.DBHelp.Commit();
-                            }
+                            dbHelp.RollBack();
+                            return Task.CompletedTask;
                         }
-                        finally
-                        {
-                            support.DBHelp.RollBack();
-                        }
+
                     }
+                    dbHelp.Commit();
                 }
                 else
                 {
-                    try
+                    ITransReturn tr = invocation.ReturnValue as ITransReturn;
+                    if (tr != null)
                     {
-                        DBMan.Instance().BeginTrans(_isolation);
-                        invocation.Proceed();
-                        ITransReturn tr = invocation.ReturnValue as ITransReturn;
-                        if (tr != null)
+                        if (!tr.IsSuccess())
                         {
-                            if (tr.IsSuccess())
-                            {
-                                DBMan.Instance().Commit();
-                            }
-                        }
-                        else
-                        {
-                            DBMan.Instance().Commit();
+                            dbHelp.RollBack();
+                            return Task.CompletedTask;
                         }
                     }
-                    finally
-                    {
-                        DBMan.Instance().RollBack();
-                    }
+                    dbHelp.Commit();
                 }
-                
             }
+            else
+            {
+                if (ex != null)
+                {
+                    DBTransMan.Instance().RollBack();
+                    return Task.CompletedTask;
+                }
+                Task rt = invocation.ReturnValue as Task;
+                if (rt != null)
+                {
+                    ITransReturn irt = rt.GetType().GetProperty("Result").GetValue(rt, null) as ITransReturn;
+                    if (irt != null)
+                    {
+                        if (!irt.IsSuccess())
+                        {
+                            DBTransMan.Instance().RollBack();
+                            return Task.CompletedTask;
+                        }
 
-            return true;
+                    }
+                    DBTransMan.Instance().Commit();
+                }
+                else
+                {
+                    ITransReturn tr = invocation.ReturnValue as ITransReturn;
+                    if (tr != null)
+                    {
+                        if (!tr.IsSuccess())
+                        {
+                            DBTransMan.Instance().RollBack();
+                            return Task.CompletedTask;
+                        }
+                    }
+                    DBTransMan.Instance().Commit();
+                }
+
+            }
+            return Task.CompletedTask;
         }
+
 
     }
 }

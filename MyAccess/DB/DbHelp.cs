@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data;
-using System.Text;
 using System.Data.Common;
 using System.Reflection;
 using System.Collections.Generic;
@@ -85,34 +84,34 @@ namespace MyAccess.DB
             get { return mCommand; }
         }
 
-        public void BeginTran()
+        private void InitBeginTran(Isolation level)
         {
-            BeginTran(Isolation.DEFAULT);
+            switch (level)
+            {
+                case Isolation.DEFAULT:
+                    mDbTrans = mConn.BeginTransaction();
+                    break;
+                case Isolation.READ_UNCOMITTED:
+                    mDbTrans = mConn.BeginTransaction(IsolationLevel.ReadUncommitted);
+                    break;
+                case Isolation.READ_COMMITED:
+                    mDbTrans = mConn.BeginTransaction(IsolationLevel.ReadCommitted);
+                    break;
+                case Isolation.REPEATABLE_READ:
+                    mDbTrans = mConn.BeginTransaction(IsolationLevel.RepeatableRead);
+                    break;
+                case Isolation.SERIALIZABLE:
+                    mDbTrans = mConn.BeginTransaction(IsolationLevel.Serializable);
+                    break;
+            }
+            mCommand.Transaction = mDbTrans;
         }
-        public void BeginTran(Isolation level)
+        public void BeginTran(Isolation level = Isolation.DEFAULT)
         {
             if (Equals(mDbTrans, null))
             {
                 Open();
-                switch (level)
-                {
-                    case Isolation.DEFAULT:
-                        mDbTrans = mConn.BeginTransaction();
-                        break;
-                    case Isolation.READ_UNCOMITTED:
-                        mDbTrans = mConn.BeginTransaction(IsolationLevel.ReadUncommitted);
-                        break;
-                    case Isolation.READ_COMMITED:
-                        mDbTrans = mConn.BeginTransaction(IsolationLevel.ReadCommitted);
-                        break;
-                    case Isolation.REPEATABLE_READ:
-                        mDbTrans = mConn.BeginTransaction(IsolationLevel.RepeatableRead);
-                        break;
-                    case Isolation.SERIALIZABLE:
-                        mDbTrans = mConn.BeginTransaction(IsolationLevel.Serializable);
-                        break;
-                }
-                mCommand.Transaction = mDbTrans;
+                InitBeginTran(level);
             }
         }
         public void Commit()
@@ -241,6 +240,14 @@ namespace MyAccess.DB
 
 
         #region 异步操作
+        public async Task BeginTranAsync(Isolation level = Isolation.DEFAULT)
+        {
+            if (Equals(mDbTrans, null))
+            {
+                await OpenAsync();
+                InitBeginTran(level);
+            }
+        }
         public async Task OpenAsync()
         {
             mConn = CreateConnection();

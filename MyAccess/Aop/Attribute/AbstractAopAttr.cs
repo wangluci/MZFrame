@@ -7,12 +7,7 @@ namespace MyAccess.Aop
 {
     public abstract class AbstractAopAttr : Attribute
     {
-
-        /// <summary>
-        /// 自定义注解拦截器
-        /// </summary>
-        /// <param name="invocation"></param>
-        /// <returns>是否调用了invocation的Proceed函数</returns>
-        public abstract bool InterceptDeal(bool isAsync,IInvocation invocation);
+        public virtual async Task ProceedBefore(object state, IInvocation invocation) { await Task.CompletedTask; }
+        public virtual async Task ProceedAfter(object state, Exception ex, IInvocation invocation) { await Task.CompletedTask; }
     }
 }

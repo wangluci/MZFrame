@@ -1,35 +1,27 @@
 ﻿using MyAccess.DB;
 using System;
+using System.Threading;
+
 namespace MyAccess.Aop.DAL
 {
     /// <summary>
-    /// 同步用DAL层
+    /// DAL层
     /// </summary>
-    public abstract class DBSupport : DBSupportBase
+    public abstract class DBSupport
     {
-        [ThreadStatic]
-        protected static IDbHelp mDBHelp;
-        protected IDBFactory _dbFactory;
-     
+        protected static AsyncLocal<IDbHelp> mDBHelp = new AsyncLocal<IDbHelp>();
+        protected string _connectionStr;
+
         public DBSupport(string connectionStr)
         {
-            _dbFactory = CreateDBFactory(connectionStr);
+            _connectionStr = connectionStr;
         }
-
-        internal override IDbHelp DBHelp
+        internal IDbHelp CreateHelp()
         {
-            get { return mDBHelp; }
+            mDBHelp.Value = CreateDBHelpImp();
+            return mDBHelp.Value;
         }
+        protected abstract IDbHelp CreateDBHelpImp();
 
-        internal override bool IsTranslation
-        {
-            get { return DBMan.Instance().IsTranslation; }
-        }
-        internal override void InitHelp()
-        {
-            mDBHelp = DBMan.Instance().OpenDB(_dbFactory);
-        }
-
-        protected abstract IDBFactory CreateDBFactory(string connstr);
     }
 }

@@ -1,45 +1,67 @@
 ﻿using Castle.DynamicProxy;
+using MyAccess.Aop.Intercept;
 using System;
-using System.Reflection;
-using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace MyAccess.Aop
 {
     /// <summary>
     /// 业务层拦截器
     /// </summary>
-    public class BLLIntercept : IInterceptor
+    public class BLLIntercept : AsyncInterceptorBase
     {
-        public void Intercept(IInvocation invocation)
+        protected override async Task InterceptAsync(IInvocation invocation, IInvocationProceedInfo proceedInfo, Func<IInvocation, IInvocationProceedInfo, Task> proceed)
         {
-            //判断是否为异步
-            Attribute attrib = invocation.MethodInvocationTarget.GetCustomAttribute(typeof(AsyncStateMachineAttribute));
-            bool isasync = false;
-            if (attrib != null)
+            AbstractAopAttr[] Attributes = (AbstractAopAttr[])invocation.MethodInvocationTarget.GetCustomAttributes(typeof(AbstractAopAttr), true);
+            foreach (AbstractAopAttr attribute in Attributes)
             {
-                isasync = true;
+                await attribute.ProceedBefore(null, invocation);
             }
-
-            object[] Attributes = invocation.MethodInvocationTarget.GetCustomAttributes(typeof(AbstractAopAttr), true);
-            bool hasProceed = false;
-
-            foreach (object attribute in Attributes)
+            Exception proceedEx = null;
+            try
             {
-                AbstractAopAttr dbtrans = (AbstractAopAttr)attribute;
-                if (dbtrans != null)
+                await proceed(invocation, proceedInfo);
+            }
+            catch (Exception ex)
+            {
+                proceedEx = ex;
+            }
+            finally
+            {
+                foreach (AbstractAopAttr attribute in Attributes)
                 {
-                    if (dbtrans.InterceptDeal(isasync, invocation))
-                    {
-                        hasProceed = true;
-                    }
+                    await attribute.ProceedAfter(null, proceedEx, invocation);
                 }
             }
-
-            if (!hasProceed)
-            {
-                invocation.Proceed();
-            }
-
         }
+
+        protected override async Task<TResult> InterceptAsync<TResult>(IInvocation invocation, IInvocationProceedInfo proceedInfo, Func<IInvocation, IInvocationProceedInfo, Task<TResult>> proceed)
+        {
+            AbstractAopAttr[] Attributes = (AbstractAopAttr[])invocation.MethodInvocationTarget.GetCustomAttributes(typeof(AbstractAopAttr), true);
+            foreach (AbstractAopAttr attribute in Attributes)
+            {
+                await attribute.ProceedBefore(null, invocation);
+            }
+            Exception proceedEx = null;
+            TResult result = default(TResult);
+            try
+            {
+                result = await proceed(invocation, proceedInfo);
+            }
+            catch (Exception ex)
+            {
+                proceedEx = ex;
+            }
+            finally
+            {
+                foreach (AbstractAopAttr attribute in Attributes)
+                {
+                    await attribute.ProceedAfter(null, proceedEx, invocation);
+                }
+            }
+            return result;
+        }
+
+
     }
 }

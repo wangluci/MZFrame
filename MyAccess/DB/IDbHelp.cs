@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace MyAccess.DB
 {
@@ -18,11 +19,10 @@ namespace MyAccess.DB
     public interface IDbHelp
     {
         bool IsNoTran();
-        void BeginTran(Isolation level);
+        void BeginTran(Isolation level = Isolation.DEFAULT);
+        Task BeginTranAsync(Isolation level = Isolation.DEFAULT);
         void Commit();
         void RollBack();
-        void DiableClearParam();
         void EnableAndClearParam();
-        void Close();
     }
 }

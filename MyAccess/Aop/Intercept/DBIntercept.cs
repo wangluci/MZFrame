@@ -2,8 +2,6 @@
 using MyAccess.Aop.DAL;
 using MyAccess.DB;
 using System;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace MyAccess.Aop
@@ -11,74 +9,85 @@ namespace MyAccess.Aop
     /// <summary>
     /// 数据链路层拦截器
     /// </summary>
-    public class DBIntercept : IInterceptor
+    public class DBIntercept : AsyncInterceptorBase
     {
-        public void Intercept(IInvocation invocation)
+        protected override async Task InterceptAsync(IInvocation invocation, IInvocationProceedInfo proceedInfo, Func<IInvocation, IInvocationProceedInfo, Task> proceed)
         {
-            //判断是否为异步
-            Attribute attrib = invocation.MethodInvocationTarget.GetCustomAttribute(typeof(AsyncStateMachineAttribute));
-            bool isasync = false;
-            if (attrib != null)
-            {
-                isasync = true;
-            }
-
-            DBSupportBase support = invocation.InvocationTarget as DBSupportBase;
+            DBSupport support = invocation.InvocationTarget as DBSupport;
             if (support != null)
             {
-                support.InitHelp();
-
-                object[] Attributes = invocation.MethodInvocationTarget.GetCustomAttributes(typeof(AbstractAopAttr), true);
-                bool hasProceed = false;
-
-                foreach (object attribute in Attributes)
+                IDbHelp dbHelp = support.CreateHelp();
+                AbstractAopAttr[] Attributes = (AbstractAopAttr[])invocation.MethodInvocationTarget.GetCustomAttributes(typeof(AbstractAopAttr), true);
+                foreach (AbstractAopAttr attribute in Attributes)
                 {
-                    AbstractAopAttr dbtrans = (AbstractAopAttr)attribute;
-                    if (dbtrans != null)
+                    await attribute.ProceedBefore(dbHelp, invocation);
+                }
+
+                Exception proceedEx = null;
+                try
+                {
+                    await proceed(invocation, proceedInfo);
+                }
+                catch (Exception ex)
+                {
+                    proceedEx = ex;
+                }
+                finally
+                {
+                    foreach (AbstractAopAttr attribute in Attributes)
                     {
-                        if (dbtrans.InterceptDeal(isasync, invocation))
-                        {
-                            hasProceed = true;
-                        }
+                       await attribute.ProceedAfter(dbHelp, proceedEx, invocation);
                     }
-                }
-
-                if (!hasProceed)
-                {
-                    invocation.Proceed();
-                }
-
-                if (isasync)
-                {
-                    //异步
-                    Task rt = invocation.ReturnValue as Task;
-                    rt.ContinueWith((t) =>
-                    {
-                        IDbHelp help = support.DBHelp;
-                        if (help != null)
-                        {
-                            help.EnableAndClearParam();
-                        }
-
-                    }, TaskContinuationOptions.ExecuteSynchronously);
-                }
-                else
-                {
                     //同步
                     //结束后自动清参数
-                    IDbHelp help = support.DBHelp;
-                    if (help != null)
-                    {
-                        help.EnableAndClearParam();
-                    }
+                    dbHelp?.EnableAndClearParam();
                 }
             }
             else
             {
-                invocation.Proceed();
+                await proceed(invocation, proceedInfo);
             }
+        }
 
+        protected override async Task<TResult> InterceptAsync<TResult>(IInvocation invocation, IInvocationProceedInfo proceedInfo, Func<IInvocation, IInvocationProceedInfo, Task<TResult>> proceed)
+        {
+            DBSupport support = invocation.InvocationTarget as DBSupport;
+            if (support != null)
+            {
+                IDbHelp dbHelp = support.CreateHelp();
+                AbstractAopAttr[] Attributes = (AbstractAopAttr[])invocation.MethodInvocationTarget.GetCustomAttributes(typeof(AbstractAopAttr), true);
+                foreach (AbstractAopAttr attribute in Attributes)
+                {
+                    await attribute.ProceedBefore(dbHelp, invocation);
+                }
 
+                Exception proceedEx = null;
+                TResult result = default(TResult);
+                try
+                {
+                    result = await proceed(invocation, proceedInfo);
+                }
+                catch (Exception ex)
+                {
+                    proceedEx = ex;
+                }
+                finally
+                {
+                    foreach (AbstractAopAttr attribute in Attributes)
+                    {
+                        await attribute.ProceedAfter(dbHelp, proceedEx, invocation);
+                    }
+                    int a = 0;
+                    //同步
+                    //结束后自动清参数
+                    dbHelp?.EnableAndClearParam();
+                }
+                return result;
+            }
+            else
+            {
+                return await proceed(invocation, proceedInfo);
+            }
         }
     }
 }
