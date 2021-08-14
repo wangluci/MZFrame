@@ -1,5 +1,4 @@
 ﻿using Castle.DynamicProxy;
-using MyAccess.Aop.Intercept;
 using System;
 using System.Threading.Tasks;
 
