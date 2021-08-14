@@ -10,13 +10,14 @@ namespace TestService
     /// <summary>
     /// 异步数据库操作层
     /// </summary>
-    public class TestDALAsync: MySqlSupportAsync
+    public class TestDALAsync: MySqlSupport
     {
         public TestDALAsync(string testconnstr) : base(testconnstr) { }
         public virtual async Task<int> AddTestRow(testtb tb)
         {
             DoInsert di = new DoInsert(tb);
             await help.DoCommandAsync(di);
+            Thread.Sleep(5000);
             return di.RowCount;
         }
     }
