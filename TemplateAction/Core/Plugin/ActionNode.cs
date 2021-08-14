@@ -88,7 +88,7 @@ namespace TemplateAction.Core
             string taboutaction = mKey;
 
             //判断是否为异步
-            _async = !(method.ReturnType == typeof(void) || !typeof(Task).IsAssignableFrom(method.ReturnType));
+            _async = method.ReturnType != typeof(void) && typeof(Task).IsAssignableFrom(method.ReturnType);
 
             //描述特性
             DesAttribute ad = (DesAttribute)method.GetCustomAttribute(typeof(DesAttribute));
