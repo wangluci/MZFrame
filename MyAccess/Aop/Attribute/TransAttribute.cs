@@ -2,8 +2,6 @@
 using System;
 using MyAccess.DB;
 using System.Threading.Tasks;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace MyAccess.Aop
 {
@@ -26,23 +24,17 @@ namespace MyAccess.Aop
         }
         public override async Task ProceedBefore(object state, IInvocation invocation)
         {
-            Attribute attrib = invocation.MethodInvocationTarget.GetCustomAttribute(typeof(AsyncStateMachineAttribute));
-            bool isasync = false;
-            if (attrib != null)
-            {
-                isasync = true;
-            }
-
+            bool issync = invocation.Method.ReturnType == typeof(void) || !typeof(Task).IsAssignableFrom(invocation.Method.ReturnType);
             if (state != null)
             {
                 IDbHelp dbHelp = (IDbHelp)state;
-                if (isasync)
+                if (issync)
                 {
-                    await DBTransMan.Instance().OpenDBAsync(dbHelp, _isolation);
+                    DBTransMan.Instance().OpenDB(dbHelp, _isolation);
                 }
                 else
                 {
-                    DBTransMan.Instance().OpenDB(dbHelp, _isolation);
+                    await DBTransMan.Instance().OpenDBAsync(dbHelp, _isolation);
                 }
             }
             else

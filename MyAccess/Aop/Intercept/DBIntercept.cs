@@ -77,7 +77,6 @@ namespace MyAccess.Aop
                     {
                         await attribute.ProceedAfter(dbHelp, proceedEx, invocation);
                     }
-                    int a = 0;
                     //同步
                     //结束后自动清参数
                     dbHelp?.EnableAndClearParam();

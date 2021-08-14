@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace TemplateAction.Core
 {
@@ -86,16 +87,9 @@ namespace TemplateAction.Core
             string taboutmodule = string.Format("/{0}/{1}", pluginName, controller);
             string taboutaction = mKey;
 
-            //异步特性
-            Attribute attrib = method.GetCustomAttribute(typeof(AsyncStateMachineAttribute));
-            if (attrib != null)
-            {
-                _async = true;
-            }
-            else
-            {
-                _async = false;
-            }
+            //判断是否为异步
+            _async = !(method.ReturnType == typeof(void) || !typeof(Task).IsAssignableFrom(method.ReturnType));
+
             //描述特性
             DesAttribute ad = (DesAttribute)method.GetCustomAttribute(typeof(DesAttribute));
             if (ad != null)

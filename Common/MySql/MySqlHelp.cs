@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Data.Common;
-using MySql.Data.MySqlClient;
 using MyAccess.DB;
 using System.Data;
+using MySqlConnector;
 
 namespace Common.MySql
 {
