@@ -4,18 +4,18 @@ using MyAccess.DB;
 namespace Common.MySql
 {
     /// <summary>
-    /// MySql同步操作用
+    /// MySql异步操作用
     /// </summary>
     public abstract class MySqlSupport : DBSupport
     {
         public MySqlSupport(string connectionStr) : base(connectionStr) { }
         protected MySqlHelp help
         {
-            get { return (MySqlHelp)mDBHelp; }
+            get { return (MySqlHelp)mDBHelp.Value; }
         }
-        protected override IDBFactory CreateDBFactory(string connstr)
+        protected override IDbHelp CreateDBHelpImp()
         {
-            return new MySqlDBFactory(connstr);
+            return new MySqlHelp(_connectionStr);
         }
     }
 }

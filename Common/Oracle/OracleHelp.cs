@@ -15,17 +15,23 @@ namespace Common.Oracle
         { }
         public override DbCommand CreateCommand()
         {
+#pragma warning disable CS0618 // “OracleCommand”已过时:“OracleCommand has been deprecated. http://go.microsoft.com/fwlink/?LinkID=144260”
             return new OracleCommand();
+#pragma warning restore CS0618 // “OracleCommand”已过时:“OracleCommand has been deprecated. http://go.microsoft.com/fwlink/?LinkID=144260”
         }
 
         public override DbConnection CreateConnection()
         {
+#pragma warning disable CS0618 // “OracleConnection”已过时:“OracleConnection has been deprecated. http://go.microsoft.com/fwlink/?LinkID=144260”
             return new OracleConnection();
+#pragma warning restore CS0618 // “OracleConnection”已过时:“OracleConnection has been deprecated. http://go.microsoft.com/fwlink/?LinkID=144260”
         }
 
         public override DbDataAdapter CreateDataAdapter()
         {
+#pragma warning disable CS0618 // “OracleDataAdapter”已过时:“OracleDataAdapter has been deprecated. http://go.microsoft.com/fwlink/?LinkID=144260”
             return new OracleDataAdapter();
+#pragma warning restore CS0618 // “OracleDataAdapter”已过时:“OracleDataAdapter has been deprecated. http://go.microsoft.com/fwlink/?LinkID=144260”
         }
 
 

@@ -8,11 +8,11 @@ namespace Common.Oracle
         public OracleSupport(string connectionStr) : base(connectionStr) { }
         protected OracleHelp help
         {
-            get { return (OracleHelp)mDBHelp; }
+            get { return (OracleHelp)mDBHelp.Value; }
         }
-        protected override IDBFactory CreateDBFactory(string connstr)
+        protected override IDbHelp CreateDBHelpImp()
         {
-            return new OracelDBFactory(connstr);
+            return new OracleHelp(_connectionStr);
         }
     }
 }
