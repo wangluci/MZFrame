@@ -13,10 +13,10 @@ namespace MyAccess.DB
         protected int mRowCount;
         protected IDoSqlCommand mDoCommand;
         /// <summary>
-        /// 替换执行的IDoSqlCommand
+        /// 关联执行的IDoSqlCommand
         /// </summary>
         /// <param name="command"></param>
-        public void UseSqlCommand(IDoSqlCommand command)
+        public void ContactCommand(IDoSqlCommand command)
         {
             mDoCommand = command;
         }
@@ -43,6 +43,7 @@ namespace MyAccess.DB
         {
             if (mDoCommand != null)
             {
+                mDoCommand.SetSql(GetSql());
                 mDoCommand.Excute(help);
             }
             else
@@ -60,6 +61,7 @@ namespace MyAccess.DB
         {
             if (mDoCommand != null)
             {
+                mDoCommand.SetSql(GetSql());
                 await mDoCommand.ExcuteAsync(help);
             }
             else
