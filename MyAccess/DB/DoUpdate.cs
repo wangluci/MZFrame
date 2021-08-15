@@ -19,13 +19,13 @@ namespace MyAccess.DB
         /// </summary>
         /// <param name="updated"></param>
         /// <returns></returns>
-        private void ObjToStr(DbHelp help, object updated, ref string where, out string updatestr)
+        private void ObjToStr(DbHelp help, ref string where, out string updatestr)
         {
             updatestr = "";
             bool autowhere = string.IsNullOrEmpty(where);
-            Type curObjType = updated.GetType();
+            Type curObjType = mUpdated.GetType();
 
-            IBaseEntity be = updated as IBaseEntity;
+            IBaseEntity be = mUpdated as IBaseEntity;
             PropertyInfo[] myProInfos;
             if (be != null)
             {
@@ -45,12 +45,12 @@ namespace MyAccess.DB
                     canupdated = false;
                     if (autowhere)
                     {
-                        where = pi.Name + "=" + help.AddParamAndReturn(pi.Name, pi.GetValue(updated));
+                        where = pi.Name + "=" + help.AddParamAndReturn(pi.Name, pi.GetValue(mUpdated));
                     }
                 }
                 if (canupdated)
                 {
-                    updatestr += "," + pi.Name + "=" + help.AddParamAndReturn(pi.Name, pi.GetValue(updated));
+                    updatestr += "," + pi.Name + "=" + help.AddParamAndReturn(pi.Name, pi.GetValue(mUpdated));
                 }
             }
             if (updatestr.StartsWith(","))
@@ -72,7 +72,7 @@ namespace MyAccess.DB
         {
             string updatestr;
             //重设sql语句
-            ObjToStr(help, mUpdated, ref mwherestr, out updatestr);
+            ObjToStr(help, ref mwherestr, out updatestr);
             string rtSQL = "update " + _tablename + " set ";
             if (string.IsNullOrEmpty(mwherestr))
             {

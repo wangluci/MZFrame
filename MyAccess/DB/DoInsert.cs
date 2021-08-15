@@ -16,6 +16,33 @@ namespace MyAccess.DB
         protected T[] _inserted;
         protected string _tablename;
 
+       
+
+        public DoInsert(T inserted, string tablename = "") : base(string.Empty)
+        {
+            _inserted = new T[1];
+            _inserted[0] = inserted;
+            if (string.IsNullOrEmpty(tablename))
+            {
+                _tablename = InterceptFactory.GetProxyTypeName(inserted);
+            }
+        }
+        public DoInsert(T[] inserted, string tablename = "") : base(string.Empty)
+        {
+            _inserted = inserted;
+            if (string.IsNullOrEmpty(tablename))
+            {
+                _tablename = InterceptFactory.GetProxyTypeName(inserted);
+            }
+        }
+        public DoInsert(List<T> inserted, string tablename = "") : base(string.Empty)
+        {
+            _inserted = inserted.ToArray();
+            if (string.IsNullOrEmpty(tablename))
+            {
+                _tablename = InterceptFactory.GetProxyTypeName(inserted);
+            }
+        }
         /// <summary>
         /// 反射出要插入的数据
         /// </summary>
@@ -23,19 +50,19 @@ namespace MyAccess.DB
         /// <param name="tablename"></param>
         /// <param name="rtfields"></param>
         /// <param name="rtvalues"></param>
-        private void ObjToStr(DbHelp help, T[] iptObjs, out string rtfields, out string rtvalues)
+        private void ObjToStr(DbHelp help, out string rtfields, out string rtvalues)
         {
             rtfields = string.Empty;
             rtvalues = string.Empty;
-            if (iptObjs == null || iptObjs.Length == 0) return;
-            Type curObjType = InterceptFactory.GetProxyType(iptObjs[0]);
+            if (_inserted == null || _inserted.Length == 0) return;
+            Type curObjType = InterceptFactory.GetProxyType(_inserted[0]);
 
 
             PropertyInfo[] myProInfos = curObjType.GetProperties();
 
-            for (int idx = 0; idx < iptObjs.Length; idx++)
+            for (int idx = 0; idx < _inserted.Length; idx++)
             {
-                T iitem = iptObjs[idx];
+                T iitem = _inserted[idx];
                 rtvalues += ",(";
                 for (int i = 0; i < myProInfos.Length; i++)
                 {
@@ -75,40 +102,13 @@ namespace MyAccess.DB
 
         }
 
-        public DoInsert(T inserted, string tablename = "") : base(string.Empty)
-        {
-            _inserted = new T[1];
-            _inserted[0] = inserted;
-            if (string.IsNullOrEmpty(tablename))
-            {
-                _tablename = InterceptFactory.GetProxyTypeName(inserted);
-            }
-        }
-        public DoInsert(T[] inserted, string tablename = "") : base(string.Empty)
-        {
-            _inserted = inserted;
-            if (string.IsNullOrEmpty(tablename))
-            {
-                _tablename = InterceptFactory.GetProxyTypeName(inserted);
-            }
-        }
-        public DoInsert(List<T> inserted, string tablename = "") : base(string.Empty)
-        {
-            _inserted = inserted.ToArray();
-            if (string.IsNullOrEmpty(tablename))
-            {
-                _tablename = InterceptFactory.GetProxyTypeName(inserted);
-            }
-        }
-
-
         private void ExcuteInit(DbHelp help)
         {
             if (string.IsNullOrEmpty(mSqlText))
             {
                 string fields;
                 string values;
-                ObjToStr(help, _inserted, out fields, out values);
+                ObjToStr(help, out fields, out values);
                 mSqlText = string.Format("insert into {0} {1} values ({2})", _tablename, fields, values);
             }
 
