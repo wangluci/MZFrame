@@ -10,7 +10,7 @@ namespace MyAccess.DB
     /// <summary>
     /// 自动生成插入sql语句
     /// </summary>
-    public class DoInsert<T> : DoExecSql where T:class
+    public class DoInsert<T> : DoExecSql where T : class
     {
         protected IDoSqlCommand mDo;
         protected T[] _inserted;
@@ -23,12 +23,12 @@ namespace MyAccess.DB
         /// <param name="tablename"></param>
         /// <param name="rtfields"></param>
         /// <param name="rtvalues"></param>
-        public static bool ObjToStr(DbHelp help, T[] iptObjs, out string rtfields, out string rtvalues)
+        private void ObjToStr(DbHelp help, T[] iptObjs, out string rtfields, out string rtvalues)
         {
             rtfields = string.Empty;
             rtvalues = string.Empty;
-            if (iptObjs == null || iptObjs.Length == 0) return false;
-            Type curObjType = iptObjs[0].GetType();
+            if (iptObjs == null || iptObjs.Length == 0) return;
+            Type curObjType = InterceptFactory.GetProxyType(iptObjs[0]);
 
 
             PropertyInfo[] myProInfos = curObjType.GetProperties();
@@ -36,7 +36,6 @@ namespace MyAccess.DB
             for (int idx = 0; idx < iptObjs.Length; idx++)
             {
                 T iitem = iptObjs[idx];
-                IBaseEntity be = iitem as IBaseEntity;
                 rtvalues += ",(";
                 for (int i = 0; i < myProInfos.Length; i++)
                 {
@@ -49,11 +48,15 @@ namespace MyAccess.DB
                     }
                     if (caninserted)
                     {
-                        if (i == 0)
+                        if (idx == 0)
                         {
                             rtfields += "," + pi.Name;
+                            rtvalues += help.AddParamAndReturn("iptparam_" + idx + "_" + i, pi.GetValue(iitem));
                         }
-                        rtvalues += "," + help.AddParamAndReturn("inparam_" + idx, iitem);
+                        else
+                        {
+                            rtvalues += "," + help.AddParamAndReturn("iptparam_" + idx + "_" + i, pi.GetValue(iitem));
+                        }
                     }
                 }
                 rtvalues += ")";
@@ -69,7 +72,7 @@ namespace MyAccess.DB
             {
                 rtvalues = rtvalues.Substring(1);
             }
-            return true;
+
         }
 
         public DoInsert(T inserted, string tablename = "") : base(string.Empty)
@@ -110,12 +113,12 @@ namespace MyAccess.DB
             }
 
         }
-        public void Excute(DbHelp help)
+        public override void Excute(DbHelp help)
         {
             ExcuteInit(help);
             base.Excute(help);
         }
-        public async Task ExcuteAsync(DbHelp help)
+        public override async Task ExcuteAsync(DbHelp help)
         {
             ExcuteInit(help);
             await base.ExcuteAsync(help);

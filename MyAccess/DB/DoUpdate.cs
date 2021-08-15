@@ -11,13 +11,15 @@ namespace MyAccess.DB
     /// </summary>
     public class DoUpdate : DoExecSql
     {
-        protected object mUpdated;
+        private object mUpdated;
+        private string mwherestr;
+        private string _tablename;
         /// <summary>
         /// 反射出要插入的数据
         /// </summary>
         /// <param name="updated"></param>
         /// <returns></returns>
-        public static void ObjToStr(object updated, ref string where, out string updatestr)
+        private void ObjToStr(DbHelp help, object updated, ref string where, out string updatestr)
         {
             updatestr = "";
             bool autowhere = string.IsNullOrEmpty(where);
@@ -43,12 +45,12 @@ namespace MyAccess.DB
                     canupdated = false;
                     if (autowhere)
                     {
-                        where = pi.Name + "=@" + pi.Name;
+                        where = pi.Name + "=" + help.AddParamAndReturn(pi.Name, pi.GetValue(updated));
                     }
                 }
                 if (canupdated)
                 {
-                    updatestr += "," + pi.Name + "=@" + pi.Name;
+                    updatestr += "," + pi.Name + "=" + help.AddParamAndReturn(pi.Name, pi.GetValue(updated));
                 }
             }
             if (updatestr.StartsWith(","))
@@ -59,34 +61,36 @@ namespace MyAccess.DB
         public DoUpdate(object updated, string tablename, string where) : base("")
         {
             mUpdated = updated;
-            string updatestr;
-            string wherestr = where;
-            //重设sql语句
-            ObjToStr(updated, ref wherestr, out updatestr);
+            mwherestr = where;
             if (string.IsNullOrEmpty(tablename))
             {
-                tablename = updated.GetType().Name;
+                _tablename = InterceptFactory.GetProxyTypeName(updated);
             }
-            string rtSQL = "update " + tablename + " set ";
-            if (string.IsNullOrEmpty(wherestr))
+        }
+        public DoUpdate(object updated, string tablename) : this(updated, tablename, "") { }
+        private void ExcuteInit(DbHelp help)
+        {
+            string updatestr;
+            //重设sql语句
+            ObjToStr(help, mUpdated, ref mwherestr, out updatestr);
+            string rtSQL = "update " + _tablename + " set ";
+            if (string.IsNullOrEmpty(mwherestr))
             {
                 rtSQL += updatestr;
             }
             else
             {
-                rtSQL += updatestr + " where " + wherestr;
+                rtSQL += updatestr + " where " + mwherestr;
             }
-            SetSql(rtSQL);
         }
-        public DoUpdate(object updated, string tablename) : this(updated, tablename, "") { }
         public override void Excute(DbHelp help)
         {
-            help.AddParamFrom(mUpdated);
+            ExcuteInit(help);
             base.Excute(help);
         }
         public override async Task ExcuteAsync(DbHelp help)
         {
-            help.AddParamFrom(mUpdated);
+            ExcuteInit(help);
             await base.ExcuteAsync(help);
         }
     }

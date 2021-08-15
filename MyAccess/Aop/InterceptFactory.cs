@@ -119,5 +119,16 @@ namespace MyAccess.Aop
                 return obj.GetType().Name;
             }
         }
+        public static Type GetProxyType(object obj)
+        {
+            if (ProxyUtil.IsProxy(obj))
+            {
+                return ProxyUtil.GetUnproxiedType(obj);
+            }
+            else
+            {
+                return obj.GetType();
+            }
+        }
     }
 }

@@ -5,7 +5,7 @@ namespace TestService.Model
 {
     public class testtb
     {
-        [ID]
+        [ID(true)]
         public virtual int testid { get; set; }
         public virtual string testdes { get; set; }
     }
