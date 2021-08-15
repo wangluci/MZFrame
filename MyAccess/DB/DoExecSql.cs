@@ -11,6 +11,15 @@ namespace MyAccess.DB
     {
         protected string mSqlText;
         protected int mRowCount;
+        protected IDoSqlCommand mDoCommand;
+        /// <summary>
+        /// 替换执行的IDoSqlCommand
+        /// </summary>
+        /// <param name="command"></param>
+        public void UseSqlCommand(IDoSqlCommand command)
+        {
+            mDoCommand = command;
+        }
         /// <summary>
         /// 影响的行数
         /// </summary>
@@ -18,8 +27,10 @@ namespace MyAccess.DB
         {
             get { return mRowCount; }
         }
+
         public DoExecSql(string sql)
         {
+            mDoCommand = null;
             mSqlText = sql;
             mRowCount = -1;
         }
@@ -30,20 +41,35 @@ namespace MyAccess.DB
 
         public virtual void Excute(DbHelp help)
         {
-            help.Command.CommandType = CommandType.Text;
-            help.Command.CommandText = mSqlText;
-            help.InitParams();
-            mRowCount = help.Command.ExecuteNonQuery();
-            help.ClearParams();
+            if (mDoCommand != null)
+            {
+                mDoCommand.Excute(help);
+            }
+            else
+            {
+                help.Command.CommandType = CommandType.Text;
+                help.Command.CommandText = mSqlText;
+                help.InitParams();
+                mRowCount = help.Command.ExecuteNonQuery();
+                help.ClearParams();
+            }
+
         }
 
         public virtual async Task ExcuteAsync(DbHelp help)
         {
-            help.Command.CommandType = CommandType.Text;
-            help.Command.CommandText = mSqlText;
-            help.InitParams();
-            mRowCount = await help.Command.ExecuteNonQueryAsync();
-            help.ClearParams();
+            if (mDoCommand != null)
+            {
+                await mDoCommand.ExcuteAsync(help);
+            }
+            else
+            {
+                help.Command.CommandType = CommandType.Text;
+                help.Command.CommandText = mSqlText;
+                help.InitParams();
+                mRowCount = await help.Command.ExecuteNonQueryAsync();
+                help.ClearParams();
+            }
         }
 
         public string GetSql()

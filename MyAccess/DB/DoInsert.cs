@@ -1,6 +1,7 @@
 ﻿using MyAccess.Aop;
 using MyAccess.DB.Attr;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -9,33 +10,11 @@ namespace MyAccess.DB
     /// <summary>
     /// 自动生成插入sql语句
     /// </summary>
-    public class DoInsert : IDoSqlCommand
+    public class DoInsert<T> : DoExecSql where T:class
     {
         protected IDoSqlCommand mDo;
-        protected object mInserted;
-        public int RowCount
-        {
-            get
-            {
-                DoExecSql des = mDo as DoExecSql;
-                if (des != null)
-                {
-                    return des.RowCount;
-                }
-                else
-                {
-                    return -1;
-                }
-            }
-        }
-        public DoQueryScalar LastQuery
-        {
-            get
-            {
-                return mDo as DoQueryScalar;
-            }
-        }
-
+        protected T[] _inserted;
+        protected string _tablename;
 
         /// <summary>
         /// 反射出要插入的数据
@@ -44,107 +23,103 @@ namespace MyAccess.DB
         /// <param name="tablename"></param>
         /// <param name="rtfields"></param>
         /// <param name="rtvalues"></param>
-        public static void ObjToStr(object inserted, out string rtfields, out string rtvalues)
+        public static bool ObjToStr(DbHelp help, T[] iptObjs, out string rtfields, out string rtvalues)
         {
-            Type curObjType = inserted.GetType();
             rtfields = string.Empty;
             rtvalues = string.Empty;
-            IBaseEntity be = inserted as IBaseEntity;
-            PropertyInfo[] myProInfos;
-            if (be != null)
+            if (iptObjs == null || iptObjs.Length == 0) return false;
+            Type curObjType = iptObjs[0].GetType();
+
+
+            PropertyInfo[] myProInfos = curObjType.GetProperties();
+
+            for (int idx = 0; idx < iptObjs.Length; idx++)
             {
-                myProInfos = be.GetUsedPropertys();
-            }
-            else
-            {
-                myProInfos = curObjType.GetProperties();
-            }
-            for (int i = 0; i < myProInfos.Length; i++)
-            {
-                PropertyInfo pi = myProInfos[i];
-                object[] attrs = pi.GetCustomAttributes(typeof(IDAttribute), false);
-                bool caninserted = true;
-                if (attrs.Length > 0)
+                T iitem = iptObjs[idx];
+                IBaseEntity be = iitem as IBaseEntity;
+                rtvalues += ",(";
+                for (int i = 0; i < myProInfos.Length; i++)
                 {
-                    IDAttribute idattr = attrs[0] as IDAttribute;
-                    caninserted = !idattr.IsAuto;
+                    PropertyInfo pi = myProInfos[i];
+                    IDAttribute idattr = (IDAttribute)pi.GetCustomAttribute(typeof(IDAttribute), false);
+                    bool caninserted = true;
+                    if (idattr != null)
+                    {
+                        caninserted = !idattr.IsAuto;
+                    }
+                    if (caninserted)
+                    {
+                        if (i == 0)
+                        {
+                            rtfields += "," + pi.Name;
+                        }
+                        rtvalues += "," + help.AddParamAndReturn("inparam_" + idx, iitem);
+                    }
                 }
-                if (caninserted)
-                {
-                    rtfields += "," + pi.Name;
-                    rtvalues += ",@" + pi.Name;
-                }
+                rtvalues += ")";
             }
+
 
             if (rtfields.StartsWith(","))
             {
                 rtfields = rtfields.Substring(1);
             }
+            rtfields = "(" + rtfields + ")";
             if (rtvalues.StartsWith(","))
             {
                 rtvalues = rtvalues.Substring(1);
             }
+            return true;
         }
 
-        public DoInsert(object inserted, string intosql, string middsql, string lastsql)
+        public DoInsert(T inserted, string tablename = "") : base(string.Empty)
         {
-            mInserted = inserted;
-            string fields;
-            string values;
-            ObjToStr(inserted, out fields, out values);
-            mDo = new DoExecSql(string.Format("{0}{1}{2}{3}{4}", intosql, fields, middsql, values, lastsql));
-        }
-        public DoInsert(object inserted, string tablename = "")
-        {
-            mInserted = inserted;
-            string fields;
-            string values;
-            ObjToStr(inserted, out fields, out values);
+            _inserted = new T[1];
+            _inserted[0] = inserted;
             if (string.IsNullOrEmpty(tablename))
             {
-                tablename = InterceptFactory.GetProxyTypeName(inserted);
+                _tablename = InterceptFactory.GetProxyTypeName(inserted);
             }
-            mDo = new DoExecSql(string.Format("insert into {0} ({1}) values ({2})", tablename, fields, values));
         }
-        /// <summary>
-        /// 添加并获取自动id
-        /// </summary>
-        /// <param name="inserted"></param>
-        /// <param name="tablename"></param>
-        /// <param name="lastsql"></param>
-        public DoInsert(object inserted, string tablename, string lastsql)
+        public DoInsert(T[] inserted, string tablename = "") : base(string.Empty)
         {
-            mInserted = inserted;
-            string fields;
-            string values;
-            ObjToStr(inserted, out fields, out values);
+            _inserted = inserted;
             if (string.IsNullOrEmpty(tablename))
             {
-                tablename = InterceptFactory.GetProxyTypeName(inserted);
+                _tablename = InterceptFactory.GetProxyTypeName(inserted);
             }
-            mDo = new DoQueryScalar(string.Format("insert into {0} ({1}) values ({2}){3}", tablename, fields, values, lastsql));
+        }
+        public DoInsert(List<T> inserted, string tablename = "") : base(string.Empty)
+        {
+            _inserted = inserted.ToArray();
+            if (string.IsNullOrEmpty(tablename))
+            {
+                _tablename = InterceptFactory.GetProxyTypeName(inserted);
+            }
         }
 
 
+        private void ExcuteInit(DbHelp help)
+        {
+            if (string.IsNullOrEmpty(mSqlText))
+            {
+                string fields;
+                string values;
+                ObjToStr(help, _inserted, out fields, out values);
+                mSqlText = string.Format("insert into {0} {1} values ({2})", _tablename, fields, values);
+            }
+
+        }
         public void Excute(DbHelp help)
         {
-            help.AddParamFrom(mInserted);
-            mDo.Excute(help);
+            ExcuteInit(help);
+            base.Excute(help);
         }
         public async Task ExcuteAsync(DbHelp help)
         {
-            help.AddParamFrom(mInserted);
-            await mDo.ExcuteAsync(help);
+            ExcuteInit(help);
+            await base.ExcuteAsync(help);
         }
 
-        public void SetSql(string sql)
-        {
-            mDo.SetSql(sql);
-        }
-
-        public string GetSql()
-        {
-            return mDo.GetSql();
-        }
     }
 }

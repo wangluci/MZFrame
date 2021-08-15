@@ -11,7 +11,7 @@ namespace TestService
         public TestDAL(string testconnstr) : base(testconnstr) { }
         public virtual int AddTestRow(testtb tb)
         {
-            DoInsert di = new DoInsert(tb);
+            DoInsert<testtb> di = new DoInsert<testtb>(tb);
             help.DoCommand(di);
             return di.RowCount;
         }

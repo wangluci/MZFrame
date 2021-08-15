@@ -15,9 +15,8 @@ namespace TestService
         public TestDALAsync(string testconnstr) : base(testconnstr) { }
         public virtual async Task<int> AddTestRow(testtb tb)
         {
-            DoInsert di = new DoInsert(tb);
+            DoInsert<testtb> di = new DoInsert<testtb>(tb);
             await help.DoCommandAsync(di);
-            Thread.Sleep(5000);
             return di.RowCount;
         }
     }
