@@ -22,19 +22,18 @@ namespace MyAccess.Aop
         {
             _isolation = level;
         }
-        public override async Task ProceedBefore(object state, IInvocation invocation)
+        public override async Task ProceedBefore(IDbHelp dbhelp, IInvocation invocation)
         {
             bool issync = invocation.Method.ReturnType == typeof(void) || !typeof(Task).IsAssignableFrom(invocation.Method.ReturnType);
-            if (state != null)
+            if (dbhelp != null)
             {
-                IDbHelp dbHelp = (IDbHelp)state;
                 if (issync)
                 {
-                    DBTransMan.Instance().OpenDB(dbHelp, _isolation);
+                    DBTransMan.Instance().OpenDB(dbhelp, _isolation);
                 }
                 else
                 {
-                    await DBTransMan.Instance().OpenDBAsync(dbHelp, _isolation);
+                    await DBTransMan.Instance().OpenDBAsync(dbhelp, _isolation);
                 }
             }
             else
@@ -42,18 +41,29 @@ namespace MyAccess.Aop
                 DBTransMan.Instance().BeginTrans();
             }
         }
-        public override Task ProceedAfter(object state, Exception ex, IInvocation invocation)
+        public override Task ProceedException(IDbHelp dbhelp, IInvocation invocation)
         {
-            if (state != null)
+            if (dbhelp != null)
+            {
+                dbhelp.RollBack();
+                return Task.CompletedTask;
+            }
+            else
+            {
+                DBTransMan.Instance().RollBack();
+                return Task.CompletedTask;
+            }
+        }
+        public override Task ProceedAfter(IDbHelp dbhelp, IInvocation invocation)
+        {
+            if (dbhelp != null)
             {
                 if (DBTransMan.Instance().IsOpenTrans())
                 {
                     return Task.CompletedTask;
                 }
-                IDbHelp dbHelp = (IDbHelp)state;
-                if (ex != null)
+                if (!dbhelp.IsTran())
                 {
-                    dbHelp.RollBack();
                     return Task.CompletedTask;
                 }
                 Task rt = invocation.ReturnValue as Task;
@@ -64,12 +74,12 @@ namespace MyAccess.Aop
                     {
                         if (!irt.IsSuccess())
                         {
-                            dbHelp.RollBack();
+                            dbhelp.RollBack();
                             return Task.CompletedTask;
                         }
 
                     }
-                    dbHelp.Commit();
+                    dbhelp.Commit();
                 }
                 else
                 {
@@ -78,18 +88,17 @@ namespace MyAccess.Aop
                     {
                         if (!tr.IsSuccess())
                         {
-                            dbHelp.RollBack();
+                            dbhelp.RollBack();
                             return Task.CompletedTask;
                         }
                     }
-                    dbHelp.Commit();
+                    dbhelp.Commit();
                 }
             }
             else
             {
-                if (ex != null)
+                if (!DBTransMan.Instance().IsOpenTrans())
                 {
-                    DBTransMan.Instance().RollBack();
                     return Task.CompletedTask;
                 }
                 Task rt = invocation.ReturnValue as Task;

@@ -16,20 +16,23 @@ namespace MyAccess.Aop
             {
                 await attribute.ProceedBefore(null, invocation);
             }
-            Exception proceedEx = null;
             try
             {
                 await proceed(invocation, proceedInfo);
             }
-            catch (Exception ex)
+            catch
             {
-                proceedEx = ex;
+                foreach (AbstractAopAttr attribute in Attributes)
+                {
+                    await attribute.ProceedException(null, invocation);
+                }
+                throw;
             }
             finally
             {
                 foreach (AbstractAopAttr attribute in Attributes)
                 {
-                    await attribute.ProceedAfter(null, proceedEx, invocation);
+                    await attribute.ProceedAfter(null, invocation);
                 }
             }
         }
@@ -42,23 +45,25 @@ namespace MyAccess.Aop
                 await attribute.ProceedBefore(null, invocation);
             }
             Exception proceedEx = null;
-            TResult result = default(TResult);
             try
             {
-                result = await proceed(invocation, proceedInfo);
+                return await proceed(invocation, proceedInfo);
             }
             catch (Exception ex)
             {
-                proceedEx = ex;
+                foreach (AbstractAopAttr attribute in Attributes)
+                {
+                    await attribute.ProceedException(null, invocation);
+                }
+                throw;
             }
             finally
             {
                 foreach (AbstractAopAttr attribute in Attributes)
                 {
-                    await attribute.ProceedAfter(null, proceedEx, invocation);
+                    await attribute.ProceedAfter(null, invocation);
                 }
             }
-            return result;
         }
 
 

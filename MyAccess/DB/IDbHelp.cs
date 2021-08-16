@@ -18,7 +18,7 @@ namespace MyAccess.DB
     }
     public interface IDbHelp
     {
-        bool IsNoTran();
+        bool IsTran();
         void BeginTran(Isolation level = Isolation.DEFAULT);
         Task BeginTranAsync(Isolation level = Isolation.DEFAULT);
         void Commit();

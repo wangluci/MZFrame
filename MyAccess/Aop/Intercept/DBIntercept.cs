@@ -22,21 +22,23 @@ namespace MyAccess.Aop
                 {
                     await attribute.ProceedBefore(dbHelp, invocation);
                 }
-
-                Exception proceedEx = null;
                 try
                 {
                     await proceed(invocation, proceedInfo);
                 }
-                catch (Exception ex)
+                catch
                 {
-                    proceedEx = ex;
+                    foreach (AbstractAopAttr attribute in Attributes)
+                    {
+                        await attribute.ProceedException(dbHelp, invocation);
+                    }
+                    throw;
                 }
                 finally
                 {
                     foreach (AbstractAopAttr attribute in Attributes)
                     {
-                       await attribute.ProceedAfter(dbHelp, proceedEx, invocation);
+                       await attribute.ProceedAfter(dbHelp, invocation);
                     }
                     //同步
                     //结束后自动清参数
@@ -61,27 +63,29 @@ namespace MyAccess.Aop
                     await attribute.ProceedBefore(dbHelp, invocation);
                 }
 
-                Exception proceedEx = null;
-                TResult result = default(TResult);
+
                 try
                 {
-                    result = await proceed(invocation, proceedInfo);
+                    return await proceed(invocation, proceedInfo);
                 }
-                catch (Exception ex)
+                catch
                 {
-                    proceedEx = ex;
+                    foreach (AbstractAopAttr attribute in Attributes)
+                    {
+                        await attribute.ProceedException(dbHelp, invocation);
+                    }
+                    throw;
                 }
                 finally
                 {
                     foreach (AbstractAopAttr attribute in Attributes)
                     {
-                        await attribute.ProceedAfter(dbHelp, proceedEx, invocation);
+                        await attribute.ProceedAfter(dbHelp, invocation);
                     }
                     //同步
                     //结束后自动清参数
                     dbHelp?.EnableAndClearParam();
                 }
-                return result;
             }
             else
             {

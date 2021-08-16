@@ -18,9 +18,9 @@ namespace MyAccess.DB
         /// 是否禁止清参数
         /// </summary>
         protected bool mDiableClearParam;
-        public bool IsNoTran()
+        public bool IsTran()
         {
-            return Equals(mDbTrans, null);
+            return mDbTrans != null;
         }
 
         /// <summary>
