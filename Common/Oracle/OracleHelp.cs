@@ -58,7 +58,14 @@ namespace Common.Oracle
         }
         protected override string NameToDbParam(string param)
         {
-            return ":" + param;
+            if (param.StartsWith(":"))
+            {
+                return param;
+            }
+            else
+            {
+                return ":" + param;
+            }
         }
     }
 }

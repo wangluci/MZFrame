@@ -27,7 +27,6 @@ namespace MyAccess.DB
         /// 当前参数集
         /// </summary>
         protected List<DbParameter> mDbParamters;
-        public List<DbParameter> DBParamters { get { return mDbParamters; } }
         ~DbHelp()
         {
             Dispose(false);
@@ -182,7 +181,10 @@ namespace MyAccess.DB
         {
             foreach (DbParameter p in mDbParamters)
             {
-                mCommand.Parameters.Add(p);
+                if (!mCommand.Parameters.Contains(p.ParameterName))
+                {
+                    mCommand.Parameters.Add(p);
+                }
             }
         }
 

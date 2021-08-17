@@ -33,7 +33,11 @@ namespace Common.MySql
 
         protected override void AutoDbParam(string name, object val, ParameterDirection direct)
         {
-            MySqlParameter dbParameter = new MySqlParameter("@" + name, val);
+            if (!name.StartsWith("@"))
+            {
+                name = "@" + name;
+            }
+            MySqlParameter dbParameter = new MySqlParameter(name, val);
             dbParameter.Direction = direct;
             mDbParamters.Add(dbParameter);
         }
@@ -46,13 +50,21 @@ namespace Common.MySql
 
         public void AddOutParam(string parameterName, MySqlDbType dbType)
         {
-            MySqlParameter dbParameter = new MySqlParameter("@" + parameterName, dbType);
+            if (!parameterName.StartsWith("@"))
+            {
+                parameterName = "@" + parameterName;
+            }
+            MySqlParameter dbParameter = new MySqlParameter(parameterName, dbType);
             dbParameter.Direction = ParameterDirection.Output;
             mDbParamters.Add(dbParameter);
         }
         public void AddInParam(string parameterName, MySqlDbType dbType, object value)
         {
-            MySqlParameter dbParameter = new MySqlParameter("@" + parameterName, dbType);
+            if (!parameterName.StartsWith("@"))
+            {
+                parameterName = "@" + parameterName;
+            }
+            MySqlParameter dbParameter = new MySqlParameter(parameterName, dbType);
             dbParameter.Value = value;
             dbParameter.Direction = ParameterDirection.Input;
             mDbParamters.Add(dbParameter);
@@ -60,7 +72,14 @@ namespace Common.MySql
 
         protected override string NameToDbParam(string param)
         {
-            return "@" + param;
+            if (param.StartsWith("@"))
+            {
+                return param;
+            }
+            else
+            {
+                return "@" + param;
+            }
         }
     }
 }

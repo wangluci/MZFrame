@@ -35,27 +35,47 @@ namespace Common.MSSql
         }
         protected override void AutoDbParam(string name, object val, ParameterDirection direct)
         {
-            SqlParameter dbParameter = new SqlParameter("@" + name, val);
+            if (!name.StartsWith("@"))
+            {
+                name = "@" + name;
+            }
+            SqlParameter dbParameter = new SqlParameter(name, val);
             dbParameter.Direction = direct;
             mDbParamters.Add(dbParameter);
         }
 
         public void AddOutParam(string parameterName, SqlDbType dbType)
         {
-            SqlParameter dbParameter = new SqlParameter("@" + parameterName, dbType);
+            if (!parameterName.StartsWith("@"))
+            {
+                parameterName = "@" + parameterName;
+            }
+            SqlParameter dbParameter = new SqlParameter(parameterName, dbType);
             dbParameter.Direction = ParameterDirection.Output;
             mDbParamters.Add(dbParameter);
         }
         public void AddInParam(string parameterName, SqlDbType dbType, object value)
         {
-            SqlParameter dbParameter = new SqlParameter("@" + parameterName, dbType);
+            if (!parameterName.StartsWith("@"))
+            {
+                parameterName = "@" + parameterName;
+            }
+            SqlParameter dbParameter = new SqlParameter(parameterName, dbType);
             dbParameter.Value = value;
             dbParameter.Direction = ParameterDirection.Input;
             mDbParamters.Add(dbParameter);
         }
         protected override string NameToDbParam(string param)
         {
-            return "@" + param;
+            if (param.StartsWith("@"))
+            {
+                return param;
+            }
+            else
+            {
+                return "@" + param;
+            }
+       
         }
     }
 }
