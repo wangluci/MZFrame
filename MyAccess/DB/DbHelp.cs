@@ -301,7 +301,7 @@ namespace MyAccess.DB
             for (int i = 0; i < myProInfos.Length; i++)
             {
                 PropertyInfo pi = myProInfos[i];
-                AutoDbParam(pi.PropertyType, pi.Name, pi.GetValue(obj, null), ParameterDirection.Input);
+                AutoDbParam(pi.Name, pi.GetValue(obj, null), ParameterDirection.Input);
             }
         }
         /// <summary>
@@ -327,14 +327,7 @@ namespace MyAccess.DB
         }
         public void AddParam(string param, object value)
         {
-            if (value == null)
-            {
-                AutoDbParam(typeof(string), param, DBNull.Value, ParameterDirection.Input);
-            }
-            else
-            {
-                AutoDbParam(value.GetType(), param, value, ParameterDirection.Input);
-            }
+            AutoDbParam(param, value, ParameterDirection.Input);
         }
         public string AddParamAndReturn(string param, object value)
         {
@@ -346,7 +339,7 @@ namespace MyAccess.DB
         /// </summary>
         /// <param name="tp"></param>
         /// <returns></returns>
-        protected abstract void AutoDbParam(Type tp, string name, object val, ParameterDirection direct);
+        protected abstract void AutoDbParam(string name, object val, ParameterDirection direct);
         /// <summary>
         /// 参数名转为各个数据库所需参数格式名称
         /// </summary>
