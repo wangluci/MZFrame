@@ -86,10 +86,6 @@
       <Project>{41f576d9-01d6-4df8-b1f2-c3ae4c75ca61}</Project>
       <Name>MyAccess</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MyNet.MQ\MyNet.MQ.csproj">
-      <Project>{509ee6e6-10cf-45b4-953e-b442df8ca8eb}</Project>
-      <Name>MyNet.MQ</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MyNet\MyNet.csproj">
       <Project>{d5b0f697-7df5-462e-aa9f-6e967c5df428}</Project>
       <Name>MyNet</Name>
