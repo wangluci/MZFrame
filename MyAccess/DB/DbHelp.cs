@@ -60,9 +60,9 @@ namespace MyAccess.DB
             mConnString = connectionStr;
             mDbParamters = new List<DbParameter>();
         }
-        public abstract DbConnection CreateConnection();
-        public abstract DbCommand CreateCommand();
-        public abstract DbDataAdapter CreateDataAdapter();
+        protected abstract DbConnection CreateConnection();
+        protected abstract DbCommand CreateCommand();
+        protected abstract DbDataAdapter CreateDataAdapter();
 
 
 

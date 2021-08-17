@@ -14,17 +14,17 @@ namespace Common.Oracle
             base(string.Format(@"Data Source=(DESCRIPTION =(ADDRESS = (PROTOCOL = TCP)(HOST = {0})(PORT = {1}))
 	   (CONNECT_DATA =(SERVER = DEDICATED)(SERVICE_NAME = {4}) ) );User ID={2};PassWord={3};", host, port, userName, password, dbName))
         { }
-        public override DbCommand CreateCommand()
+        protected override DbCommand CreateCommand()
         {
             return new OracleCommand();
         }
 
-        public override DbConnection CreateConnection()
+        protected override DbConnection CreateConnection()
         {
             return new OracleConnection();
         }
 
-        public override DbDataAdapter CreateDataAdapter()
+        protected override DbDataAdapter CreateDataAdapter()
         {
             return new OracleDataAdapter();
         }

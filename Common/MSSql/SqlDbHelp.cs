@@ -12,15 +12,15 @@ namespace Common.MSSql
             base(string.Format("Max Pool Size = 2048;Server={0};UID={1};PWD={2};DataBase={3};Pooling=true;", host, userName, password, dbName))
         { }
 
-        public override DbConnection CreateConnection()
+        protected override DbConnection CreateConnection()
         {
             return new SqlConnection();
         }
-        public override DbCommand CreateCommand()
+        protected override DbCommand CreateCommand()
         {
             return new SqlCommand();
         }
-        public override DbDataAdapter CreateDataAdapter()
+        protected override DbDataAdapter CreateDataAdapter()
         {
             return new SqlDataAdapter();
         }
