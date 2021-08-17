@@ -31,7 +31,7 @@ namespace Common.MySql
         }
 
 
-        protected override void AutoDbParam(Type tp, string name, object val, ParameterDirection direct)
+        protected override void AutoDbParam(string name, object val, ParameterDirection direct)
         {
             MySqlParameter dbParameter = new MySqlParameter("@" + name, val);
             dbParameter.Direction = direct;

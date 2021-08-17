@@ -33,53 +33,10 @@ namespace Common.MSSql
         {
             CopyDbParamFrom(parameters);
         }
-        protected override void AutoDbParam(Type tp, string name, object val, ParameterDirection direct)
+        protected override void AutoDbParam(string name, object val, ParameterDirection direct)
         {
-            SqlParameter dbParameter = new SqlParameter();
-            dbParameter.ParameterName = "@" + name;
-            dbParameter.Value = val;
+            SqlParameter dbParameter = new SqlParameter("@" + name, val);
             dbParameter.Direction = direct;
-
-            if (tp == typeof(string))
-            {
-                dbParameter.SqlDbType = SqlDbType.VarChar;
-            }
-            else if (tp == typeof(int))
-            {
-                dbParameter.SqlDbType = SqlDbType.Int;
-            }
-            else if (tp == typeof(long))
-            {
-                dbParameter.SqlDbType = SqlDbType.BigInt;
-            }
-            else if (tp == typeof(float) || tp == typeof(double))
-            {
-                dbParameter.SqlDbType = SqlDbType.Float;
-            }
-            else if (tp == typeof(Int16))
-            {
-                dbParameter.SqlDbType = SqlDbType.SmallInt;
-            }
-            else if (tp == typeof(bool))
-            {
-                dbParameter.SqlDbType = SqlDbType.Bit;
-            }
-            else if (tp == typeof(decimal))
-            {
-                dbParameter.SqlDbType = SqlDbType.Decimal;
-            }
-            else if (tp == typeof(DateTime))
-            {
-                dbParameter.SqlDbType = SqlDbType.DateTime;
-            }
-            else if (tp.IsEnum)
-            {
-                dbParameter.SqlDbType = SqlDbType.SmallInt;
-            }
-            else
-            {
-                dbParameter.SqlDbType = SqlDbType.VarChar;
-            }
             mDbParamters.Add(dbParameter);
         }
 
