@@ -1,6 +1,7 @@
 ﻿
 using MyAccess.Aop;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using TestService.Model;
@@ -26,6 +27,10 @@ namespace TestService
             testtb tb = MyAccess.Aop.InterceptFactory.CreateEntityOp<testtb>();
             tb.testdes = "测试异步添加";
             return await _dalAsync.AddTestRow(tb);
+        }
+        public virtual async Task<List<testtb>> GetTestListAsync()
+        {
+            return await _dalAsync.GetTesttbsAsync();
         }
         public virtual async Task<string> TestTask()
         {

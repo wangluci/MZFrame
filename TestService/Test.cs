@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TemplateAction.Core;
+using TestService.Model;
 
 namespace TestService
 {
@@ -22,6 +23,16 @@ namespace TestService
             SetGlobal("a", 1);
             SetGlobal("Hx", "<a href='xxx'>你好啊</a>");
             return View();
+        }
+        public async Task<TextResult> List()
+        {
+            List<testtb> tlist = await _service.GetTestListAsync();
+            string rt = string.Empty;
+            foreach(testtb tb in tlist)
+            {
+                rt += "id:" + tb.testid + " des:" + tb.testdes + "\n";
+            }
+            return Content(rt);
         }
         public TextResult TestAdd()
         {
