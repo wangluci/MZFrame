@@ -47,7 +47,9 @@ namespace MyAccess.Aop
             Exception proceedEx = null;
             try
             {
-                return await proceed(invocation, proceedInfo);
+                TResult rt = await proceed(invocation, proceedInfo);
+                invocation.ReturnValue = rt;
+                return rt;
             }
             catch (Exception ex)
             {

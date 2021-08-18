@@ -1,4 +1,5 @@
 ﻿
+using MyAccess.Aop;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,7 +24,7 @@ namespace TestService
         public virtual async Task<int> TestDALAsync()
         {
             testtb tb = MyAccess.Aop.InterceptFactory.CreateEntityOp<testtb>();
-            tb.testdes = "测试同步添加";
+            tb.testdes = "测试异步添加";
             return await _dalAsync.AddTestRow(tb);
         }
         public virtual async Task<string> TestTask()

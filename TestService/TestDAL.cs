@@ -2,6 +2,7 @@
 using TestService.Model;
 using MyAccess.DB;
 using System;
+using MyAccess.Aop;
 
 namespace TestService
 {
@@ -11,6 +12,7 @@ namespace TestService
     public class TestDAL : MySqlSupport
     {
         public TestDAL(string testconnstr) : base(testconnstr) { }
+        [Trans]
         public virtual int AddTestRow(testtb tb)
         {
             DoInsert<testtb> di = new DoInsert<testtb>(tb);

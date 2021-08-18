@@ -14,7 +14,6 @@ namespace TestService
     public class TestDALAsync: MySqlSupport
     {
         public TestDALAsync(string testconnstr) : base(testconnstr) { }
-        [Trans]
         public virtual async Task<int> AddTestRow(testtb tb)
         {
             DoInsert<testtb> di = new DoInsert<testtb>(tb);

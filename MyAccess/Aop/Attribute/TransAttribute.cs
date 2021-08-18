@@ -14,31 +14,30 @@ namespace MyAccess.Aop
         {
             get { return _isolation; }
         }
-        public TransAttribute()
-        {
-            _isolation = Isolation.DEFAULT;
-        }
-        public TransAttribute(Isolation level)
+
+        public TransAttribute(Isolation level = Isolation.DEFAULT)
         {
             _isolation = level;
         }
-        public override async Task ProceedBefore(IDbHelp dbhelp, IInvocation invocation)
+        public override Task ProceedBefore(IDbHelp dbhelp, IInvocation invocation)
         {
             bool issync = invocation.Method.ReturnType == typeof(void) || !typeof(Task).IsAssignableFrom(invocation.Method.ReturnType);
             if (dbhelp != null)
             {
                 if (issync)
                 {
-                    DBTransMan.Instance().OpenDB(dbhelp, _isolation);
+                    DBTransScope.Instance().OpenDB(dbhelp, _isolation);
+                    return Task.CompletedTask;
                 }
                 else
                 {
-                    await DBTransMan.Instance().OpenDBAsync(dbhelp, _isolation);
+                    return DBTransScope.Instance().OpenDBAsync(dbhelp, _isolation);
                 }
             }
             else
             {
-                DBTransMan.Instance().BeginTrans();
+                DBTransScope.Instance().BeginScope();
+                return Task.CompletedTask;
             }
         }
         public override Task ProceedException(IDbHelp dbhelp, IInvocation invocation)
@@ -50,7 +49,7 @@ namespace MyAccess.Aop
             }
             else
             {
-                DBTransMan.Instance().RollBack();
+                DBTransScope.Instance().RollBack();
                 return Task.CompletedTask;
             }
         }
@@ -58,7 +57,7 @@ namespace MyAccess.Aop
         {
             if (dbhelp != null)
             {
-                if (DBTransMan.Instance().IsOpenTrans())
+                if (DBTransScope.Instance().IsBegan())
                 {
                     return Task.CompletedTask;
                 }
@@ -97,7 +96,7 @@ namespace MyAccess.Aop
             }
             else
             {
-                if (!DBTransMan.Instance().IsOpenTrans())
+                if (!DBTransScope.Instance().IsBegan())
                 {
                     return Task.CompletedTask;
                 }
@@ -109,12 +108,12 @@ namespace MyAccess.Aop
                     {
                         if (!irt.IsSuccess())
                         {
-                            DBTransMan.Instance().RollBack();
+                            DBTransScope.Instance().RollBack();
                             return Task.CompletedTask;
                         }
 
                     }
-                    DBTransMan.Instance().Commit();
+                    DBTransScope.Instance().Commit();
                 }
                 else
                 {
@@ -123,11 +122,11 @@ namespace MyAccess.Aop
                     {
                         if (!tr.IsSuccess())
                         {
-                            DBTransMan.Instance().RollBack();
+                            DBTransScope.Instance().RollBack();
                             return Task.CompletedTask;
                         }
                     }
-                    DBTransMan.Instance().Commit();
+                    DBTransScope.Instance().Commit();
                 }
 
             }
