@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -41,16 +40,17 @@ namespace TemplateAction.NetCore
                 builder.UseStaticFiles();
                 builder.UseTAMvc(app =>
                 {
-                    app.Services.AddSingleton<IConfiguration>((object[] arguments) =>
-                    {
-                        return destHostBuilder._config;
-                    });
                     //映射服务
                     app.Services.AddSingleton<IServiceProvider, TANetServiceProvider>();
                     //添加日志
                     app.Services.AddSingleton<ITALoggerFactory, TANetCoreHttpLoggerFactory>((object[] arguments) =>
                     {
                         return new TANetCoreHttpLoggerFactory(builder.ApplicationServices);
+                    });
+                    //配置文件映射
+                    app.Services.AddSingleton<IConfiguration>((object[] arguments) =>
+                    {
+                        return destHostBuilder._config;
                     });
 
                     //设置路由
@@ -100,16 +100,7 @@ namespace TemplateAction.NetCore
             TAEventDispatcher.Instance.Register<IApplicationBuilder>(_appBuilderEvents);
             return this;
         }
-        /// <summary>
-        /// 配置服务
-        /// </summary>
-        /// <param name="ac"></param>
-        /// <returns></returns>
-        public TANetCoreHttpHostBuilder ConfigureServices(Action<Microsoft.Extensions.DependencyInjection.IServiceCollection> ac)
-        {
-            _servicesac = ac;
-            return this;
-        }
+
         public TANetCoreHttpHost Build()
         {
             if (_servicesac != null)
