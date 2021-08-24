@@ -6,15 +6,19 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using TemplateAction.Core;
-
+using Microsoft.Extensions.ML;
+using Microsoft.Extensions.Options;
 namespace ResumeML
 {
     public class Home : TABaseController
     {
         private TestBusiness _business;
+        private readonly PredictionEnginePool<ModelInput, ModelOutput> _predictionEnginePool;
         public Home(ITALoggerFactory loggerFactory, TestBusiness business)
         {
-            _business = business;
+            IOptions<MLOptions> xx = new Options< MLOptions>();
+               //_predictionEnginePool=new PredictionEnginePool<ModelInput, ModelOutput>()
+               _business = business;
         }
         public ViewResult Test()
         {
@@ -94,7 +98,7 @@ namespace ResumeML
                         {
                             Col1 = colfield,
                         };
-                        ModelOutput predictionResult = ConsumeModel.Predict(sampleData);
+                        ModelOutput predictionResult = _predictionEnginePool.Predict(sampleData);
                         float other = predictionResult.Score[2];
                         if (predictionResult.Prediction == 0)
                         {

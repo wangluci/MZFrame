@@ -2,14 +2,10 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Text;
 using TemplateAction.Core;
-using TemplateAction.Core.Dispatcher;
 using TemplateAction.Route;
 
 namespace TemplateAction.NetCore
@@ -39,16 +35,24 @@ namespace TemplateAction.NetCore
         }
         public static TANetCoreHttpHostBuilder CreateDefaultHostBuilder()
         {
-            return new TANetCoreHttpHostBuilder().Configure((IApplicationBuilder builder) =>
+            TANetCoreHttpHostBuilder destHostBuilder = new TANetCoreHttpHostBuilder();
+            return destHostBuilder.Configure((IApplicationBuilder builder) =>
             {
                 builder.UseStaticFiles();
                 builder.UseTAMvc(app =>
                 {
+                    app.Services.AddSingleton<IConfiguration>((object[] arguments) =>
+                    {
+                        return destHostBuilder._config;
+                    });
+                    //映射服务
+                    app.Services.AddSingleton<IServiceProvider, TANetServiceProvider>();
                     //添加日志
                     app.Services.AddSingleton<ITALoggerFactory, TANetCoreHttpLoggerFactory>((object[] arguments) =>
                     {
                         return new TANetCoreHttpLoggerFactory(builder.ApplicationServices);
                     });
+
                     //设置路由
                     string defns = null;
                     Assembly ass = Assembly.GetEntryAssembly();
