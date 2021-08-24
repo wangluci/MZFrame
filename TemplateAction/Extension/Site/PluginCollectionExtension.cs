@@ -1,11 +1,11 @@
 ﻿using System;
 using TemplateAction.Core;
 using System.Collections.Generic;
+
 namespace TemplateAction.Extension.Site
 {
     public static class PluginCollectionExtension
     {
-
         public static PluginCollection UseRouter(this PluginCollection collection, IRouterBuilder builder)
         {
             SitePluginFactory sitefactory = (SitePluginFactory)collection.PluginFactory;

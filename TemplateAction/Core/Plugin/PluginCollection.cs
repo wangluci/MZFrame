@@ -5,7 +5,7 @@ using System.Threading;
 using System.Collections.Concurrent;
 using System.IO;
 using TemplateAction.Common;
-
+using TemplateAction.Extension;
 namespace TemplateAction.Core
 {
     /// <summary>
@@ -181,15 +181,6 @@ namespace TemplateAction.Core
             return list as List<T>;
         }
 
-        public T GetService<T>(ILifetimeFactory extOtherFactory = null) where T : class
-        {
-            return GetService(typeof(T).FullName, extOtherFactory) as T;
-        }
-        public object GetService(Type tp, ILifetimeFactory extOtherFactory = null)
-        {
-            return GetService(tp.FullName, extOtherFactory);
-        }
-
         /// <summary>
         /// 获取服务实例
         /// </summary>
@@ -206,14 +197,11 @@ namespace TemplateAction.Core
         /// <param name="serviceType"></param>
         /// <param name="extOtherFactory"></param>
         /// <returns></returns>
-        public object CreateExtOtherService(Type serviceType, ProxyFactory factory, ILifetimeFactory extOtherFactory)
+        public object CreateExtOtherService(Type serviceType, ILifetimeFactory extOtherFactory, ProxyFactory factory = null)
         {
             return extOtherFactory.GetValue(this, serviceType, factory, extOtherFactory);
         }
-        public object CreateExtOtherService(Type serviceType, ILifetimeFactory extOtherFactory)
-        {
-            return CreateExtOtherService(serviceType, null, extOtherFactory);
-        }
+
         /// <summary>
         /// ServiceDescriptor转实例
         /// </summary>
@@ -303,11 +291,11 @@ namespace TemplateAction.Core
                     else if (parameterType.IsPrimitive || parameterType == typeof(string))
                     {
                         ;
-                        parameters[i] = GetService(TAUtility.TypeName2ServiceKey(parameterType, parameter.Name), extOtherFactory);
+                        parameters[i] = this.GetService(TAUtility.TypeName2ServiceKey(parameterType, parameter.Name), extOtherFactory);
                     }
                     else
                     {
-                        parameters[i] = GetService(parameterType, extOtherFactory);
+                        parameters[i] = this.GetService(parameterType, extOtherFactory);
                     }
                 }
                 if (factory != null)
