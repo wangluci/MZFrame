@@ -190,6 +190,8 @@ namespace TemplateAction.Core
                 {
                     //获取服务集
                     Type destType = tp.GetGenericArguments()[0];
+                    Type listType = typeof(List<>).MakeGenericType(destType);
+                    object list = Activator.CreateInstance(listType);
                     IServiceDescriptorEnumerable sdenum = null;
                     if (destType.IsGenericType)
                     {
@@ -199,10 +201,7 @@ namespace TemplateAction.Core
                     {
                         sdenum = FindServices(destType.FullName);
                     }
-                    if (sdenum == null) return null;
-
-                    Type listType = typeof(List<>).MakeGenericType(destType);
-                    object list = Activator.CreateInstance(listType);
+                    if (sdenum == null) return list;
                     MethodInfo addMethod = listType.GetMethod("Add");
                     foreach (ServiceDescriptor sd in sdenum)
                     {
