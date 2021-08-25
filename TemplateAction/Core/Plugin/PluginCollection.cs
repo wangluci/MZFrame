@@ -192,15 +192,7 @@ namespace TemplateAction.Core
                     Type destType = tp.GetGenericArguments()[0];
                     Type listType = typeof(List<>).MakeGenericType(destType);
                     object list = Activator.CreateInstance(listType);
-                    IServiceDescriptorEnumerable sdenum = null;
-                    if (destType.IsGenericType)
-                    {
-                        sdenum = FindServices(destType.GetGenericTypeDefinition().FullName);
-                    }
-                    else
-                    {
-                        sdenum = FindServices(destType.FullName);
-                    }
+                    IServiceDescriptorEnumerable sdenum = FindServices(destType.FullName);
                     if (sdenum == null) return list;
                     MethodInfo addMethod = listType.GetMethod("Add");
                     foreach (ServiceDescriptor sd in sdenum)
