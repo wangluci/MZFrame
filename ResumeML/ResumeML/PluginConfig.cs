@@ -1,6 +1,5 @@
 ﻿using ResumeML.Business;
 using TemplateAction.Core;
-
 namespace ResumeML
 {
     public class PluginConfig : IPluginConfig

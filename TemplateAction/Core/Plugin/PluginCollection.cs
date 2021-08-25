@@ -5,7 +5,6 @@ using System.Threading;
 using System.Collections.Concurrent;
 using System.IO;
 using TemplateAction.Common;
-using TemplateAction.Extension;
 namespace TemplateAction.Core
 {
     /// <summary>

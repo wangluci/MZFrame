@@ -35,42 +35,6 @@ namespace TemplateAction.Core
                 _services[key] = des;
             }
         }
-        public void AddTransient<T1, T2>()
-        {
-            Type imp = typeof(T1);
-            ServiceDescriptor tmp = new ServiceDescriptor(typeof(T2), ServiceLifetime.Transient, null);
-            tmp.PluginName = PluginName;
-            _services[imp.FullName] = tmp;
-        }
-        public void AddTransient<T1, T2>(ProxyFactory factory)
-        {
-            ServiceDescriptor tmp = new ServiceDescriptor(typeof(T2), ServiceLifetime.Transient, factory);
-            tmp.PluginName = PluginName;
-            _services[typeof(T1).FullName] = tmp;
-        }
-
-        public void AddSingleton<T1, T2>()
-        {
-            ServiceDescriptor tmp = new ServiceDescriptor(typeof(T2), ServiceLifetime.Singleton, null);
-            tmp.PluginName = PluginName;
-            _services[typeof(T1).FullName] = tmp;
-        }
-
-        public void AddSingleton<T1>()
-        {
-            AddSingleton<T1, T1>();
-        }
-
-        public void AddSingleton<T1, T2>(ProxyFactory factory)
-        {
-            ServiceDescriptor tmp = new ServiceDescriptor(typeof(T2), ServiceLifetime.Singleton, factory);
-            tmp.PluginName = PluginName;
-            _services[typeof(T1).FullName] = tmp;
-        }
-
-        public void AddSingleton<T1>(ProxyFactory factory)
-        {
-            AddSingleton<T1, T1>(factory);
-        }
+       
     }
 }

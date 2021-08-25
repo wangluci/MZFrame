@@ -1,6 +1,5 @@
 ﻿using System;
 using TemplateAction.Core;
-
 namespace TestService
 {
     public class PluginConfig : IPluginConfig

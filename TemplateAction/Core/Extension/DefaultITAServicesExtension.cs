@@ -1,7 +1,5 @@
 ﻿using System;
-using TemplateAction.Core;
-
-namespace TemplateAction.Extension
+namespace TemplateAction.Core
 {
     public static class DefaultITAServicesExtension
     {

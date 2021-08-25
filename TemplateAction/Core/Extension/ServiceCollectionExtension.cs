@@ -1,11 +1,31 @@
 ﻿using System;
 using TemplateAction.Common;
-using TemplateAction.Core;
-
-namespace TemplateAction.Extension
+namespace TemplateAction.Core
 {
     public static class ServiceCollectionExtension
     {
+        public static IServiceCollection AddTransient<T1>(this IServiceCollection collection, ProxyFactory factory = null)
+        {
+            collection.AddTransient<T1, T1>(factory);
+            return collection;
+        }
+        public static IServiceCollection AddTransient<T1, T2>(this IServiceCollection collection, ProxyFactory factory = null)
+        {
+            collection.Add(typeof(T1).FullName, new ServiceDescriptor(typeof(T2), ServiceLifetime.Transient, factory));
+            return collection;
+        }
+
+        public static IServiceCollection AddSingleton<T1, T2>(this IServiceCollection collection, ProxyFactory factory = null)
+        {
+            collection.Add(typeof(T1).FullName, new ServiceDescriptor(typeof(T2), ServiceLifetime.Singleton, factory));
+            return collection;
+        }
+
+        public static IServiceCollection AddSingleton<T1>(this IServiceCollection collection, ProxyFactory factory = null)
+        {
+            collection.AddSingleton<T1, T1>(factory);
+            return collection;
+        }
         public static IServiceCollection AddSingleton(this IServiceCollection collection, Type impType, Type serviceType, ProxyFactory factory = null)
         {
             collection.Add(impType.FullName, new ServiceDescriptor(serviceType, ServiceLifetime.Singleton, factory));
