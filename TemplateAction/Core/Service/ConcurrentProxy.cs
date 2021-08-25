@@ -9,7 +9,7 @@ namespace TemplateAction.Core
         internal ConcurrentProxy()
         {
         }
-        public object GetValue(PluginCollection collection, ServiceDescriptor desc, ILifetimeFactory extOtherFactory)
+        public object GetValue(PluginCollection collection, Type serviceType, ProxyFactory factory, ILifetimeFactory extOtherFactory)
         {
             if (_target == null)
             {
@@ -17,7 +17,7 @@ namespace TemplateAction.Core
                 {
                     if (_target == null)
                     {
-                        _target = collection.CreateServiceInstance(desc.ServiceType, desc.Factory, extOtherFactory);
+                        _target = collection.CreateServiceInstance(serviceType, factory, extOtherFactory);
                     }
                 }
             }

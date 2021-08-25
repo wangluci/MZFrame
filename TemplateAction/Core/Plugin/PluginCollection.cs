@@ -175,7 +175,10 @@ namespace TemplateAction.Core
             List<ServiceDescriptor> deslist = FindServices(typeof(T).FullName);
             foreach (ServiceDescriptor sd in deslist)
             {
-                addMethod.Invoke(list, new object[] { Des2Instance(sd, extOtherFactory) });
+                if (sd != null)
+                {
+                    addMethod.Invoke(list, new object[] { Des2Instance(sd, extOtherFactory) });
+                }
             }
 
             return list as List<T>;
@@ -189,8 +192,36 @@ namespace TemplateAction.Core
         public object GetService(string key, ILifetimeFactory extOtherFactory = null)
         {
             ServiceDescriptor sd = FindService(key);
+            if (sd == null)
+            {
+                return null;
+            }
             return Des2Instance(sd, extOtherFactory);
         }
+        public object GetService(Type tp, ILifetimeFactory extOtherFactory = null)
+        {
+            ServiceDescriptor sd = FindService(tp.FullName);
+            Type serviceType = sd.ServiceType;
+            if (tp.IsGenericType)
+            {
+                if (sd == null)
+                {
+                    //再使用泛型定义搜索
+                    sd = FindService(tp.GetGenericTypeDefinition().FullName);
+                    if (sd == null)
+                    {
+                        return null;
+                    }
+                    serviceType = sd.ServiceType.MakeGenericType(tp.GetGenericArguments());
+                }
+            }
+            else
+            {
+                if (sd == null) return null;
+            }
+            return Des2Instance(sd.PluginName, sd.Lifetime, serviceType, sd.Factory, sd.LifetimeFactory, extOtherFactory);
+        }
+
         /// <summary>
         /// 创建外部注入服务
         /// </summary>
@@ -202,48 +233,53 @@ namespace TemplateAction.Core
             return extOtherFactory.GetValue(this, serviceType, factory, extOtherFactory);
         }
 
+        private object Des2Instance(ServiceDescriptor sd, ILifetimeFactory extOtherFactory)
+        {
+            return Des2Instance(sd.PluginName, sd.Lifetime, sd.ServiceType, sd.Factory, sd.LifetimeFactory, extOtherFactory);
+        }
         /// <summary>
         /// ServiceDescriptor转实例
         /// </summary>
-        /// <param name="sd"></param>
+        /// <param name="plgname"></param>
+        /// <param name="lifetime"></param>
+        /// <param name="serviceType"></param>
+        /// <param name="factory"></param>
+        /// <param name="otherFactory"></param>
+        /// <param name="extOtherFactory"></param>
         /// <returns></returns>
-        private object Des2Instance(ServiceDescriptor sd, ILifetimeFactory extOtherFactory)
+        private object Des2Instance(string plgname, ServiceLifetime lifetime, Type serviceType, ProxyFactory factory, ILifetimeFactory otherFactory, ILifetimeFactory extOtherFactory)
         {
             object result = null;
-            if (Equals(sd, null))
-            {
-                return null;
-            }
-            switch (sd.Lifetime)
+            switch (lifetime)
             {
                 case ServiceLifetime.Singleton:
                     {
-                        if (string.IsNullOrEmpty(sd.PluginName))
+                        if (string.IsNullOrEmpty(plgname))
                         {
-                            ConcurrentProxy proxy = this._singletonServices.GetOrAdd(sd.ServiceType.FullName);
-                            result = proxy.GetValue(this, sd, extOtherFactory);
+                            ConcurrentProxy proxy = this._singletonServices.GetOrAdd(serviceType.FullName);
+                            result = proxy.GetValue(this, serviceType, factory, extOtherFactory);
                         }
                         else
                         {
-                            PluginObject pobj = GetPlugin(sd.PluginName);
+                            PluginObject pobj = GetPlugin(plgname);
                             if (!Equals(pobj, null))
                             {
-                                ConcurrentProxy proxy = pobj.Storer.GetOrAdd(sd.ServiceType.FullName);
-                                result = proxy.GetValue(this, sd, extOtherFactory);
+                                ConcurrentProxy proxy = pobj.Storer.GetOrAdd(serviceType.FullName);
+                                result = proxy.GetValue(this, serviceType, factory, extOtherFactory);
                             }
                         }
                     }
                     break;
                 case ServiceLifetime.Transient:
                     {
-                        result = CreateServiceInstance(sd.ServiceType, sd.Factory, extOtherFactory);
+                        result = CreateServiceInstance(serviceType, factory, extOtherFactory);
                     }
                     break;
                 case ServiceLifetime.Other:
                     {
-                        if (sd.LifetimeFactory != null)
+                        if (otherFactory != null)
                         {
-                            result = sd.LifetimeFactory.GetValue(this, sd.ServiceType, sd.Factory, extOtherFactory);
+                            result = otherFactory.GetValue(this, serviceType, factory, extOtherFactory);
                         }
                     }
                     break;
@@ -262,6 +298,18 @@ namespace TemplateAction.Core
             if (serviceType.IsInterface && factory != null)
             {
                 return factory(new object[0]);
+            }
+            else if (serviceType.IsPrimitive || serviceType == typeof(string))
+            {
+                //string或基本类型返回
+                if (factory != null)
+                {
+                    return factory(new object[0]);
+                }
+                else
+                {
+                    return Activator.CreateInstance(serviceType);
+                }
             }
             ConstructorInfo activationConstructor = null;
             ConstructorInfo[] constructors = serviceType.GetConstructors(BindingFlags.Instance | BindingFlags.Public);
@@ -290,12 +338,11 @@ namespace TemplateAction.Core
                     }
                     else if (parameterType.IsPrimitive || parameterType == typeof(string))
                     {
-                        ;
-                        parameters[i] = this.GetService(TAUtility.TypeName2ServiceKey(parameterType, parameter.Name), extOtherFactory);
+                        parameters[i] = GetService(TAUtility.TypeName2ServiceKey(parameterType, parameter.Name), extOtherFactory);
                     }
                     else
                     {
-                        parameters[i] = this.GetService(parameterType, extOtherFactory);
+                        parameters[i] = GetService(parameterType, extOtherFactory);
                     }
                 }
                 if (factory != null)

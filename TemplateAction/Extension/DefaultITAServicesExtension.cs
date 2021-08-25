@@ -9,9 +9,5 @@ namespace TemplateAction.Extension
         {
             return collection.GetService(typeof(T).FullName, extOtherFactory) as T;
         }
-        public static object GetService(this ITAServices collection, Type tp, ILifetimeFactory extOtherFactory = null)
-        {
-            return collection.GetService(tp.FullName, extOtherFactory);
-        }
     }
 }
