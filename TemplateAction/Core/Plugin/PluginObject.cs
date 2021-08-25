@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using TemplateAction.Cache;
 
@@ -132,7 +133,7 @@ namespace TemplateAction.Core
         /// </summary>
         /// <param name="implementation"></param>
         /// <returns></returns>
-        public ServiceDescriptor FindService(string key)
+        public IServiceDescriptorEnumerable FindService(string key)
         {
             return _services[key];
         }

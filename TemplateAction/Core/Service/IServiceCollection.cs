@@ -1,11 +1,12 @@
 ﻿
 using System;
+using System.Collections.Generic;
 
 namespace TemplateAction.Core
 {
     public interface IServiceCollection
     {
-        ServiceDescriptor this[string key] { get; }
+        IServiceDescriptorEnumerable this[string key] { get; }
         /// <summary>
         /// 注入服务
         /// </summary>

@@ -13,7 +13,7 @@ namespace TemplateAction.Core
             ITAContext context = request.Context;
             Type ct = request.ControllerNode.ControllerType;
             //创建控制器
-            IController c = context.Application.ServiceProvider.CreateExtOtherService(ct, request) as IController;
+            IController c = context.Application.ServiceProvider.CreateScopeService(ct, request) as IController;
             if (c == null)
             {
                 return null;

@@ -20,16 +20,11 @@ namespace TemplateAction.Core
         /// 所属插件
         /// </summary>
         public string PluginName { get; set; }
-        /// <summary>
-        /// 当Lifetime为Other时,使用
-        /// </summary>
-        public ILifetimeFactory LifetimeFactory { get; set; }
-        public ServiceDescriptor(Type serviceType, ServiceLifetime lifetime, ProxyFactory factory, ILifetimeFactory lifetimeFactory = null)
+        public ServiceDescriptor(Type serviceType, ServiceLifetime lifetime, ProxyFactory factory)
         {
             ServiceType = serviceType;
             Lifetime = lifetime;
             Factory = factory;
-            LifetimeFactory = lifetimeFactory;
         }
     }
     public enum ServiceLifetime
@@ -43,8 +38,8 @@ namespace TemplateAction.Core
         /// </summary>
         Transient,
         /// <summary>
-        /// 其它自定义
+        /// 指定的域生命周期
         /// </summary>
-        Other
+        Scope
     }
 }

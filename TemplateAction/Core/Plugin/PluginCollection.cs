@@ -52,13 +52,13 @@ namespace TemplateAction.Core
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        private List<ServiceDescriptor> FindServices(string key)
+        private IServiceDescriptorEnumerable FindServices(string key)
         {
-            List<ServiceDescriptor> deslist = new List<ServiceDescriptor>();
-            ServiceDescriptor gdes = _services[key];
+            ServiceDescriptorUnion deslist = new ServiceDescriptorUnion();
+            IServiceDescriptorEnumerable gdes = _services[key];
             if (gdes != null)
             {
-                deslist.Add(gdes);
+                deslist.Union(gdes);
             }
             PluginObject[] tarr = null;
             _lockslim.EnterReadLock();
@@ -77,18 +77,18 @@ namespace TemplateAction.Core
             }
             foreach (PluginObject plg in tarr)
             {
-                ServiceDescriptor des = plg.FindService(key);
+                IServiceDescriptorEnumerable des = plg.FindService(key);
                 if (des != null)
                 {
-                    deslist.Add(des);
+                    deslist.Union(des);
                 }
             }
             return deslist;
         }
-        private ServiceDescriptor FindServiceIn(string key)
+        private IServiceDescriptorEnumerable FindServiceIn(string key)
         {
             //查找全局服务
-            ServiceDescriptor returnDesc = _services[key];
+            IServiceDescriptorEnumerable returnDesc = _services[key];
             if (returnDesc != null)
             {
                 _keycache.TryAdd(key, "999");
@@ -126,9 +126,9 @@ namespace TemplateAction.Core
         /// </summary>
         /// <param name="key">接口类型</param>
         /// <returns>服务描述信息</returns>
-        private ServiceDescriptor FindService(string key)
+        private IServiceDescriptorEnumerable FindService(string key)
         {
-            ServiceDescriptor returnDesc;
+            IServiceDescriptorEnumerable returnDesc;
             string targetns;
             if (_keycache.TryGetValue(key, out targetns))
             {
@@ -166,75 +166,85 @@ namespace TemplateAction.Core
             }
 
         }
-        public List<T> GetServices<T>(ILifetimeFactory extOtherFactory = null) where T : class
-        {
-            Type listType = typeof(List<>).MakeGenericType(typeof(T));
-            object list = Activator.CreateInstance(listType);
-            MethodInfo addMethod = listType.GetMethod("Add");
-            List<ServiceDescriptor> deslist = FindServices(typeof(T).FullName);
-            foreach (ServiceDescriptor sd in deslist)
-            {
-                if (sd != null)
-                {
-                    addMethod.Invoke(list, new object[] { Des2Instance(sd, extOtherFactory) });
-                }
-            }
-
-            return list as List<T>;
-        }
 
         /// <summary>
         /// 获取服务实例
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public object GetService(string key, ILifetimeFactory extOtherFactory = null)
+        public object GetService(string key, ILifetimeFactory scopeFactory = null)
         {
-            ServiceDescriptor sd = FindService(key);
+            IServiceDescriptorEnumerable sd = FindService(key);
             if (sd == null)
             {
                 return null;
             }
-            return Des2Instance(sd, extOtherFactory);
+            return Des2Instance(sd.First, scopeFactory);
         }
-        public object GetService(Type tp, ILifetimeFactory extOtherFactory = null)
+        public object GetService(Type tp, ILifetimeFactory scopeFactory = null)
         {
-            ServiceDescriptor sd = FindService(tp.FullName);
-            Type serviceType = sd.ServiceType;
             if (tp.IsGenericType)
             {
-                if (sd == null)
+                Type defType = tp.GetGenericTypeDefinition();
+                if (typeof(IEnumerable<>) == defType)
                 {
-                    //再使用泛型定义搜索
-                    sd = FindService(tp.GetGenericTypeDefinition().FullName);
-                    if (sd == null)
+                    //获取服务集
+                    Type destType = tp.GetGenericArguments()[0];
+                    IServiceDescriptorEnumerable sdenum = null;
+                    if (destType.IsGenericType)
                     {
-                        return null;
+                        sdenum = FindServices(destType.GetGenericTypeDefinition().FullName);
                     }
-                    serviceType = sd.ServiceType.MakeGenericType(tp.GetGenericArguments());
+                    else
+                    {
+                        sdenum = FindServices(destType.FullName);
+                    }
+                    if (sdenum == null) return null;
+
+                    Type listType = typeof(List<>).MakeGenericType(destType);
+                    object list = Activator.CreateInstance(listType);
+                    MethodInfo addMethod = listType.GetMethod("Add");
+                    foreach (ServiceDescriptor sd in sdenum)
+                    {
+                        if (sd != null)
+                        {
+                            addMethod.Invoke(list, new object[] { Des2Instance(sd, scopeFactory) });
+                        }
+                    }
+                    return list;
                 }
+                else
+                {
+                    //使用泛型定义搜索
+                    IServiceDescriptorEnumerable sdenum = FindService(tp.GetGenericTypeDefinition().FullName);
+                    if (sdenum == null) return null;
+                    ServiceDescriptor sd = sdenum.First;
+                    return Des2Instance(sd.PluginName, sd.Lifetime, sd.ServiceType.MakeGenericType(tp.GetGenericArguments()), sd.Factory, scopeFactory);
+                }
+
             }
             else
             {
-                if (sd == null) return null;
+                IServiceDescriptorEnumerable sdenum = FindService(tp.FullName);
+                if (sdenum == null) return null;
+                return Des2Instance(sdenum.First, scopeFactory);
             }
-            return Des2Instance(sd.PluginName, sd.Lifetime, serviceType, sd.Factory, sd.LifetimeFactory, extOtherFactory);
         }
 
         /// <summary>
         /// 创建外部注入服务
         /// </summary>
         /// <param name="serviceType"></param>
-        /// <param name="extOtherFactory"></param>
+        /// <param name="scopeFactory"></param>
         /// <returns></returns>
-        public object CreateExtOtherService(Type serviceType, ILifetimeFactory extOtherFactory, ProxyFactory factory = null)
+        public object CreateScopeService(Type serviceType, ILifetimeFactory scopeFactory, ProxyFactory factory = null)
         {
-            return extOtherFactory.GetValue(this, serviceType, factory, extOtherFactory);
+            return scopeFactory.GetValue(this, serviceType, factory);
         }
 
-        private object Des2Instance(ServiceDescriptor sd, ILifetimeFactory extOtherFactory)
+        private object Des2Instance(ServiceDescriptor sd, ILifetimeFactory scopeFactory)
         {
-            return Des2Instance(sd.PluginName, sd.Lifetime, sd.ServiceType, sd.Factory, sd.LifetimeFactory, extOtherFactory);
+            return Des2Instance(sd.PluginName, sd.Lifetime, sd.ServiceType, sd.Factory, scopeFactory);
         }
         /// <summary>
         /// ServiceDescriptor转实例
@@ -243,10 +253,9 @@ namespace TemplateAction.Core
         /// <param name="lifetime"></param>
         /// <param name="serviceType"></param>
         /// <param name="factory"></param>
-        /// <param name="otherFactory"></param>
-        /// <param name="extOtherFactory"></param>
+        /// <param name="scopeFactory"></param>
         /// <returns></returns>
-        private object Des2Instance(string plgname, ServiceLifetime lifetime, Type serviceType, ProxyFactory factory, ILifetimeFactory otherFactory, ILifetimeFactory extOtherFactory)
+        private object Des2Instance(string plgname, ServiceLifetime lifetime, Type serviceType, ProxyFactory factory, ILifetimeFactory scopeFactory)
         {
             object result = null;
             switch (lifetime)
@@ -256,7 +265,7 @@ namespace TemplateAction.Core
                         if (string.IsNullOrEmpty(plgname))
                         {
                             ConcurrentProxy proxy = this._singletonServices.GetOrAdd(serviceType.FullName);
-                            result = proxy.GetValue(this, serviceType, factory, extOtherFactory);
+                            result = proxy.GetValue(this, serviceType, factory, scopeFactory);
                         }
                         else
                         {
@@ -264,21 +273,21 @@ namespace TemplateAction.Core
                             if (!Equals(pobj, null))
                             {
                                 ConcurrentProxy proxy = pobj.Storer.GetOrAdd(serviceType.FullName);
-                                result = proxy.GetValue(this, serviceType, factory, extOtherFactory);
+                                result = proxy.GetValue(this, serviceType, factory, scopeFactory);
                             }
                         }
                     }
                     break;
                 case ServiceLifetime.Transient:
                     {
-                        result = CreateServiceInstance(serviceType, factory, extOtherFactory);
+                        result = CreateServiceInstance(serviceType, factory, scopeFactory);
                     }
                     break;
-                case ServiceLifetime.Other:
+                case ServiceLifetime.Scope:
                     {
-                        if (otherFactory != null)
+                        if (scopeFactory != null)
                         {
-                            result = otherFactory.GetValue(this, serviceType, factory, extOtherFactory);
+                            result = scopeFactory.GetValue(this, serviceType, factory);
                         }
                     }
                     break;
@@ -291,7 +300,7 @@ namespace TemplateAction.Core
         /// </summary>
         /// <param name="serviceType"></param>
         /// <returns></returns>
-        public object CreateServiceInstance(Type serviceType, ProxyFactory factory, ILifetimeFactory extOtherFactory)
+        public object CreateServiceInstance(Type serviceType, ProxyFactory factory, ILifetimeFactory scopeFactory)
         {
             //接口则直接调用factory无参构造
             if (serviceType.IsInterface && factory != null)
@@ -337,11 +346,11 @@ namespace TemplateAction.Core
                     }
                     else if (parameterType.IsPrimitive || parameterType == typeof(string))
                     {
-                        parameters[i] = GetService(TAUtility.TypeName2ServiceKey(parameterType, parameter.Name), extOtherFactory);
+                        parameters[i] = GetService(TAUtility.TypeName2ServiceKey(parameterType, parameter.Name), scopeFactory);
                     }
                     else
                     {
-                        parameters[i] = GetService(parameterType, extOtherFactory);
+                        parameters[i] = GetService(parameterType, scopeFactory);
                     }
                 }
                 if (factory != null)

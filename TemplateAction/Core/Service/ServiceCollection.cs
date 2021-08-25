@@ -4,7 +4,7 @@ namespace TemplateAction.Core
 {
     public class ServiceCollection : IServiceCollection
     {
-        private Dictionary<string, ServiceDescriptor> _services;
+        private Dictionary<string, ServiceDescriptorList> _services;
         private string _pluginName;
         public string PluginName
         {
@@ -13,13 +13,13 @@ namespace TemplateAction.Core
         public ServiceCollection(string plugin)
         {
             _pluginName = plugin;
-            _services = new Dictionary<string, ServiceDescriptor>();
+            _services = new Dictionary<string, ServiceDescriptorList>();
         }
-        public ServiceDescriptor this[string key]
+        public IServiceDescriptorEnumerable this[string key]
         {
             get
             {
-                ServiceDescriptor sd;
+                ServiceDescriptorList sd;
                 if (_services.TryGetValue(key, out sd))
                 {
                     return sd;
@@ -29,12 +29,18 @@ namespace TemplateAction.Core
         }
         public void Add(string key, ServiceDescriptor des)
         {
-            if (des != null)
+            if (des == null) return;
+            ServiceDescriptorList sd;
+            if (_services.TryGetValue(key, out sd))
+            {
+                sd.Add(des);
+            }
+            else
             {
                 des.PluginName = _pluginName;
-                _services[key] = des;
+                _services.Add(key, ServiceDescriptorList.Create(des));
             }
         }
-       
+
     }
 }
