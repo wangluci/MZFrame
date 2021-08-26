@@ -3,9 +3,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
-using System.Reflection;
 using TemplateAction.Core;
-using TemplateAction.Route;
 
 namespace TemplateAction.NetCore
 {
@@ -71,7 +69,16 @@ namespace TemplateAction.NetCore
             TAEventDispatcher.Instance.Register<IApplicationBuilder>(_appBuilderEvents);
             return this;
         }
-
+        /// <summary>
+        /// 配置服务
+        /// </summary>
+        /// <param name="ac"></param>
+        /// <returns></returns>
+        public TANetCoreHttpHostBuilder ConfigureServices(Action<Microsoft.Extensions.DependencyInjection.IServiceCollection> ac)
+        {
+            ac?.Invoke(_services);
+            return this;
+        }
         public TANetCoreHttpHost Build()
         {
             if (_servicesac != null)

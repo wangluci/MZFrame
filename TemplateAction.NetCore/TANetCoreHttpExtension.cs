@@ -49,11 +49,15 @@ namespace TemplateAction.NetCore
         {
             await ((TANetCoreHttpFile)file).SaveAsAsync(filename);
         }
+
         /// <summary>
         /// 微软内置服务转移到TA的服务中
         /// </summary>
-        public static IApplicationBuilder ServicesMoveToApp(this IApplicationBuilder appBuilder, TASiteApplication app)
-        {                    
+        /// <param name="app"></param>
+        /// <param name="appBuilder"></param>
+        /// <returns></returns>
+        public static TASiteApplication CopyServicesFrom(this TASiteApplication app, IApplicationBuilder appBuilder)
+        {
             //映射服务
             app.Services.AddSingleton<IServiceProvider, TANetServiceProvider>();
 
@@ -84,16 +88,21 @@ namespace TemplateAction.NetCore
                 }
                 app.Services.Add(micsd.ImplementationType.FullName, new ServiceDescriptor(micsd.ServiceType, lifetime, pfactory, micsd.ImplementationInstance));
             }
-            return appBuilder;
+            return app;
         }
-
+        /// <summary>
+        /// 设置使用TA的MVC
+        /// </summary>
+        /// <param name="appBuilder"></param>
+        /// <param name="init"></param>
+        /// <returns></returns>
         public static IApplicationBuilder UseTAMvc(this IApplicationBuilder appBuilder, Action<TASiteApplication> init = null)
         {
             if (init == null)
             {
                 TAEventDispatcher.Instance.RegisterLoadBefore<TASiteApplication>(app =>
                 {
-                    appBuilder.ServicesMoveToApp(app);
+                    app.CopyServicesFrom(appBuilder);
 
                     //设置路由
                     string defns = null;
@@ -149,7 +158,7 @@ namespace TemplateAction.NetCore
                                 return Task.CompletedTask;
                             }
                         }
-                  
+
                     }
                     return next(context);
                 };
