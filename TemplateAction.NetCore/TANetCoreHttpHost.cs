@@ -102,6 +102,7 @@ namespace TemplateAction.NetCore
             _server = new KestrelServer(Options.Create(_kestrelOptions), new SocketTransportFactory(Options.Create(_socketOptions), _applifetime, _logger), _logger);
             _appBuilder = new ApplicationBuilderFactory(serviceprovider).CreateBuilder(_server.Features);
             _appBuilder.ApplicationServices = serviceprovider;
+            _appBuilder.ServerFeatures.Set<ServiceCollection>(services);
             TemplateAction.Core.TAEventDispatcher.Instance.Dispatch(_appBuilder);
 
             _app = new TANetCoreHttpApplication(_appBuilder);

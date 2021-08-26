@@ -32,72 +32,13 @@ namespace TemplateAction.NetCore
    .Build();
             _config[TANetCoreHttpHost.WORK_PATH] = rootpath;
         }
-        /// <summary>
-        /// 微软内置服务转移到TA的服务中
-        /// </summary>
-        private void SDMoveToApp(TASiteApplication app)
-        {
-            foreach (Microsoft.Extensions.DependencyInjection.ServiceDescriptor micsd in _services)
-            {
-                ServiceLifetime lifetime = ServiceLifetime.Singleton;
-                switch (micsd.Lifetime)
-                {
-                    case Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped:
-                        lifetime = ServiceLifetime.Scope;
-                        break;
-                    case Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient:
-                        lifetime = ServiceLifetime.Transient;
-                        break;
-                    case Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton:
-                        lifetime = ServiceLifetime.Singleton;
-                        break;
-                }
-                ProxyFactory pfactory = null;
-                if (micsd.ImplementationFactory != null)
-                {
-                    pfactory = (object[] constructorArguments) =>
-                     {
-                         return micsd.ImplementationFactory.Invoke(app.ServiceProvider.GetService<IServiceProvider>());
-                     };
-                }
-                app.Services.Add(micsd.ImplementationType.FullName, new ServiceDescriptor(micsd.ServiceType, lifetime, pfactory, micsd.ImplementationInstance));
-            }
-        }
-
+        
         public static TANetCoreHttpHostBuilder CreateDefaultHostBuilder()
         {
-            TANetCoreHttpHostBuilder netHostBuilder = new TANetCoreHttpHostBuilder();
-            return netHostBuilder.Configure((IApplicationBuilder builder) =>
+            return new TANetCoreHttpHostBuilder().Configure((IApplicationBuilder builder) =>
             {
                 builder.UseStaticFiles();
-                builder.UseTAMvc(app =>
-                {
-                    //映射服务
-                    app.Services.AddSingleton<IServiceProvider, TANetServiceProvider>();
-                    //添加日志
-                    app.Services.AddSingleton<ITALoggerFactory>((object[] arguments) =>
-                    {
-                        return new TANetCoreHttpLoggerFactory(app.ServiceProvider.GetService<IServiceProvider>());
-                    });
-
-                    netHostBuilder.SDMoveToApp(app);
-
-                    //设置路由
-                    string defns = null;
-                    Assembly ass = Assembly.GetEntryAssembly();
-                    if (ass != null)
-                    {
-                        defns = ass.GetName().Name;
-                    }
-                    RouterBuilder rtbuilder = new RouterBuilder();
-                    rtbuilder.UsePlugin();
-                    if (defns != null)
-                    {
-                        rtbuilder.UseDefault(defns);
-                    }
-                    app.UseRouterBuilder(rtbuilder);
-
-                });
+                builder.UseTAMvc();
             });
         }
         public TANetCoreHttpHostBuilder UseHttpUrl(string url)

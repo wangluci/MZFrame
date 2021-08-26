@@ -3,15 +3,17 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using TemplateAction.Common;
 using TemplateAction.Core;
 using TemplateAction.Core.Dispatcher;
+using TemplateAction.Route;
 
 namespace TemplateAction.NetCore
 {
-    public static class TANetCoreHttpExtensions
+    public static class TANetCoreHttpExtension
     {
         public static void Write(this HttpResponse response, string content)
         {
@@ -47,14 +49,75 @@ namespace TemplateAction.NetCore
         {
             await ((TANetCoreHttpFile)file).SaveAsAsync(filename);
         }
-        public static IApplicationBuilder UseTAMvc(this IApplicationBuilder app, Action<TASiteApplication> init = null)
+        /// <summary>
+        /// 微软内置服务转移到TA的服务中
+        /// </summary>
+        public static IApplicationBuilder ServicesMoveToApp(this IApplicationBuilder appBuilder, TASiteApplication app)
+        {                    
+            //映射服务
+            app.Services.AddSingleton<IServiceProvider, TANetServiceProvider>();
+
+            //复制服务
+            Microsoft.Extensions.DependencyInjection.ServiceCollection tservices = appBuilder.ServerFeatures.Get<Microsoft.Extensions.DependencyInjection.ServiceCollection>();
+            foreach (Microsoft.Extensions.DependencyInjection.ServiceDescriptor micsd in tservices)
+            {
+                ServiceLifetime lifetime = ServiceLifetime.Singleton;
+                switch (micsd.Lifetime)
+                {
+                    case Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped:
+                        lifetime = ServiceLifetime.Scope;
+                        break;
+                    case Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient:
+                        lifetime = ServiceLifetime.Transient;
+                        break;
+                    case Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton:
+                        lifetime = ServiceLifetime.Singleton;
+                        break;
+                }
+                ProxyFactory pfactory = null;
+                if (micsd.ImplementationFactory != null)
+                {
+                    pfactory = (object[] constructorArguments) =>
+                    {
+                        return micsd.ImplementationFactory.Invoke(app.ServiceProvider.GetService<IServiceProvider>());
+                    };
+                }
+                app.Services.Add(micsd.ImplementationType.FullName, new ServiceDescriptor(micsd.ServiceType, lifetime, pfactory, micsd.ImplementationInstance));
+            }
+            return appBuilder;
+        }
+
+        public static IApplicationBuilder UseTAMvc(this IApplicationBuilder appBuilder, Action<TASiteApplication> init = null)
         {
-            if (init != null)
+            if (init == null)
+            {
+                TAEventDispatcher.Instance.RegisterLoadBefore<TASiteApplication>(app =>
+                {
+                    appBuilder.ServicesMoveToApp(app);
+
+                    //设置路由
+                    string defns = null;
+                    Assembly ass = Assembly.GetEntryAssembly();
+                    if (ass != null)
+                    {
+                        defns = ass.GetName().Name;
+                    }
+                    RouterBuilder rtbuilder = new RouterBuilder();
+                    rtbuilder.UsePlugin();
+                    if (defns != null)
+                    {
+                        rtbuilder.UseDefault(defns);
+                    }
+                    app.UseRouterBuilder(rtbuilder);
+
+                });
+            }
+            else
             {
                 TAEventDispatcher.Instance.RegisterLoadBefore(init);
             }
 
-            app.Use(next =>
+            appBuilder.Use(next =>
             {
                 return context =>
                 {
@@ -91,7 +154,7 @@ namespace TemplateAction.NetCore
                     return next(context);
                 };
             });
-            return app;
+            return appBuilder;
         }
 
     }
