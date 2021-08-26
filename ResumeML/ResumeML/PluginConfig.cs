@@ -6,10 +6,12 @@ namespace ResumeML
     {
         public void Configure(IServiceCollection services)
         {
-            services.AddSingleton<TestBusiness, TestBusiness>((object[] arguments) =>
+            services.AddSingleton<TestBusiness>((object[] arguments) =>
             {
                 return MyAccess.Aop.InterceptFactory.CreateBLL(typeof(TestBusiness), arguments);
             });
+  
+   
         }
         public void Loaded(ITAApplication app, IEventRegister register) { }
         public void Unload() { }

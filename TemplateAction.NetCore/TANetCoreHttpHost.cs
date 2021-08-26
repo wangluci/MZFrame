@@ -1,24 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Builder;
 using Microsoft.AspNetCore.Hosting.Internal;
-using Microsoft.AspNetCore.Hosting.Server;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets;
-using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TemplateAction.Label;
@@ -77,7 +70,7 @@ namespace TemplateAction.NetCore
 
             _hostingEnvironment.Initialize(_workroot, hostoptions);
             _servicecollection.AddSingleton<IHostingEnvironment>(_hostingEnvironment);
-
+            _servicecollection.AddSingleton<IConfiguration>(_config);
 
             ServiceProvider serviceprovider = _servicecollection.BuildServiceProvider();
             _logger = serviceprovider.GetRequiredService<ILoggerFactory>();
@@ -110,6 +103,9 @@ namespace TemplateAction.NetCore
             _appBuilder = new ApplicationBuilderFactory(serviceprovider).CreateBuilder(_server.Features);
             _appBuilder.ApplicationServices = serviceprovider;
             TemplateAction.Core.TAEventDispatcher.Instance.Dispatch(_appBuilder);
+
+            _app = new TANetCoreHttpApplication(_appBuilder);
+            _app.Init(_workroot);
         }
 
 
@@ -120,9 +116,6 @@ namespace TemplateAction.NetCore
         private async Task StartAsync(CancellationToken token)
         {
             if (_startedServer) return;
-            _app = new TANetCoreHttpApplication(_appBuilder);
-            _app.Init(_workroot);
-            _appBuilder.ApplicationServices = _servicecollection.AddSingleton<TANetCoreHttpApplication>(_app).BuildServiceProvider();
             await _server.StartAsync(_app, token).ConfigureAwait(false);
             _startedServer = true;
             _applifetime.NotifyStarted();
@@ -136,13 +129,6 @@ namespace TemplateAction.NetCore
                 await _server.StopAsync(cancellationToken).ConfigureAwait(false);
             }
             _applifetime?.NotifyStopped();
-            if (_app != null)
-            {
-                ServiceDescriptor serviceDescriptor = _servicecollection.FirstOrDefault(descriptor => descriptor.ServiceType == typeof(TANetCoreHttpApplication));
-                if (serviceDescriptor != null) _servicecollection.Remove(serviceDescriptor);
-                _app.Dispose();
-                _app = null;
-            }
         }
         private async Task RunAsync(CancellationToken token = default)
         {

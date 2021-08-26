@@ -69,7 +69,7 @@ namespace TemplateAction.NetCore
                 return ass;
             }
         }
- 
+
         public TANetCoreHttpApplication(IApplicationBuilder appbuilder)
         {
             _requestDelegate = appbuilder.Build();
@@ -78,8 +78,9 @@ namespace TemplateAction.NetCore
 
         public HttpContext CreateContext(IFeatureCollection contextFeatures)
         {
+            contextFeatures.Set<TANetCoreHttpApplication>(this);
             DefaultHttpContext df = new DefaultHttpContext(contextFeatures);
-            df.RequestServices = _appbuilder.ApplicationServices;
+            df.RequestServices = this.ServiceProvider.GetService<IServiceProvider>();
             return df;
         }
 

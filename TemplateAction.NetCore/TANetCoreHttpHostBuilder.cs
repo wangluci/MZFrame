@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using System;
 using System.IO;
 using System.Reflection;
 using TemplateAction.Core;
 using TemplateAction.Route;
-using TemplateAction.Extension;
+
 namespace TemplateAction.NetCore
 {
     public class TANetCoreHttpHostBuilder
@@ -33,10 +32,42 @@ namespace TemplateAction.NetCore
    .Build();
             _config[TANetCoreHttpHost.WORK_PATH] = rootpath;
         }
+        /// <summary>
+        /// 微软内置服务转移到TA的服务中
+        /// </summary>
+        private void SDMoveToApp(TASiteApplication app)
+        {
+            foreach (Microsoft.Extensions.DependencyInjection.ServiceDescriptor micsd in _services)
+            {
+                ServiceLifetime lifetime = ServiceLifetime.Singleton;
+                switch (micsd.Lifetime)
+                {
+                    case Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped:
+                        lifetime = ServiceLifetime.Scope;
+                        break;
+                    case Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient:
+                        lifetime = ServiceLifetime.Transient;
+                        break;
+                    case Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton:
+                        lifetime = ServiceLifetime.Singleton;
+                        break;
+                }
+                ProxyFactory pfactory = null;
+                if (micsd.ImplementationFactory != null)
+                {
+                    pfactory = (object[] constructorArguments) =>
+                     {
+                         return micsd.ImplementationFactory.Invoke(app.ServiceProvider.GetService<IServiceProvider>());
+                     };
+                }
+                app.Services.Add(micsd.ImplementationType.FullName, new ServiceDescriptor(micsd.ServiceType, lifetime, pfactory, micsd.ImplementationInstance));
+            }
+        }
+
         public static TANetCoreHttpHostBuilder CreateDefaultHostBuilder()
         {
-            TANetCoreHttpHostBuilder destHostBuilder = new TANetCoreHttpHostBuilder();
-            return destHostBuilder.Configure((IApplicationBuilder builder) =>
+            TANetCoreHttpHostBuilder netHostBuilder = new TANetCoreHttpHostBuilder();
+            return netHostBuilder.Configure((IApplicationBuilder builder) =>
             {
                 builder.UseStaticFiles();
                 builder.UseTAMvc(app =>
@@ -44,15 +75,12 @@ namespace TemplateAction.NetCore
                     //映射服务
                     app.Services.AddSingleton<IServiceProvider, TANetServiceProvider>();
                     //添加日志
-                    app.Services.AddSingleton<ITALoggerFactory, TANetCoreHttpLoggerFactory>((object[] arguments) =>
+                    app.Services.AddSingleton<ITALoggerFactory>((object[] arguments) =>
                     {
-                        return new TANetCoreHttpLoggerFactory(builder.ApplicationServices);
+                        return new TANetCoreHttpLoggerFactory(app.ServiceProvider.GetService<IServiceProvider>());
                     });
-                    //配置文件映射
-                    app.Services.AddSingleton<IConfiguration>((object[] arguments) =>
-                    {
-                        return destHostBuilder._config;
-                    });
+
+                    netHostBuilder.SDMoveToApp(app);
 
                     //设置路由
                     string defns = null;
@@ -90,6 +118,7 @@ namespace TemplateAction.NetCore
             TAEventDispatcher.Instance.Register<ListenOptions>(_middlewareEvents);
             return this;
         }
+   
         /// <summary>
         /// 配置Http中间件
         /// </summary>

@@ -8,7 +8,7 @@ namespace ShareService
         public void Configure(IServiceCollection services)
         {
             //添加共享实例
-            services.AddSingleton<ShareInstance>();
+            services.AddSingleton<ShareInstance, ShareInstance>();
         }
         public void Loaded(ITAApplication app, IEventRegister register)
         {

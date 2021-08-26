@@ -6,6 +6,6 @@ namespace TemplateAction.Core
     /// </summary>
     public interface ILifetimeFactory
     {
-        object GetValue(PluginCollection collection, Type serviceType, ProxyFactory factory);
+        object GetValue(IInstanceFactory instanceFactory, Type serviceType, ProxyFactory factory,object impInstance);
     }
 }

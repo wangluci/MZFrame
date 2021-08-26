@@ -2,6 +2,7 @@
 
 namespace TemplateAction.Core
 {
+
     /// <summary>
     /// 代理服务工厂
     /// </summary>
@@ -17,14 +18,20 @@ namespace TemplateAction.Core
         public Type ServiceType { get; }
         public ProxyFactory Factory { get; }
         /// <summary>
+        /// 直接指定实例
+        /// </summary>
+        public object ImpInstance { get; }
+        /// <summary>
         /// 所属插件
         /// </summary>
         public string PluginName { get; set; }
-        public ServiceDescriptor(Type serviceType, ServiceLifetime lifetime, ProxyFactory factory)
+ 
+        public ServiceDescriptor(Type serviceType, ServiceLifetime lifetime, ProxyFactory factory, object impInstance)
         {
             ServiceType = serviceType;
             Lifetime = lifetime;
             Factory = factory;
+            ImpInstance = impInstance;
         }
     }
     public enum ServiceLifetime

@@ -58,7 +58,7 @@ namespace TemplateAction.NetCore
             {
                 return context =>
                 {
-                    TANetCoreHttpApplication taapp = app.ApplicationServices.GetService(typeof(TANetCoreHttpApplication)) as TANetCoreHttpApplication;
+                    TANetCoreHttpApplication taapp = context.Features.Get<TANetCoreHttpApplication>();
                     if (taapp != null)
                     {
                         string requestUrl = context.Request.Path;

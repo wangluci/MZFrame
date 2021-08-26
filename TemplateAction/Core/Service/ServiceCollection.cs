@@ -41,6 +41,16 @@ namespace TemplateAction.Core
                 _services.Add(key, ServiceDescriptorList.Create(des));
             }
         }
-
+        public bool TryAdd(string key, ServiceDescriptor des)
+        {
+            if (des == null) return false;
+            if (!_services.ContainsKey(key))
+            {
+                des.PluginName = _pluginName;
+                _services.Add(key, ServiceDescriptorList.Create(des));
+                return true;
+            }
+            return false;
+        }
     }
 }

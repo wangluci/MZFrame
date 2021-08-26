@@ -14,11 +14,10 @@ namespace ResumeML
     {
         private TestBusiness _business;
         private readonly PredictionEnginePool<ModelInput, ModelOutput> _predictionEnginePool;
-        public Home(ITALoggerFactory loggerFactory, TestBusiness business)
+        public Home(ITALoggerFactory loggerFactory, TestBusiness business, PredictionEnginePool<ModelInput, ModelOutput> prediction)
         {
-            IOptions<MLOptions> xx = new Options< MLOptions>();
-               //_predictionEnginePool=new PredictionEnginePool<ModelInput, ModelOutput>()
-               _business = business;
+            _predictionEnginePool = prediction;
+            _business = business;
         }
         public ViewResult Test()
         {
@@ -247,7 +246,7 @@ namespace ResumeML
                             }
                         }
 
-                       
+
                     }
                     //包含字段的处理
                     tmps = tmps.Replace("姓名", "##:0");
@@ -328,7 +327,7 @@ namespace ResumeML
                             resume.Diploma = tmpdip;
                         }
                         bool hasdip = false;
-                        foreach(int sdip in EduDiploma)
+                        foreach (int sdip in EduDiploma)
                         {
                             if (sdip == tmpdip)
                             {

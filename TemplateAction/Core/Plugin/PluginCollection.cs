@@ -10,7 +10,7 @@ namespace TemplateAction.Core
     /// <summary>
     /// 插件集合
     /// </summary>
-    public class PluginCollection : ITAServices, IDispatcher
+    public class PluginCollection : ITAServices, IDispatcher, IInstanceFactory
     {
         private ConcurrentDictionary<string, string> _keycache = new ConcurrentDictionary<string, string>();
         private Dictionary<string, PluginObject> mPluginList = new Dictionary<string, PluginObject>();
@@ -210,7 +210,7 @@ namespace TemplateAction.Core
                     IServiceDescriptorEnumerable sdenum = FindService(tp.GetGenericTypeDefinition().FullName);
                     if (sdenum == null) return null;
                     ServiceDescriptor sd = sdenum.First;
-                    return Des2Instance(sd.PluginName, sd.Lifetime, sd.ServiceType.MakeGenericType(tp.GetGenericArguments()), sd.Factory, scopeFactory);
+                    return Des2Instance(sd.PluginName, sd.Lifetime, sd.ServiceType.MakeGenericType(tp.GetGenericArguments()), sd.Factory, sd.ImpInstance, scopeFactory);
                 }
 
             }
@@ -228,15 +228,19 @@ namespace TemplateAction.Core
         /// <param name="serviceType"></param>
         /// <param name="scopeFactory"></param>
         /// <returns></returns>
-        public object CreateScopeService(Type serviceType, ILifetimeFactory scopeFactory, ProxyFactory factory = null)
+        public object CreateScopeService(ILifetimeFactory scopeFactory, Type serviceType)
         {
-            return scopeFactory.GetValue(this, serviceType, factory);
+            return scopeFactory.GetValue(this, serviceType, null, null);
         }
-
+        public object CreateScopeService(ILifetimeFactory scopeFactory, ProxyFactory factory)
+        {
+            return scopeFactory.GetValue(this, null, factory, null);
+        }
         private object Des2Instance(ServiceDescriptor sd, ILifetimeFactory scopeFactory)
         {
-            return Des2Instance(sd.PluginName, sd.Lifetime, sd.ServiceType, sd.Factory, scopeFactory);
+            return Des2Instance(sd.PluginName, sd.Lifetime, sd.ServiceType, sd.Factory, sd.ImpInstance, scopeFactory);
         }
+
         /// <summary>
         /// ServiceDescriptor转实例
         /// </summary>
@@ -244,9 +248,10 @@ namespace TemplateAction.Core
         /// <param name="lifetime"></param>
         /// <param name="serviceType"></param>
         /// <param name="factory"></param>
+        /// <param name="impInstance"></param>
         /// <param name="scopeFactory"></param>
         /// <returns></returns>
-        private object Des2Instance(string plgname, ServiceLifetime lifetime, Type serviceType, ProxyFactory factory, ILifetimeFactory scopeFactory)
+        private object Des2Instance(string plgname, ServiceLifetime lifetime, Type serviceType, ProxyFactory factory, object impInstance, ILifetimeFactory scopeFactory)
         {
             object result = null;
             switch (lifetime)
@@ -256,7 +261,7 @@ namespace TemplateAction.Core
                         if (string.IsNullOrEmpty(plgname))
                         {
                             ConcurrentProxy proxy = this._singletonServices.GetOrAdd(serviceType.FullName);
-                            result = proxy.GetValue(this, serviceType, factory, scopeFactory);
+                            result = proxy.GetValue(this, serviceType, factory, impInstance, scopeFactory);
                         }
                         else
                         {
@@ -264,21 +269,21 @@ namespace TemplateAction.Core
                             if (!Equals(pobj, null))
                             {
                                 ConcurrentProxy proxy = pobj.Storer.GetOrAdd(serviceType.FullName);
-                                result = proxy.GetValue(this, serviceType, factory, scopeFactory);
+                                result = proxy.GetValue(this, serviceType, factory, impInstance, scopeFactory);
                             }
                         }
                     }
                     break;
                 case ServiceLifetime.Transient:
                     {
-                        result = CreateServiceInstance(serviceType, factory, scopeFactory);
+                        result = CreateServiceInstance(serviceType, factory, impInstance, scopeFactory);
                     }
                     break;
                 case ServiceLifetime.Scope:
                     {
                         if (scopeFactory != null)
                         {
-                            result = scopeFactory.GetValue(this, serviceType, factory);
+                            result = scopeFactory.GetValue(this, serviceType, factory, impInstance);
                         }
                     }
                     break;
@@ -291,8 +296,10 @@ namespace TemplateAction.Core
         /// </summary>
         /// <param name="serviceType"></param>
         /// <returns></returns>
-        public object CreateServiceInstance(Type serviceType, ProxyFactory factory, ILifetimeFactory scopeFactory)
+        public object CreateServiceInstance(Type serviceType, ProxyFactory factory, object impInstance, ILifetimeFactory scopeFactory)
         {
+            if (impInstance != null) return impInstance;
+            if (serviceType == null) return factory(new object[0]);
             //接口则直接调用factory无参构造
             if (serviceType.IsInterface && factory != null)
             {
