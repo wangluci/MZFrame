@@ -20,18 +20,18 @@ namespace TemplateAction.Core
         /// <summary>
         /// 直接指定实例
         /// </summary>
-        public object ImpInstance { get; }
+        public object Instance { get; }
         /// <summary>
         /// 所属插件
         /// </summary>
         public string PluginName { get; set; }
  
-        public ServiceDescriptor(Type serviceType, ServiceLifetime lifetime, ProxyFactory factory, object impInstance)
+        public ServiceDescriptor(Type serviceType, ServiceLifetime lifetime, ProxyFactory factory, object instance)
         {
             ServiceType = serviceType;
             Lifetime = lifetime;
             Factory = factory;
-            ImpInstance = impInstance;
+            Instance = instance;
         }
     }
     public enum ServiceLifetime

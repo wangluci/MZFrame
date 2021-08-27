@@ -210,7 +210,7 @@ namespace TemplateAction.Core
                     IServiceDescriptorEnumerable sdenum = FindService(tp.GetGenericTypeDefinition().FullName);
                     if (sdenum == null) return null;
                     ServiceDescriptor sd = sdenum.First;
-                    return Des2Instance(sd.PluginName, sd.Lifetime, sd.ServiceType.MakeGenericType(tp.GetGenericArguments()), sd.Factory, sd.ImpInstance, scopeFactory);
+                    return Des2Instance(sd.PluginName, sd.Lifetime, sd.ServiceType.MakeGenericType(tp.GetGenericArguments()), sd.Factory, sd.Instance, scopeFactory);
                 }
 
             }
@@ -238,7 +238,7 @@ namespace TemplateAction.Core
         }
         private object Des2Instance(ServiceDescriptor sd, ILifetimeFactory scopeFactory)
         {
-            return Des2Instance(sd.PluginName, sd.Lifetime, sd.ServiceType, sd.Factory, sd.ImpInstance, scopeFactory);
+            return Des2Instance(sd.PluginName, sd.Lifetime, sd.ServiceType, sd.Factory, sd.Instance, scopeFactory);
         }
 
         /// <summary>
