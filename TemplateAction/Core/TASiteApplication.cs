@@ -24,16 +24,21 @@ namespace TemplateAction.Core
         {
             get { return _filterCenter; }
         }
+        /// <summary>
+        /// 正在使用的中间件名
+        /// </summary>
+        private HashSet<string> _middlewareUsing;
         public TASiteApplication()
         {
             _filterCenter = new FilterCenter();
             _readAssetsFromPlugin = true;
+            _middlewareUsing = new HashSet<string>();
         }
         protected override IPluginFactory CreatePluginFactory()
         {
             return new SitePluginFactory();
         }
-
+      
         /// <summary>
         /// 使用指定中间件，需要先AddSingle注册
         /// </summary>
@@ -51,11 +56,14 @@ namespace TemplateAction.Core
         /// <returns></returns>
         public TASiteApplication UseFilterMiddleware(string key)
         {
-            _filterCenter.AddFirst(new PluginMiddleware(key));
+            if (_middlewareUsing.Add(key))
+            {
+                _filterCenter.AddFirst(new PluginMiddleware(key));
+            }
             return this;
         }
         /// <summary>
-        /// 
+        /// 清空中间件
         /// </summary>
         /// <returns></returns>
         public TASiteApplication ClearFilter()

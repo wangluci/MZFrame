@@ -16,8 +16,6 @@ namespace MainWeb
             {
                 //设置路由
                 app.UseRouterBuilder(new RouterBuilder().UsePlugin().UseDefault("TestService"));
-                //使用身份认证
-                app.UseFilterMiddleware("TestService.AuthMiddleware");
                 //注册字符串
                 app.Services.AddString("testconnstr", ConfigurationManager.AppSettings["testconnstr"]);
             });
