@@ -257,6 +257,7 @@ namespace TemplateAction.Core
         /// <returns></returns>
         private object Des2Instance(string plgname, ServiceLifetime lifetime, Type serviceType, ProxyFactory factory, object impInstance, ILifetimeFactory scopeFactory)
         {
+            if (impInstance != null) return impInstance;
             object result = null;
             switch (lifetime)
             {
@@ -328,9 +329,6 @@ namespace TemplateAction.Core
                 //开始选择构造函数
                 ConstructorInfo activationConstructor = null;
                 object[] parameters = null;
-
-                ConstructorInfo waitConstructor = null;
-                object[] waitParameters = null;
                 foreach (ConstructorInfo tmpConstructor in constructors)
                 {
                     ParameterInfo[] tmpParameterInfos = tmpConstructor.GetParameters();
@@ -354,8 +352,15 @@ namespace TemplateAction.Core
                             tmpParameters[i] = GetService(parameterType, scopeFactory);
                             if (tmpParameters[i] == null)
                             {
-                                isFullInstance = false;
-                                break;
+                                if (parameter.HasDefaultValue)
+                                {
+                                    tmpParameters[i] = parameter.DefaultValue;
+                                }
+                                else
+                                {
+                                    isFullInstance = false;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -372,25 +377,11 @@ namespace TemplateAction.Core
                             parameters = tmpParameters;
                         }
                     }
-                    else
-                    {
-                        if (waitConstructor == null)
-                        {
-                            waitConstructor = tmpConstructor;
-                            waitParameters = tmpParameters;
-                        }
-                        else if (parameters.Length > tmpParameters.Length)
-                        {
-                            waitConstructor = tmpConstructor;
-                            waitParameters = tmpParameters;
-                        }
-                    }
                 }
-                //找不到可用的，则使用备用的
+
                 if (activationConstructor == null)
                 {
-                    activationConstructor = waitConstructor;
-                    parameters = waitParameters;
+                    return null;
                 }
 
                 if (factory != null)
