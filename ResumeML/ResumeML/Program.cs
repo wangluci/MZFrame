@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.ML;
+using ResumeMLML.Model;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,7 +18,10 @@ namespace ResumeML
             string tpath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "log4net.config";
             MyAccess.log4net.Config.XmlConfigurator.ConfigureAndWatch(new FileInfo(tpath));
             MyAccess.WordSegment.Segment.Init();
-            TANetCoreHttpHostBuilder.CreateDefaultHostBuilder().Build().Run();
+            TANetCoreHttpHostBuilder.CreateDefaultHostBuilder().ConfigureServices(services=> {
+                services.AddPredictionEnginePool<ModelInput, ModelOutput>()
+    .FromFile(modelName: "ResumeModel", filePath: "MLModel.zip", watchForChanges: true);
+            }).Build().Run();
         }
 
     }

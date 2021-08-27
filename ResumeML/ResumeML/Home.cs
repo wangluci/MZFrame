@@ -97,7 +97,7 @@ namespace ResumeML
                         {
                             Col1 = colfield,
                         };
-                        ModelOutput predictionResult = _predictionEnginePool.Predict(sampleData);
+                        ModelOutput predictionResult = _predictionEnginePool.Predict("ResumeModel", sampleData);
                         float other = predictionResult.Score[2];
                         if (predictionResult.Prediction == 0)
                         {
