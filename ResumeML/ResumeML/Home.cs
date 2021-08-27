@@ -7,14 +7,13 @@ using System.Text;
 using System.Text.RegularExpressions;
 using TemplateAction.Core;
 using Microsoft.Extensions.ML;
-using Microsoft.Extensions.Options;
 namespace ResumeML
 {
     public class Home : TABaseController
     {
         private TestBusiness _business;
         private readonly PredictionEnginePool<ModelInput, ModelOutput> _predictionEnginePool;
-        public Home(ITALoggerFactory loggerFactory, TestBusiness business, PredictionEnginePool<ModelInput, ModelOutput> prediction)
+        public Home(TestBusiness business, PredictionEnginePool<ModelInput, ModelOutput> prediction)
         {
             _predictionEnginePool = prediction;
             _business = business;
