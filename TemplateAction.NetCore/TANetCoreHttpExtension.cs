@@ -86,7 +86,7 @@ namespace TemplateAction.NetCore
                         return micsd.ImplementationFactory.Invoke(app.ServiceProvider.GetService<IServiceProvider>());
                     };
                 }
-                app.Services.Add(micsd.ImplementationType.FullName, new ServiceDescriptor(micsd.ServiceType, lifetime, pfactory, micsd.ImplementationInstance));
+                app.Services.Add(micsd.ServiceType.FullName, new ServiceDescriptor(micsd.ImplementationType, lifetime, pfactory, micsd.ImplementationInstance));
             }
             return app;
         }
