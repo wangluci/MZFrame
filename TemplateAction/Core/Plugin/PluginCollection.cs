@@ -183,7 +183,7 @@ namespace TemplateAction.Core
         }
         public object GetService(Type tp, ILifetimeFactory scopeFactory = null)
         {
-            if (tp.IsGenericType)
+            if (tp.IsGenericType && !tp.IsGenericTypeDefinition)
             {
                 Type defType = tp.GetGenericTypeDefinition();
                 if (typeof(IEnumerable<>) == defType)
@@ -193,7 +193,6 @@ namespace TemplateAction.Core
                     Type listType = typeof(List<>).MakeGenericType(destType);
                     object list = Activator.CreateInstance(listType);
                     IServiceDescriptorEnumerable sdenum = FindServices(destType.FullName);
-                    if (sdenum == null) return list;
                     MethodInfo addMethod = listType.GetMethod("Add");
                     foreach (ServiceDescriptor sd in sdenum)
                     {
@@ -206,11 +205,16 @@ namespace TemplateAction.Core
                 }
                 else
                 {
-                    //使用泛型定义搜索
-                    IServiceDescriptorEnumerable sdenum = FindService(tp.GetGenericTypeDefinition().FullName);
-                    if (sdenum == null) return null;
-                    ServiceDescriptor sd = sdenum.First;
-                    return Des2Instance(sd.PluginName, sd.Lifetime, sd.ServiceType.MakeGenericType(tp.GetGenericArguments()), sd.Factory, sd.Instance, scopeFactory);
+                    IServiceDescriptorEnumerable sdenum = FindService(tp.FullName);
+                    if (sdenum == null)
+                    {
+                        //使用泛型定义搜索
+                        sdenum = FindService(tp.GetGenericTypeDefinition().FullName);
+                        if (sdenum == null) return null;
+                        ServiceDescriptor sd = sdenum.First;
+                        return Des2Instance(sd.PluginName, sd.Lifetime, sd.ServiceType.MakeGenericType(tp.GetGenericArguments()), sd.Factory, sd.Instance, scopeFactory);
+                    }
+                    return Des2Instance(sdenum.First, scopeFactory);
                 }
 
             }
@@ -317,40 +321,78 @@ namespace TemplateAction.Core
                     return Activator.CreateInstance(serviceType);
                 }
             }
-            ConstructorInfo activationConstructor = null;
+
             ConstructorInfo[] constructors = serviceType.GetConstructors(BindingFlags.Instance | BindingFlags.Public);
             if (constructors.Length > 0)
             {
-                ParameterInfo[] parameterInfos = null;
-                for (int i = 0; i < constructors.Length; i++)
-                {
-                    activationConstructor = constructors[i];
-                    parameterInfos = activationConstructor.GetParameters();
-                    if (parameterInfos.Length > 0)
-                    {
-                        break;
-                    }
-                }
+                //开始选择构造函数
+                ConstructorInfo activationConstructor = null;
+                object[] parameters = null;
 
-                object[] parameters = new object[parameterInfos.Length];
-                for (int i = 0; i < parameterInfos.Length; i++)
+                ConstructorInfo waitConstructor = null;
+                object[] waitParameters = null;
+                foreach (ConstructorInfo tmpConstructor in constructors)
                 {
-                    ParameterInfo parameter = parameterInfos[i];
-                    Type parameterType = parameter.ParameterType;
+                    ParameterInfo[] tmpParameterInfos = tmpConstructor.GetParameters();
+                    object[] tmpParameters = new object[tmpParameterInfos.Length];
+                    bool isFullInstance = true;
+                    for (int i = 0; i < tmpParameterInfos.Length; i++)
+                    {
+                        ParameterInfo parameter = tmpParameterInfos[i];
+                        Type parameterType = parameter.ParameterType;
 
-                    if (parameterType == typeof(ITAServices))
-                    {
-                        parameters[i] = this;
+                        if (parameterType == typeof(ITAServices))
+                        {
+                            tmpParameters[i] = this;
+                        }
+                        else if (parameterType.IsPrimitive || parameterType == typeof(string))
+                        {
+                            tmpParameters[i] = GetService(TAUtility.TypeName2ServiceKey(parameterType, parameter.Name), scopeFactory);
+                        }
+                        else
+                        {
+                            tmpParameters[i] = GetService(parameterType, scopeFactory);
+                            if (tmpParameters[i] == null)
+                            {
+                                isFullInstance = false;
+                                break;
+                            }
+                        }
                     }
-                    else if (parameterType.IsPrimitive || parameterType == typeof(string))
+                    if (isFullInstance)
                     {
-                        parameters[i] = GetService(TAUtility.TypeName2ServiceKey(parameterType, parameter.Name), scopeFactory);
+                        if (activationConstructor == null)
+                        {
+                            activationConstructor = tmpConstructor;
+                            parameters = tmpParameters;
+                        }
+                        else if (parameters.Length < tmpParameters.Length)
+                        {
+                            activationConstructor = tmpConstructor;
+                            parameters = tmpParameters;
+                        }
                     }
                     else
                     {
-                        parameters[i] = GetService(parameterType, scopeFactory);
+                        if (waitConstructor == null)
+                        {
+                            waitConstructor = tmpConstructor;
+                            waitParameters = tmpParameters;
+                        }
+                        else if (parameters.Length > tmpParameters.Length)
+                        {
+                            waitConstructor = tmpConstructor;
+                            waitParameters = tmpParameters;
+                        }
                     }
                 }
+                //找不到可用的，则使用备用的
+                if (activationConstructor == null)
+                {
+                    activationConstructor = waitConstructor;
+                    parameters = waitParameters;
+                }
+
                 if (factory != null)
                 {
                     return factory(parameters);
