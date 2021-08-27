@@ -9,7 +9,7 @@ namespace TemplateAction.Core
         internal ConcurrentProxy()
         {
         }
-        public object GetValue(IInstanceFactory instanceFactory, Type serviceType, ProxyFactory factory,object impInstance, ILifetimeFactory scopeFactory)
+        public object GetValue(IInstanceFactory instanceFactory, Type serviceType, ProxyFactory factory, ILifetimeFactory scopeFactory)
         {
             if (_target == null)
             {
@@ -17,7 +17,7 @@ namespace TemplateAction.Core
                 {
                     if (_target == null)
                     {
-                        _target = instanceFactory.CreateServiceInstance(serviceType, factory, impInstance, scopeFactory);
+                        _target = instanceFactory.CreateServiceInstance(serviceType, factory, scopeFactory);
                     }
                 }
             }

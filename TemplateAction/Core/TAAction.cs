@@ -118,7 +118,7 @@ namespace TemplateAction.Core
             return indexTemp.MakeHtml(this);
         }
         private const string CONTROLLER_PRE = "CONTR_STORE_$$";
-        public object GetValue(IInstanceFactory instanceFactory, Type serviceType, ProxyFactory factory, object impInstance)
+        public object GetValue(IInstanceFactory instanceFactory, Type serviceType, ProxyFactory factory)
         {
             string tkey = CONTROLLER_PRE + serviceType.FullName;
             if (mContext.Items.Contains(tkey))
@@ -127,7 +127,7 @@ namespace TemplateAction.Core
             }
             else
             {
-                object target = instanceFactory.CreateServiceInstance(serviceType, factory, impInstance, this);
+                object target = instanceFactory.CreateServiceInstance(serviceType, factory, this);
                 mContext.Items[tkey] = target;
                 return target;
             }

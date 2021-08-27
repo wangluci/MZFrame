@@ -234,11 +234,11 @@ namespace TemplateAction.Core
         /// <returns></returns>
         public object CreateScopeService(ILifetimeFactory scopeFactory, Type serviceType)
         {
-            return scopeFactory.GetValue(this, serviceType, null, null);
+            return scopeFactory.GetValue(this, serviceType, null);
         }
         public object CreateScopeService(ILifetimeFactory scopeFactory, ProxyFactory factory)
         {
-            return scopeFactory.GetValue(this, null, factory, null);
+            return scopeFactory.GetValue(this, null, factory);
         }
         private object Des2Instance(ServiceDescriptor sd, ILifetimeFactory scopeFactory)
         {
@@ -266,7 +266,7 @@ namespace TemplateAction.Core
                         if (string.IsNullOrEmpty(plgname))
                         {
                             ConcurrentProxy proxy = this._singletonServices.GetOrAdd(serviceType.FullName);
-                            result = proxy.GetValue(this, serviceType, factory, impInstance, scopeFactory);
+                            result = proxy.GetValue(this, serviceType, factory, scopeFactory);
                         }
                         else
                         {
@@ -274,21 +274,21 @@ namespace TemplateAction.Core
                             if (!Equals(pobj, null))
                             {
                                 ConcurrentProxy proxy = pobj.Storer.GetOrAdd(serviceType.FullName);
-                                result = proxy.GetValue(this, serviceType, factory, impInstance, scopeFactory);
+                                result = proxy.GetValue(this, serviceType, factory, scopeFactory);
                             }
                         }
                     }
                     break;
                 case ServiceLifetime.Transient:
                     {
-                        result = CreateServiceInstance(serviceType, factory, impInstance, scopeFactory);
+                        result = CreateServiceInstance(serviceType, factory, scopeFactory);
                     }
                     break;
                 case ServiceLifetime.Scope:
                     {
                         if (scopeFactory != null)
                         {
-                            result = scopeFactory.GetValue(this, serviceType, factory, impInstance);
+                            result = scopeFactory.GetValue(this, serviceType, factory);
                         }
                     }
                     break;
@@ -301,9 +301,8 @@ namespace TemplateAction.Core
         /// </summary>
         /// <param name="serviceType"></param>
         /// <returns></returns>
-        public object CreateServiceInstance(Type serviceType, ProxyFactory factory, object impInstance, ILifetimeFactory scopeFactory)
+        public object CreateServiceInstance(Type serviceType, ProxyFactory factory, ILifetimeFactory scopeFactory)
         {
-            if (impInstance != null) return impInstance;
             if (serviceType == null) return factory(new object[0]);
             //接口则直接调用factory无参构造
             if (serviceType.IsInterface && factory != null)
@@ -381,7 +380,7 @@ namespace TemplateAction.Core
 
                 if (activationConstructor == null)
                 {
-                    return null;
+                    throw new ArgumentException(string.Format("{0} 构造函数的参数无法注入", serviceType.Name));
                 }
 
                 if (factory != null)

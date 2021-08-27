@@ -4,6 +4,6 @@ namespace TemplateAction.Core
 {
     public interface IInstanceFactory
     {
-        object CreateServiceInstance(Type serviceType, ProxyFactory factory, object impInstance, ILifetimeFactory scopeFactory);
+        object CreateServiceInstance(Type serviceType, ProxyFactory factory, ILifetimeFactory scopeFactory);
     }
 }
