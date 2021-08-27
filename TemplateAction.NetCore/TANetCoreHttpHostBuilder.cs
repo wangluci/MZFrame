@@ -15,6 +15,11 @@ namespace TemplateAction.NetCore
         private DefaultMultiHandler<ListenOptions> _middlewareEvents;
         private IConfiguration _config;
         private Microsoft.Extensions.DependencyInjection.ServiceCollection _services;
+
+        private Action<IApplicationBuilder> _configAC;
+        private Action<ListenOptions> _middleAC;
+        private Action<IConfiguration, ILoggingBuilder> _loggingAC;
+        private Action<Microsoft.Extensions.DependencyInjection.IServiceCollection> _serviceAC;
         /// <summary>
         /// 获取配置文件
         /// </summary>
@@ -58,12 +63,7 @@ namespace TemplateAction.NetCore
             _config["Kestrel:EndPoints:Https:Certificate:Password"] = password;
             return this;
         }
-        public TANetCoreHttpHostBuilder UseMiddleware(Action<ListenOptions> ac)
-        {
-            _middlewareEvents.Register(ac);
-            TAEventDispatcher.Instance.Register<ListenOptions>(_middlewareEvents);
-            return this;
-        }
+    
 
         /// <summary>
         /// 配置Http中间件
@@ -72,8 +72,17 @@ namespace TemplateAction.NetCore
         /// <returns></returns>
         public TANetCoreHttpHostBuilder Configure(Action<IApplicationBuilder> ac)
         {
-            _appBuilderEvents.Register(ac);
-            TAEventDispatcher.Instance.Register<IApplicationBuilder>(_appBuilderEvents);
+            _configAC = ac;
+            return this;
+        }
+        /// <summary>
+        /// 配置中间件
+        /// </summary>
+        /// <param name="ac"></param>
+        /// <returns></returns>
+        public TANetCoreHttpHostBuilder ConfigureMiddleware(Action<ListenOptions> ac)
+        {
+            _middleAC = ac;
             return this;
         }
         /// <summary>
@@ -82,7 +91,7 @@ namespace TemplateAction.NetCore
         /// <returns></returns>
         public TANetCoreHttpHostBuilder ConfigureLogging(Action<IConfiguration, ILoggingBuilder> ac)
         {
-            _services.AddLogging(loggingbuilder => ac(_config, loggingbuilder));
+            _loggingAC = ac;
             return this;
         }
         /// <summary>
@@ -92,11 +101,28 @@ namespace TemplateAction.NetCore
         /// <returns></returns>
         public TANetCoreHttpHostBuilder ConfigureServices(Action<Microsoft.Extensions.DependencyInjection.IServiceCollection> ac)
         {
-            ac?.Invoke(_services);
+            _serviceAC = ac;
             return this;
         }
         public TANetCoreHttpHost Build()
         {
+            //初始化配置
+            if (_configAC != null)
+            {
+                _appBuilderEvents.Register(_configAC);
+                TAEventDispatcher.Instance.Register<IApplicationBuilder>(_appBuilderEvents);
+            }
+            if (_middleAC != null)
+            {
+                _middlewareEvents.Register(_middleAC);
+                TAEventDispatcher.Instance.Register<ListenOptions>(_middlewareEvents);
+            }
+            if (_loggingAC != null)
+            {
+                _services.AddLogging(loggingbuilder => _loggingAC(_config, loggingbuilder));
+            }
+            _serviceAC?.Invoke(_services);
+
             return new TANetCoreHttpHost(_config, _services);
         }
     }
