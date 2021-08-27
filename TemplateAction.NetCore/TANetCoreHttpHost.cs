@@ -52,10 +52,6 @@ namespace TemplateAction.NetCore
             _workroot = config[WORK_PATH];
             _config = config;
             _servicecollection = services;
-            _servicecollection.AddLogging((logginbuilder) =>
-            {
-                logginbuilder.AddConfiguration(_config.GetSection("Logging")).AddConsole();
-            });
             _hostingEnvironment = new HostingEnvironment();
             WebHostOptions hostoptions = new WebHostOptions(_config, Assembly.GetEntryAssembly()?.GetName().Name ?? string.Empty);
             string webroot = Path.Combine(_workroot, _webroot);

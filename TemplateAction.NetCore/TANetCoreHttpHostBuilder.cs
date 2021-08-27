@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using TemplateAction.Core;
@@ -13,7 +15,6 @@ namespace TemplateAction.NetCore
         private DefaultMultiHandler<ListenOptions> _middlewareEvents;
         private IConfiguration _config;
         private Microsoft.Extensions.DependencyInjection.ServiceCollection _services;
-        private Action<Microsoft.Extensions.DependencyInjection.IServiceCollection> _servicesac;
         /// <summary>
         /// 获取配置文件
         /// </summary>
@@ -30,13 +31,19 @@ namespace TemplateAction.NetCore
    .Build();
             _config[TANetCoreHttpHost.WORK_PATH] = rootpath;
         }
-        
+        /// <summary>
+        /// 创建默认配置的TANetCoreHttpHostBuilder
+        /// </summary>
+        /// <returns></returns>
         public static TANetCoreHttpHostBuilder CreateDefaultHostBuilder()
         {
             return new TANetCoreHttpHostBuilder().Configure((IApplicationBuilder builder) =>
             {
                 builder.UseStaticFiles();
                 builder.UseTAMvc();
+            }).ConfigureLogging((config, logginbuilder) =>
+            {
+                logginbuilder.AddConfiguration(config.GetSection("Logging")).AddConsole();
             });
         }
         public TANetCoreHttpHostBuilder UseHttpUrl(string url)
@@ -57,7 +64,7 @@ namespace TemplateAction.NetCore
             TAEventDispatcher.Instance.Register<ListenOptions>(_middlewareEvents);
             return this;
         }
-   
+
         /// <summary>
         /// 配置Http中间件
         /// </summary>
@@ -67,6 +74,15 @@ namespace TemplateAction.NetCore
         {
             _appBuilderEvents.Register(ac);
             TAEventDispatcher.Instance.Register<IApplicationBuilder>(_appBuilderEvents);
+            return this;
+        }
+        /// <summary>
+        /// 配置日志服务
+        /// </summary>
+        /// <returns></returns>
+        public TANetCoreHttpHostBuilder ConfigureLogging(Action<IConfiguration, ILoggingBuilder> ac)
+        {
+            _services.AddLogging(loggingbuilder => ac(_config, loggingbuilder));
             return this;
         }
         /// <summary>
@@ -81,10 +97,6 @@ namespace TemplateAction.NetCore
         }
         public TANetCoreHttpHost Build()
         {
-            if (_servicesac != null)
-            {
-                _servicesac(_services);
-            }
             return new TANetCoreHttpHost(_config, _services);
         }
     }
