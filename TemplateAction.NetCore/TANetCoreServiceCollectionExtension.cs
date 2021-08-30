@@ -6,6 +6,46 @@ namespace TemplateAction.NetCore
 {
     public static class TANetCoreServiceCollectionExtension
     {
+
+        /// <summary>
+        /// 微软内置服务转移到TA的服务中
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <param name="tservices"></param>
+        /// <returns></returns>
+        public static IServiceCollection CopyServicesFrom(this IServiceCollection collection, Microsoft.Extensions.DependencyInjection.ServiceCollection tservices)
+        {
+            //映射服务
+            collection.AddSingleton<IServiceProvider, TANetServiceProvider>();
+
+            //复制服务
+            foreach (Microsoft.Extensions.DependencyInjection.ServiceDescriptor micsd in tservices)
+            {
+                ServiceLifetime lifetime = ServiceLifetime.Singleton;
+                switch (micsd.Lifetime)
+                {
+                    case Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped:
+                        lifetime = ServiceLifetime.Scope;
+                        break;
+                    case Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient:
+                        lifetime = ServiceLifetime.Transient;
+                        break;
+                    case Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton:
+                        lifetime = ServiceLifetime.Singleton;
+                        break;
+                }
+                ProxyFactory pfactory = null;
+                if (micsd.ImplementationFactory != null)
+                {
+                    pfactory = (object[] constructorArguments, ITAServices provider) =>
+                    {
+                        return micsd.ImplementationFactory.Invoke(provider.GetService<IServiceProvider>());
+                    };
+                }
+                collection.Add(micsd.ServiceType.FullName, new ServiceDescriptor(micsd.ImplementationType, lifetime, pfactory, micsd.ImplementationInstance));
+            }
+            return collection;
+        }
         public static IServiceCollection AddOptions(this IServiceCollection collection)
         {
             collection.TryAddSingleton(typeof(IOptions<>), typeof(OptionsManager<>));

@@ -8,7 +8,7 @@ namespace TemplateAction.Core
     /// </summary>
     /// <param name="constructorArguments"></param>
     /// <returns></returns>
-    public delegate object ProxyFactory(object[] constructorArguments);
+    public delegate object ProxyFactory(object[] constructorArguments, ITAServices provider);
     /// <summary>
     /// 服务描述信息
     /// </summary>
@@ -25,7 +25,7 @@ namespace TemplateAction.Core
         /// 所属插件
         /// </summary>
         public string PluginName { get; set; }
- 
+
         public ServiceDescriptor(Type serviceType, ServiceLifetime lifetime, ProxyFactory factory, object instance)
         {
             ServiceType = serviceType;

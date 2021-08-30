@@ -65,7 +65,7 @@ namespace TemplateAction.NetCore
                 TAEventDispatcher.Instance.RegisterLoadBefore<TASiteApplication>(app =>
                 {
                     Microsoft.Extensions.DependencyInjection.ServiceCollection tservices = appBuilder.ServerFeatures.Get<Microsoft.Extensions.DependencyInjection.ServiceCollection>();
-                    app.CopyServicesFrom(tservices);
+                    app.Services.CopyServicesFrom(tservices);
 
                     //设置路由
                     string defns = null;

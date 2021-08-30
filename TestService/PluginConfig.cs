@@ -9,7 +9,7 @@ namespace TestService
         public void Configure(IServiceCollection services)
         {
             //注册一个事件分发
-            services.AddSingleton<ITestListener>((object[] arguments) =>
+            services.AddSingleton<ITestListener>((object[] arguments, ITAServices provider) =>
             {
                 return MyAccess.Aop.InterceptFactory.CreateDispatcher<ITestListener>(TAEventDispatcher.Instance.Dispatch);
             });
@@ -18,17 +18,17 @@ namespace TestService
             //添加监听实例
             services.AddSingleton<TestListener>();
             //添加服务
-            services.AddSingleton<TestService>((object[] arguments) =>
+            services.AddSingleton<TestService>((object[] arguments, ITAServices provider) =>
             {
                 return MyAccess.Aop.InterceptFactory.CreateBLL(typeof(TestService), arguments);
             });
             //注册异步DAL
-            services.AddSingleton<TestDALAsync>((object[] arguments) =>
+            services.AddSingleton<TestDALAsync>((object[] arguments, ITAServices provider) =>
             {
                 return MyAccess.Aop.InterceptFactory.CreateDAL(typeof(TestDALAsync), arguments);
             });
             //注册同步DAL
-            services.AddSingleton<TestDAL>((object[] arguments) =>
+            services.AddSingleton<TestDAL>((object[] arguments, ITAServices provider) =>
             {
                 return MyAccess.Aop.InterceptFactory.CreateDAL(typeof(TestDAL), arguments);
             });

@@ -100,7 +100,7 @@ namespace TemplateAction.Core
             string[] nsArr;
             if (_mulkeycache.TryGetValue(key, out nsArr))
             {
-                foreach(string ns in nsArr)
+                foreach (string ns in nsArr)
                 {
                     if (ns.Equals("999"))
                     {
@@ -352,18 +352,18 @@ namespace TemplateAction.Core
         /// <returns></returns>
         public object CreateServiceInstance(Type serviceType, ProxyFactory factory, ILifetimeFactory scopeFactory)
         {
-            if (serviceType == null) return factory(new object[0]);
+            if (serviceType == null) return factory(new object[0], this);
             //接口则直接调用factory无参构造
             if (serviceType.IsInterface && factory != null)
             {
-                return factory(new object[0]);
+                return factory(new object[0], this);
             }
             else if (serviceType.IsPrimitive || serviceType == typeof(string))
             {
                 //string或基本类型返回
                 if (factory != null)
                 {
-                    return factory(new object[0]);
+                    return factory(new object[0], this);
                 }
                 else
                 {
@@ -434,7 +434,7 @@ namespace TemplateAction.Core
 
                 if (factory != null)
                 {
-                    return factory(parameters);
+                    return factory(parameters, this);
                 }
                 else
                 {
@@ -445,7 +445,7 @@ namespace TemplateAction.Core
             {
                 if (factory != null)
                 {
-                    return factory(new object[0]);
+                    return factory(new object[0], this);
                 }
                 else
                 {
@@ -593,7 +593,7 @@ namespace TemplateAction.Core
                 catch { }
             }
         }
-        
+
 
         public void Dispatch<T>(string key, T evt) where T : class
         {
