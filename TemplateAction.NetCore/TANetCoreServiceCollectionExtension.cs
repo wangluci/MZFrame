@@ -16,7 +16,7 @@ namespace TemplateAction.NetCore
         public static IServiceCollection CopyServicesFrom(this IServiceCollection collection, Microsoft.Extensions.DependencyInjection.ServiceCollection tservices)
         {
             //映射服务
-            collection.AddSingleton<IServiceProvider, TANetServiceProvider>();
+            collection.TryAddSingleton<IServiceProvider, TANetServiceProvider>();
 
             //复制服务
             foreach (Microsoft.Extensions.DependencyInjection.ServiceDescriptor micsd in tservices)
