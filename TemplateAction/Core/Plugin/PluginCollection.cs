@@ -12,7 +12,6 @@ namespace TemplateAction.Core
     /// </summary>
     public class PluginCollection : ITAServices, IDispatcher, IInstanceFactory
     {
-        private ConcurrentDictionary<string, string> _keycache = new ConcurrentDictionary<string, string>();
         private Dictionary<string, PluginObject> mPluginList = new Dictionary<string, PluginObject>();
         private ReaderWriterLockSlim _lockslim = new ReaderWriterLockSlim();
         /// <summary>
@@ -34,31 +33,34 @@ namespace TemplateAction.Core
         {
             get { return _singletonServices; }
         }
-        private IPluginFactory _pluginFactory;
-        public IPluginFactory PluginFactory
+        private IPluginCollectionExtData _extionData;
+        public IPluginCollectionExtData ExtentionData
         {
-            get { return _pluginFactory; }
+            get { return _extionData; }
         }
-
-        public PluginCollection(IPluginFactory factory)
+        /// <summary>
+        /// 单服务搜索缓存
+        /// </summary>
+        private ConcurrentDictionary<string, string> _keycache = new ConcurrentDictionary<string, string>();
+        /// <summary>
+        /// 多服务搜索缓存
+        /// </summary>
+        private ConcurrentDictionary<string, string[]> _mulkeycache = new ConcurrentDictionary<string, string[]>();
+        public PluginCollection(IPluginCollectionExtData extionData)
         {
-            _pluginFactory = factory;
+            _extionData = extionData;
             _singletonServices = new ConcurrentStorer();
             _services = new ServiceCollection(string.Empty);
         }
-
-        /// <summary>
-        /// 通过接口查找多个服务
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        private IServiceDescriptorEnumerable FindServices(string key)
+        private IServiceDescriptorEnumerable FindServicesIn(string key)
         {
+            List<string> tnslist = new List<string>();
             ServiceDescriptorUnion deslist = new ServiceDescriptorUnion();
             IServiceDescriptorEnumerable gdes = _services[key];
             if (gdes != null)
             {
                 deslist.Union(gdes);
+                tnslist.Add("999");
             }
             PluginObject[] tarr = null;
             _lockslim.EnterReadLock();
@@ -81,9 +83,56 @@ namespace TemplateAction.Core
                 if (des != null)
                 {
                     deslist.Union(des);
+                    tnslist.Add(plg.Name);
                 }
             }
+            _mulkeycache.TryAdd(key, tnslist.ToArray());
             return deslist;
+        }
+        /// <summary>
+        /// 通过接口查找多个服务
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        private IServiceDescriptorEnumerable FindServices(string key)
+        {
+            ServiceDescriptorUnion deslist = new ServiceDescriptorUnion();
+            string[] nsArr;
+            if (_mulkeycache.TryGetValue(key, out nsArr))
+            {
+                foreach(string ns in nsArr)
+                {
+                    if (ns.Equals("999"))
+                    {
+                        IServiceDescriptorEnumerable gdes = _services[key];
+                        if (gdes != null)
+                        {
+                            deslist.Union(gdes);
+                        }
+                        else
+                        {
+                            _mulkeycache.TryRemove(key, out nsArr);
+                            return FindServicesIn(key);
+                        }
+                    }
+                    else
+                    {
+                        PluginObject pobj = GetPlugin(ns);
+                        IServiceDescriptorEnumerable des = pobj.FindService(key);
+                        if (des != null)
+                        {
+                            deslist.Union(des);
+                        }
+                        else
+                        {
+                            _mulkeycache.TryRemove(key, out nsArr);
+                            return FindServicesIn(key);
+                        }
+                    }
+                }
+                return deslist;
+            }
+            return FindServicesIn(key);
         }
         private IServiceDescriptorEnumerable FindServiceIn(string key)
         {
@@ -462,17 +511,59 @@ namespace TemplateAction.Core
                 _lockslim.ExitReadLock();
             }
         }
+        private PluginObject Create(Assembly tAssembly, string filepath)
+        {
+            PluginObject newObj = new PluginObject(_extionData, tAssembly, filepath);
+            if (newObj.Config == null) return null;
+            return newObj;
+        }
+        /// <summary>
+        /// 创建入口插件
+        /// </summary>
         public void InitFromEntryAssembly()
         {
             Assembly ass = Assembly.GetEntryAssembly();
             if (ass != null)
             {
-                PluginObject newObj = _pluginFactory.Create(ass, string.Empty);
+                PluginObject newObj = Create(ass, string.Empty);
                 if (newObj != null)
                 {
                     mPluginList[newObj.Name.ToLower()] = newObj;
                 }
             }
+        }
+        /// <summary>
+        /// 创建插件
+        /// </summary>
+        /// <param name="tAssembly"></param>
+        /// <param name="filepath"></param>
+        /// <returns></returns>
+        public PluginObject CreatePlugin(Assembly tAssembly, string filepath)
+        {
+            if (tAssembly == null) return null;
+            PluginObject newObj = Create(tAssembly, filepath);
+            if (newObj != null)
+            {
+                PluginObject oldPlugin;
+                _lockslim.EnterWriteLock();
+                try
+                {
+                    string keylow = newObj.Name.ToLower();
+                    mPluginList.TryGetValue(keylow, out oldPlugin);
+                    mPluginList[keylow] = newObj;
+                }
+                finally
+                {
+                    _lockslim.ExitWriteLock();
+                }
+                if (oldPlugin != null)
+                {
+                    oldPlugin.CacheDependency.NoticeChange();
+                    oldPlugin.Unload();
+                }
+            }
+
+            return newObj;
         }
         /// <summary>
         /// 移除指定插件
@@ -502,39 +593,7 @@ namespace TemplateAction.Core
                 catch { }
             }
         }
-        /// <summary>
-        /// 创建插件
-        /// </summary>
-        /// <param name="tAssembly"></param>
-        /// <param name="filepath"></param>
-        /// <returns></returns>
-        public PluginObject CreatePlugin(Assembly tAssembly, string filepath)
-        {
-            if (tAssembly == null) return null;
-            PluginObject newObj = _pluginFactory.Create(tAssembly, filepath);
-            if (newObj != null)
-            {
-                PluginObject oldPlugin;
-                _lockslim.EnterWriteLock();
-                try
-                {
-                    string keylow = newObj.Name.ToLower();
-                    mPluginList.TryGetValue(keylow, out oldPlugin);
-                    mPluginList[keylow] = newObj;
-                }
-                finally
-                {
-                    _lockslim.ExitWriteLock();
-                }
-                if (oldPlugin != null)
-                {
-                    oldPlugin.CacheDependency.NoticeChange();
-                    oldPlugin.Unload();
-                }
-            }
-
-            return newObj;
-        }
+        
 
         public void Dispatch<T>(string key, T evt) where T : class
         {

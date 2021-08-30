@@ -8,7 +8,7 @@ namespace TemplateAction.Extension.Site
     {
         public static PluginCollection UseRouter(this PluginCollection collection, IRouterBuilder builder)
         {
-            SitePluginFactory sitefactory = (SitePluginFactory)collection.PluginFactory;
+            SitePluginCollectionExtData sitefactory = (SitePluginCollectionExtData)collection.ExtentionData;
             sitefactory.RouterBuilder = builder;
             sitefactory.RouterCollection = builder.Build();
             return collection;
@@ -20,7 +20,7 @@ namespace TemplateAction.Extension.Site
         /// <returns></returns>
         public static IDictionary<string, object> Route(this PluginCollection collection, ITAContext context)
         {
-            SitePluginFactory sitefactory = (SitePluginFactory)collection.PluginFactory;
+            SitePluginCollectionExtData sitefactory = (SitePluginCollectionExtData)collection.ExtentionData;
             if (sitefactory.RouterCollection == null)
             {
                 return null;

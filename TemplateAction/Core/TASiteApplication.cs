@@ -34,9 +34,9 @@ namespace TemplateAction.Core
             _readAssetsFromPlugin = true;
             _middlewareUsing = new HashSet<string>();
         }
-        protected override IPluginFactory CreatePluginFactory()
+        protected override IPluginCollectionExtData CreatePluginCollectionExtData()
         {
-            return new SitePluginFactory();
+            return new SitePluginCollectionExtData();
         }
       
         /// <summary>

@@ -25,9 +25,9 @@ namespace TemplateAction.Core
             get { return mControllerList; } 
         }
         private string _myControllerName;
-        public void LoadBefore(IPluginFactory factory, Assembly assembly, string pluginpath)
+        public void LoadBefore(IPluginCollectionExtData factory, Assembly assembly, string pluginpath)
         {
-            SitePluginFactory siteFactory = (SitePluginFactory)factory;
+            SitePluginCollectionExtData siteFactory = (SitePluginCollectionExtData)factory;
             if (siteFactory.RouterBuilder != null)
             {
                 this._routerBuilder = siteFactory.RouterBuilder.NewPluginBuilder();
@@ -46,7 +46,7 @@ namespace TemplateAction.Core
             }
             return false;
         }
-        public void LoadAfter(IPluginFactory factory, Assembly assembly, string pluginpath)
+        public void LoadAfter(IPluginCollectionExtData factory, Assembly assembly, string pluginpath)
         {
             if (this._routerBuilder != null)
             {

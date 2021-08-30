@@ -60,12 +60,10 @@ namespace TemplateAction.Core
         private IExtentionData _data;
         public IExtentionData Data { get { return _data; } }
 
-        public PluginObject(IPluginFactory factory, IExtentionData data, Assembly assembly, string pluginpath)
+        public PluginObject(IPluginCollectionExtData pcdata, Assembly assembly, string pluginpath)
         {
-            this._data = data;
             this._assembly = assembly;
             this._plgPath = pluginpath;
-
             this._cacheDependency = new FileDependency();
             this._storer = new ConcurrentStorer();
             this._dispatcher = new PluginEventDispatcher();
@@ -73,9 +71,10 @@ namespace TemplateAction.Core
             this._services = new ServiceCollection(this.mName);
             this.mVersion = assembly.GetName().Version;
 
-            if (data != null)
+            if (pcdata != null)
             {
-                data.LoadBefore(factory, assembly, pluginpath);
+                this._data = pcdata.CreateExtentionData();
+                this._data.LoadBefore(pcdata, assembly, pluginpath);
                 string myPluginConfigName = typeof(IPluginConfig).FullName;
 
                 Type[] exports = this._assembly.GetExportedTypes();
@@ -84,7 +83,7 @@ namespace TemplateAction.Core
                     //判断非抽像
                     if (!t.IsAbstract)
                     {
-                        if (!data.LoadItem(this.mName, t))
+                        if (!this._data.LoadItem(this.mName, t))
                         {
                             if (t.GetInterface(myPluginConfigName) != null)
                             {
@@ -100,7 +99,7 @@ namespace TemplateAction.Core
                     }
 
                 }
-                data.LoadAfter(factory, assembly, pluginpath);
+                this._data.LoadAfter(pcdata, assembly, pluginpath);
             }
             else
             {

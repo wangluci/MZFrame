@@ -59,11 +59,11 @@ namespace TemplateAction.Core
         }
         public TAAbstractApplication()
         {
-            _plugins = new PluginCollection(CreatePluginFactory());
+            _plugins = new PluginCollection(CreatePluginCollectionExtData());
             _pluginsnode = TAEventDispatcher.Instance.AddScope(_plugins);
             AppDomain.CurrentDomain.AssemblyResolve += (sender, e) => LoadEmbeddedAssembly(e.Name);
         }
-        protected abstract IPluginFactory CreatePluginFactory();
+        protected abstract IPluginCollectionExtData CreatePluginCollectionExtData();
         /// <summary>
         /// 模块引用其它模块时调用
         /// </summary>

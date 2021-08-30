@@ -5,8 +5,8 @@ namespace TemplateAction.Core
 {
     public interface IExtentionData
     {
-        void LoadBefore(IPluginFactory factory, Assembly assembly, string pluginpath);
+        void LoadBefore(IPluginCollectionExtData pcdata, Assembly assembly, string pluginpath);
         bool LoadItem(string pluginName,Type t);
-        void LoadAfter(IPluginFactory factory, Assembly assembly, string pluginpath);
+        void LoadAfter(IPluginCollectionExtData pcdata, Assembly assembly, string pluginpath);
     }
 }

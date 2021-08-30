@@ -12,9 +12,9 @@ namespace TemplateAction.Core
             _pluginPath = path;
             return this;
         }
-        protected override IPluginFactory CreatePluginFactory()
+        protected override IPluginCollectionExtData CreatePluginCollectionExtData()
         {
-            return new PluginFactory();
+            return null;
         }
         public TAApplication Init(string rootpath)
         {
