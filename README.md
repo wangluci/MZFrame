@@ -18,7 +18,7 @@
 
 MainWeb目录为.net framework下mvc的测试项目
 
-MyAccess目录包含orm框架、json、日志、分词等
+MyAccess目录包含orm框架、json等
 
 MyNet目录为异步的、事件驱动的网络应用程序框架
 
