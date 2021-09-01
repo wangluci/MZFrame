@@ -19,7 +19,7 @@ namespace MainWeb
                 //注册字符串
                 app.Services.AddString("testconnstr", ConfigurationManager.AppSettings["testconnstr"]);
             });
-            MyAccess.log4net.Config.XmlConfigurator.ConfigureAndWatch(new FileInfo(Server.MapPath("log4net.config")));
+            log4net.Config.XmlConfigurator.ConfigureAndWatch(new FileInfo(Server.MapPath("log4net.config")));
         }
 
         protected void Session_Start(object sender, EventArgs e)
