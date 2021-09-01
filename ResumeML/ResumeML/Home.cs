@@ -1,4 +1,4 @@
-﻿using MyAccess.WordSegment;
+﻿using PanGu;
 using ResumeML.Business;
 using ResumeMLML.Model;
 using System;
@@ -83,7 +83,7 @@ namespace ResumeML
                     linkNodeString = linkNodeString.Next;
                     if (!FieldDict.Instance.IsFieldName(tmps))
                     {
-                        MyAccess.WordSegment.Segment segment = new MyAccess.WordSegment.Segment();
+                        PanGu.Segment segment = new PanGu.Segment();
                         ICollection<WordInfo> words = segment.DoSegment(tmps);
                         StringBuilder segments = new StringBuilder();
                         foreach (WordInfo w in words)
