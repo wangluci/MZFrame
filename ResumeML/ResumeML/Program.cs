@@ -16,7 +16,7 @@ namespace ResumeML
         static void Main(string[] args)
         {
             string tpath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "log4net.config";
-            MyAccess.log4net.Config.XmlConfigurator.ConfigureAndWatch(new FileInfo(tpath));
+            log4net.Config.XmlConfigurator.ConfigureAndWatch(new FileInfo(tpath));
             PanGu.Segment.Init();
             TANetCoreHttpHostBuilder.CreateDefaultHostBuilder().ConfigureServices(services=> {
                 services.AddPredictionEnginePool<ModelInput, ModelOutput>()
