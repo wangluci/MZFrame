@@ -7,6 +7,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using TemplateAction.Core;
 using Microsoft.Extensions.ML;
+using System.Linq;
+
 namespace ResumeML
 {
     public class Home : TABaseController
@@ -97,10 +99,10 @@ namespace ResumeML
                             Col1 = colfield,
                         };
                         ModelOutput predictionResult = _predictionEnginePool.Predict("ResumeModel", sampleData);
-                        float other = predictionResult.Score[2];
+                        float preScore = predictionResult.Score.Max();
                         if (predictionResult.Prediction == 0)
                         {
-                            if (predictionResult.Score[0] > 0.4 && isChinese(tmps))
+                            if (preScore > 0.4 && isChinese(tmps))
                             {
                                 if (string.IsNullOrEmpty(resume.TrueName))
                                 {
@@ -111,7 +113,7 @@ namespace ResumeML
                         }
                         else if (predictionResult.Prediction == 1)
                         {
-                            if (predictionResult.Score[1] > 0.6)
+                            if (preScore > 0.6)
                             {
                                 resume.Appraise += tmps;
                                 continue;
@@ -119,7 +121,7 @@ namespace ResumeML
                         }
                         else if (predictionResult.Prediction == 2)
                         {
-                            if (predictionResult.Score[3] > 0.6)
+                            if (preScore > 0.6)
                             {
                                 if (string.IsNullOrEmpty(resume.Address))
                                 {
@@ -130,7 +132,7 @@ namespace ResumeML
                         }
                         else if (predictionResult.Prediction == 3)
                         {
-                            if (predictionResult.Score[4] > 0.6)
+                            if (preScore > 0.6)
                             {
                                 WorkItem item = null;
                                 if (resume.WorkList.Count == 0)
@@ -170,7 +172,7 @@ namespace ResumeML
                         }
                         else if (predictionResult.Prediction == 4)
                         {
-                            if (predictionResult.Score[5] > 0.5)
+                            if (preScore > 0.5)
                             {
                                 WorkItem item = null;
                                 if (resume.WorkList.Count == 0)
@@ -202,7 +204,7 @@ namespace ResumeML
                         }
                         else if (predictionResult.Prediction == 5)
                         {
-                            if (predictionResult.Score[6] > 0.5)
+                            if (preScore > 0.5)
                             {
                                 WorkItem item = null;
                                 if (resume.WorkList.Count == 0)
@@ -234,7 +236,7 @@ namespace ResumeML
                         }
                         else if (predictionResult.Prediction == 6)
                         {
-                            if (predictionResult.Score[7] > 0.5)
+                            if (preScore > 0.5)
                             {
                                 if (tmps.StartsWith("学校名称"))
                                 {
