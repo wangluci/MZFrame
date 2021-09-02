@@ -27,17 +27,18 @@ namespace MyAccess.Json.Processing.Nodes
                     System.Reflection.PropertyInfo item = properties[index];
                     key = item.Name;
                     value = item.GetValue(context.Value, null);
-                    object[] defattrs = item.GetCustomAttributes(false);
+                    JsonAttr[] defattrs = (JsonAttr[])item.GetCustomAttributes(typeof(JsonAttr), false);
                     if (defattrs.Length > 0)
                     {
                         bool encode = true;
-                        foreach (object obj in defattrs)
+                        foreach (JsonAttr obj in defattrs)
                         {
-                            if (obj is JsonDefault)
+                            JsonDefault defobj = obj as JsonDefault;
+                            if (defobj != null)
                             {
-                                if (value == null)
+                                if (value == defobj.Src)
                                 {
-                                    value = obj as JsonDefault;
+                                    value = defobj.Default;
                                 }
                             }
                             else
@@ -49,12 +50,12 @@ namespace MyAccess.Json.Processing.Nodes
                                     {
                                         encode = false;
                                     }
-                                    else if ((ign.Flag & HideFlag.NullHide) != 0 && value == null)
+                                    else if (ign.Flag == HideFlag.ValueHide && value == ign.Val)
                                     {
                                         encode = false;
                                     }
                                 }
-                       
+
                             }
                         }
                         if (!encode)
@@ -62,10 +63,7 @@ namespace MyAccess.Json.Processing.Nodes
                             continue;
                         }
                     }
-                    if (!context.UseNullable && value == null)
-                    {
-                        continue;
-                    }
+
                     if (isparsed)
                     {
                         context.Output += JsonToken.ValueSeperator;

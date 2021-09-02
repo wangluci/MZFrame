@@ -38,7 +38,6 @@ namespace MyAccess.Json.Processing
 
         private EncodingContext _encodeContext(EncodingContext context)
         {
-            context.UseNullable = Configuration.UsesNullable;
             context.UseUnicode = Configuration.UseUnicode;
             context.DateTimeFormat = Configuration.DateTimeFormat;
             Queue<EncodingContext> locals = new Queue<EncodingContext>();

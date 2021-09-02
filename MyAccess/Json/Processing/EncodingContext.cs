@@ -22,10 +22,6 @@ namespace MyAccess.Json.Processing
         /// </summary>
         internal JsonTokenSequence Output { get; set; }
         /// <summary>
-        /// 是否可以为NULL
-        /// </summary>
-        internal bool UseNullable { get; set; }
-        /// <summary>
         /// 是否使用unicode编码汉字
         /// </summary>
         internal bool UseUnicode { get; set; }

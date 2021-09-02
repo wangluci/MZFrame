@@ -5,8 +5,12 @@ namespace MyAccess.Json
     public enum HideFlag
     {
         /// <summary>
-        /// null值不显示
+        /// 不显示
         /// </summary>
-        NullHide = 1
+        Hide = 0,
+        /// <summary>
+        /// 指定值不显示
+        /// </summary>
+        ValueHide = 1
     }
 }
