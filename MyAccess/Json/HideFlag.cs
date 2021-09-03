@@ -9,8 +9,8 @@ namespace MyAccess.Json
         /// </summary>
         Hide = 0,
         /// <summary>
-        /// 指定值不显示
+        /// 指定条件不显示
         /// </summary>
-        ValueHide = 1
+        HideCondition = 1
     }
 }

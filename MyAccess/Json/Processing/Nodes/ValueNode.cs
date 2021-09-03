@@ -36,10 +36,7 @@ namespace MyAccess.Json.Processing.Nodes
                             JsonDefault defobj = obj as JsonDefault;
                             if (defobj != null)
                             {
-                                if (value == defobj.Src)
-                                {
-                                    value = defobj.Default;
-                                }
+                                value = defobj.Fun(value);
                             }
                             else
                             {
@@ -50,7 +47,7 @@ namespace MyAccess.Json.Processing.Nodes
                                     {
                                         encode = false;
                                     }
-                                    else if (ign.Flag == HideFlag.ValueHide && value == ign.Val)
+                                    else if (ign.Flag == HideFlag.HideCondition && ign.Fun(value))
                                     {
                                         encode = false;
                                     }

@@ -3,30 +3,43 @@ namespace MyAccess.Json.Attributes
 {
     public class JsonDefault : JsonAttr
     {
-        private object _srcVal;
-        private object _defaultVal;
-        public object Default
+        /// <summary>
+        /// 返回要替换的值
+        /// </summary>
+        /// <param name="input">原值</param>
+        /// <returns></returns>
+        public delegate object ReplaceFun(object input);
+        private ReplaceFun _fun;
+        internal ReplaceFun Fun
         {
-            get { return _defaultVal; }
+            get { return _fun; }
         }
-        public object Src
+
+        /// <summary>
+        /// 替换指定值
+        /// </summary>
+        /// <param name="fun"></param>
+        public JsonDefault(ReplaceFun fun)
         {
-            get { return _srcVal; }
+            _fun = fun;
         }
         /// <summary>
-        /// 当值等于src时，赋值val
+        /// 当值等于null时，赋值val
         /// </summary>
-        /// <param name="src"></param>
         /// <param name="val"></param>
-        public JsonDefault(object src,object val)
-        {
-            _srcVal = src;
-            _defaultVal = val;
-        }
         public JsonDefault(object val)
         {
-            _srcVal = null;
-            _defaultVal = val;
+            _fun = (input) =>
+            {
+                if (input == null)
+                {
+                    return val;
+                }
+                else
+                {
+                    return input;
+                }
+            };
         }
     }
 }
