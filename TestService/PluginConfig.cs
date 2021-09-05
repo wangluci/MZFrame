@@ -37,7 +37,7 @@ namespace TestService
         public void Loaded(ITAApplication app, IEventRegister register)
         {
             //使用身份认证
-            app.UseFilterMiddleware<AuthMiddleware>();
+            app.UseMiddlewareFirst<AuthMiddleware>();
             //新增一个事件监听
             register.AddListener(app.ServiceProvider.GetService<TestListener>());
         }

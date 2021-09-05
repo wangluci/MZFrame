@@ -40,22 +40,27 @@ namespace TemplateAction.Core
         }
       
         /// <summary>
-        /// 使用指定中间件，需要先AddSingle注册
+        /// 按顺序使用指定中间件，需要先AddSingle注册
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public TASiteApplication UseFilterMiddleware<T>() where T : class, IFilterMiddleware
+        public TASiteApplication UseMiddleware<T>() where T : class, IFilterMiddleware
         {
-            UseFilterMiddleware(typeof(T).FullName);
+            string key = typeof(T).FullName;
+            if (_middlewareUsing.Add(key))
+            {
+                _filterCenter.Add(new PluginMiddleware(key));
+            }
             return this;
         }
         /// <summary>
-        /// 使用指定中间件，需要先AddSingle注册
+        /// 将中间件放在第一个执行位置
         /// </summary>
-        /// <param name="key"></param>
+        /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public TASiteApplication UseFilterMiddleware(string key)
+        public TASiteApplication UseMiddlewareFirst<T>() where T : class, IFilterMiddleware
         {
+            string key = typeof(T).FullName;
             if (_middlewareUsing.Add(key))
             {
                 _filterCenter.AddFirst(new PluginMiddleware(key));

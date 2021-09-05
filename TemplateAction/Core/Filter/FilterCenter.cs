@@ -7,14 +7,19 @@ namespace TemplateAction.Core
         /// Action拦截器中间件列表
         /// </summary>
         private FilterMiddlewareNode _first;
+        private FilterMiddlewareNode _lastMvc;
         public FilterCenter()
-        {   
+        {
             //添加Mvc中间件
-            AddFirst(new MvcMiddleware());
+            FilterMiddlewareNode node = new FilterMiddlewareNode(new MvcMiddleware());
+            node.Pre = null;
+            node.Next = null;
+            _first = node;
+            _lastMvc = node;
         }
         public void Clear()
         {
-            while (_first.GetType() != typeof(MvcMiddleware))
+            while (_first != _lastMvc)
             {
                 FilterMiddlewareNode nextnode = _first.Next;
                 nextnode.Pre = null;
@@ -25,20 +30,36 @@ namespace TemplateAction.Core
         {
             return _first.Excute(request);
         }
-        public void AddFirst(IFilterMiddleware filter)
+        /// <summary>
+        /// 添加在最后， 也就是mvc前面
+        /// </summary>
+        /// <param name="filter"></param>
+        public void Add(IFilterMiddleware filter)
         {
             FilterMiddlewareNode node = new FilterMiddlewareNode(filter);
-            if (_first == null)
+            node.Next = _lastMvc;
+            if (_lastMvc.Pre == null)
             {
                 node.Pre = null;
-                node.Next = null;
+                _first = node;
             }
             else
             {
-                _first.Pre = node;
-                node.Next = _first;
-                node.Pre = null;
+                node.Pre = _lastMvc.Pre;
+                node.Pre.Next = node;
             }
+            _lastMvc.Pre = node;
+        }
+        /// <summary>
+        /// 添加在第一个位置，也就是mvc之前
+        /// </summary>
+        /// <param name="filter"></param>
+        public void AddFirst(IFilterMiddleware filter)
+        {
+            FilterMiddlewareNode node = new FilterMiddlewareNode(filter);
+            _first.Pre = node;
+            node.Next = _first;
+            node.Pre = null;
             _first = node;
         }
     }
