@@ -6,9 +6,9 @@ namespace TemplateAction.Core
     /// <summary>
     /// 注解的权限信息
     /// </summary>
-    public class AnnotationInfo
+    public class PermissionInfo
     {
-        public AnnotationInfo()
+        public PermissionInfo()
         {
             Name = string.Empty;
             Code = string.Empty;

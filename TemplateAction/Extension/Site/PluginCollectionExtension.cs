@@ -47,11 +47,11 @@ namespace TemplateAction.Extension.Site
         /// 获取控制器和动作的描述信息
         /// </summary>
         /// <returns></returns>
-        public static List<AnnotationInfo> ViewAnnList(this PluginCollection collection)
+        public static List<PermissionInfo> FindAllPermission(this PluginCollection collection)
         {
             PluginObject[] tarr = collection.GetAllPlugin();
 
-            List<AnnotationInfo> rtlist = new List<AnnotationInfo>();
+            List<PermissionInfo> rtlist = new List<PermissionInfo>();
             foreach (PluginObject plg in tarr)
             {
                 Dictionary<string, ControllerNode> ml = plg.GetControllerList();
@@ -59,7 +59,7 @@ namespace TemplateAction.Extension.Site
                 {
                     if (!string.IsNullOrEmpty(kpcn.Value.Descript))
                     {
-                        AnnotationInfo ai = new AnnotationInfo();
+                        PermissionInfo ai = new PermissionInfo();
                         ai.Name = kpcn.Value.Descript;
                         ai.Code = string.Format("/{0}/{1}", plg.Name, kpcn.Key);
                         ai.ParentCode = string.Empty;
@@ -70,7 +70,7 @@ namespace TemplateAction.Extension.Site
                             if (an == null) continue;
                             if (!string.IsNullOrEmpty(kpn.Value.Descript))
                             {
-                                AnnotationInfo aii = new AnnotationInfo();
+                                PermissionInfo aii = new PermissionInfo();
                                 aii.Name = kpn.Value.Descript;
                                 aii.Code = string.Format("{0}/{1}", ai.Code, kpn.Key);
                                 aii.ParentCode = kpcn.Key;
@@ -81,7 +81,6 @@ namespace TemplateAction.Extension.Site
                 }
             }
             return rtlist;
-
         }
 
 

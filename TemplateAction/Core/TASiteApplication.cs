@@ -132,9 +132,13 @@ namespace TemplateAction.Core
             _plugins.UseRouter(builder);
             return this;
         }
-        public List<AnnotationInfo> FindActinAnnotationList()
+        /// <summary>
+        /// 获取所有权限信息
+        /// </summary>
+        /// <returns></returns>
+        public List<PermissionInfo> FindAllPermission()
         {
-            return _plugins.ViewAnnList();
+            return _plugins.FindAllPermission();
         }
         /// <summary>
         /// 调用者会从各个插件中复制资源文件
