@@ -71,7 +71,7 @@ namespace TemplateAction.Core
         /// 清空中间件
         /// </summary>
         /// <returns></returns>
-        public TASiteApplication ClearFilter()
+        public TASiteApplication ClearMiddleware()
         {
             _filterCenter.Clear();
             return this;
