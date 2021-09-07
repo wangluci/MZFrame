@@ -59,6 +59,7 @@ namespace TemplateAction.Core
         }
         private IExtentionData _data;
         public IExtentionData Data { get { return _data; } }
+        private static string PluginConfigName = typeof(IPluginConfig).FullName;
 
         public PluginObject(IPluginCollectionExtData pcdata, Assembly assembly, string pluginpath)
         {
@@ -75,7 +76,6 @@ namespace TemplateAction.Core
             {
                 this._data = pcdata.CreateExtentionData();
                 this._data.LoadBefore(pcdata, assembly, pluginpath);
-                string myPluginConfigName = typeof(IPluginConfig).FullName;
 
                 Type[] exports = this._assembly.GetExportedTypes();
                 foreach (Type t in exports)
@@ -85,7 +85,7 @@ namespace TemplateAction.Core
                     {
                         if (!this._data.LoadItem(this.mName, t))
                         {
-                            if (t.GetInterface(myPluginConfigName) != null)
+                            if (t.GetInterface(PluginConfigName) != null)
                             {
                                 //执行插件配置文件
                                 this._config = Activator.CreateInstance(t) as IPluginConfig;
@@ -103,15 +103,13 @@ namespace TemplateAction.Core
             }
             else
             {
-                string myPluginConfigName = typeof(IPluginConfig).FullName;
-
                 Type[] exports = this._assembly.GetExportedTypes();
                 foreach (Type t in exports)
                 {
                     //判断非抽像
                     if (!t.IsAbstract)
                     {
-                        if (t.GetInterface(myPluginConfigName) != null)
+                        if (t.GetInterface(PluginConfigName) != null)
                         {
                             //执行插件配置文件
                             this._config = Activator.CreateInstance(t) as IPluginConfig;

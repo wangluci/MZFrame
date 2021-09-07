@@ -24,7 +24,7 @@ namespace TemplateAction.Core
         { 
             get { return mControllerList; } 
         }
-        private string _myControllerName;
+        private static string ControllerInterfaceName = typeof(IController).FullName;
         public void LoadBefore(IPluginCollectionExtData factory, Assembly assembly, string pluginpath)
         {
             SitePluginCollectionExtData siteFactory = (SitePluginCollectionExtData)factory;
@@ -33,11 +33,10 @@ namespace TemplateAction.Core
                 this._routerBuilder = siteFactory.RouterBuilder.NewPluginBuilder();
             }
             this.mControllerList = new Dictionary<string, ControllerNode>();
-            this._myControllerName = typeof(IController).FullName;
         }
         public bool LoadItem(string pluginName, Type t)
         {
-            if (t.GetInterface(this._myControllerName) != null)
+            if (t.GetInterface(ControllerInterfaceName) != null)
             {
                 //获取插件的控制器节点数据
                 ControllerNode n = new ControllerNode(pluginName, this, t);
