@@ -161,9 +161,9 @@ namespace TemplateAction.Core
             return this;
         }
 
-        public bool ControllerExist(string controller)
+        public bool ExistController(string controller)
         {
-            return _plugins.ContainController(controller);
+            return _plugins.ExistController(controller);
         }
         protected override void AfterPluginChanged(PluginObject plg)
         {

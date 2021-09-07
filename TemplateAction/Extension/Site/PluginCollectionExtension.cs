@@ -117,7 +117,7 @@ namespace TemplateAction.Extension.Site
             }
             return null;
         }
-        public static bool ContainController(this PluginCollection collection, string key)
+        public static bool ExistController(this PluginCollection collection, string key)
         {
             PluginObject[] tarr = collection.GetAllPlugin();
             foreach (PluginObject plg in tarr)

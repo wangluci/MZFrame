@@ -453,8 +453,12 @@ namespace TemplateAction.Core
                 }
             }
         }
-
-        public bool ContainPlugin(string ns)
+        /// <summary>
+        /// 判断是否存在指定插件
+        /// </summary>
+        /// <param name="ns"></param>
+        /// <returns></returns>
+        public bool ExistPlugin(string ns)
         {
             _lockslim.EnterReadLock();
             try

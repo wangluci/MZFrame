@@ -148,9 +148,9 @@ namespace TemplateAction.Core
         /// </summary>
         /// <param name="ns"></param>
         /// <returns></returns>
-        public bool PluginExist(string ns)
+        public bool ExistPlugin(string ns)
         {
-            return _plugins.ContainPlugin(ns);
+            return _plugins.ExistPlugin(ns);
         }
         /// <summary>
         /// 加载程序集

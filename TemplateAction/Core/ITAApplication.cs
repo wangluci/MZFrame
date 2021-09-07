@@ -20,7 +20,7 @@ namespace TemplateAction.Core
         /// </summary>
         /// <param name="ns"></param>
         /// <returns></returns>
-        bool PluginExist(string ns);
+        bool ExistPlugin(string ns);
         /// <summary>
         /// 处理同步任务
         /// </summary>

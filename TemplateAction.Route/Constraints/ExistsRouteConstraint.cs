@@ -37,9 +37,9 @@ namespace TemplateAction.Route
                     switch (routeKey)
                     {
                         case TAUtility.NS_KEY:
-                            return context.Application.PluginExist(valueStr.ToLower());
+                            return context.Application.ExistPlugin(valueStr.ToLower());
                         case TAUtility.CONTROLLER_KEY:
-                            return context.Application.ControllerExist(valueStr.ToLower());
+                            return context.Application.ExistController(valueStr.ToLower());
                     }
                 }
             }
