@@ -4,11 +4,11 @@
 namespace TemplateAction.Core
 {
     /// <summary>
-    /// 注解的权限信息
+    /// 描述信息
     /// </summary>
-    public class PermissionInfo
+    public class DescribeInfo
     {
-        public PermissionInfo()
+        public DescribeInfo()
         {
             Name = string.Empty;
             Code = string.Empty;

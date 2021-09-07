@@ -133,12 +133,12 @@ namespace TemplateAction.Core
             return this;
         }
         /// <summary>
-        /// 获取所有权限信息
+        /// 获取所有描述信息
         /// </summary>
         /// <returns></returns>
-        public List<PermissionInfo> FindAllPermission()
+        public List<DescribeInfo> FindAllDescribe()
         {
-            return _plugins.FindAllPermission();
+            return _plugins.FindAllDescribe();
         }
         /// <summary>
         /// 调用者会从各个插件中复制资源文件
