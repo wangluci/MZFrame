@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MyAccess.Json.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -71,7 +72,15 @@ namespace MyAccess.Json.Mapping
 
             foreach (MemberInfo memberInfo in members)
             {
-                _addFieldMapping(new JsonFieldMapping<object>(memberInfo));
+                JsonName[] jsarr = (JsonName[])memberInfo.GetCustomAttributes(typeof(JsonName), false);
+                if (jsarr.Length > 0)
+                {
+                    _addFieldMapping(new JsonFieldMapping<object>(memberInfo, jsarr[0].Name));
+                }
+                else
+                {
+                    _addFieldMapping(new JsonFieldMapping<object>(memberInfo));
+                }
             }
 
             return this;

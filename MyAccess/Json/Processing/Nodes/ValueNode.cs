@@ -27,37 +27,34 @@ namespace MyAccess.Json.Processing.Nodes
                     System.Reflection.PropertyInfo item = properties[index];
                     key = item.Name;
                     value = item.GetValue(context.Value, null);
-                    JsonAttr[] defattrs = (JsonAttr[])item.GetCustomAttributes(typeof(JsonAttr), false);
-                    if (defattrs.Length > 0)
-                    {
-                        bool encode = true;
-                        foreach (JsonAttr obj in defattrs)
-                        {
-                            JsonDefault defobj = obj as JsonDefault;
-                            if (defobj != null)
-                            {
-                                value = defobj.Fun(value);
-                            }
-                            else
-                            {
-                                JsonIgnore ign = obj as JsonIgnore;
-                                if (ign != null)
-                                {
-                                    if (ign.Flag == 0)
-                                    {
-                                        encode = false;
-                                    }
-                                    else if (ign.Flag == HideFlag.HideCondition && ign.Fun(value))
-                                    {
-                                        encode = false;
-                                    }
-                                }
 
+                    JsonAttr[] jsarr = (JsonAttr[])item.GetCustomAttributes(typeof(JsonAttr), false);
+                    foreach(JsonAttr ja in jsarr)
+                    {
+
+                        JsonIgnore ign = ja as JsonIgnore;
+                        if (ign != null)
+                        {
+                            if (ign.Flag == 0)
+                            {
+                                continue;
+                            }
+                            else if (ign.Flag == HideFlag.HideCondition && ign.Fun(value))
+                            {
+                                continue;
                             }
                         }
-                        if (!encode)
+
+                        JsonDefault defobj = ja as JsonDefault;
+                        if (defobj != null)
                         {
-                            continue;
+                            value = defobj.Fun(value);
+                        }
+
+                        JsonName jsname = ja as JsonName;
+                        if (jsname != null)
+                        {
+                            key = jsname.Name;
                         }
                     }
 
