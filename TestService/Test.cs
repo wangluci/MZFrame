@@ -27,11 +27,7 @@ namespace TestService
         public async Task<TextResult> List()
         {
             List<testtb> tlist = await _service.GetTestListAsync();
-            string rt = string.Empty;
-            foreach(testtb tb in tlist)
-            {
-                rt += "id:" + tb.testid + " des:" + tb.testdes + "\n";
-            }
+            string rt = MyAccess.Json.Json.Encode(tlist);
             return Content(rt);
         }
         public TextResult TestAdd()
