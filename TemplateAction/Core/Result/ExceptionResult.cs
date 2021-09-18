@@ -1,24 +1,13 @@
 ﻿using System;
-using TemplateAction.Label;
 namespace TemplateAction.Core
 {
     /// <summary>
     /// 异常结果
     /// </summary>
-    public class ExceptionResult : IResult
+    public class ExceptionResult : AjaxResult
     {
-        protected ITAContext mContext;
-        private Exception mEx;
-        public ExceptionResult(ITAContext context, Exception ex)
+        public ExceptionResult(ITAContext context, Exception ex) : base(context, -99999, ex.Message, AjaxResult.JsonData(ex.StackTrace))
         {
-            mContext = context;
-            mEx = ex;
-        }
-
-        public void Output()
-        {
-            mContext.Response.ContentType = "application/json";
-            mContext.Response.Write("{\"Code\":-20000,\"Message\":\"" + Common.TAUtility.Unicode(mEx.Message.Replace("\"", "")) + "\",\"Data\":\"" + Common.TAUtility.Unicode(mEx.StackTrace.Replace("\"", "")) + "\"}");
         }
     }
 }

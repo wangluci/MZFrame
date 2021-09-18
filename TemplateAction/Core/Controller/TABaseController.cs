@@ -112,7 +112,7 @@ namespace TemplateAction.Core
         /// <returns></returns>
         protected AjaxResult Err(int error, string mess)
         {
-            return new AjaxResult(Context, error, mess, null);
+            return new AjaxResult(Context, error, mess);
         }
         protected AjaxResult Success(string mess, string jsondata)
         {
