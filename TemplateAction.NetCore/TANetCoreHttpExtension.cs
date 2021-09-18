@@ -1,14 +1,12 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using TemplateAction.Common;
 using TemplateAction.Core;
-using TemplateAction.Core.Dispatcher;
 using TemplateAction.Route;
 
 namespace TemplateAction.NetCore
@@ -62,32 +60,19 @@ namespace TemplateAction.NetCore
         {
             if (init == null)
             {
-                TAEventDispatcher.Instance.RegisterLoadBefore<TASiteApplication>(app =>
+                init = app =>
                 {
-                    Microsoft.Extensions.DependencyInjection.ServiceCollection tservices = appBuilder.ServerFeatures.Get<Microsoft.Extensions.DependencyInjection.ServiceCollection>();
-                    app.Services.CopyServicesFrom(tservices);
-
                     //设置路由
-                    string defns = null;
-                    Assembly ass = Assembly.GetEntryAssembly();
-                    if (ass != null)
-                    {
-                        defns = ass.GetName().Name;
-                    }
-                    RouterBuilder rtbuilder = new RouterBuilder();
-                    rtbuilder.UsePlugin();
-                    if (defns != null)
-                    {
-                        rtbuilder.UseDefault(defns);
-                    }
-                    app.UseRouterBuilder(rtbuilder);
-
-                });
+                    string defns = Assembly.GetEntryAssembly().GetName().Name;
+                    app.UseRouterBuilder(new RouterBuilder().UsePlugin().UseDefault(defns));
+                };
             }
-            else
+            TAEventDispatcher.Instance.RegisterLoadBefore<TASiteApplication>(app =>
             {
-                TAEventDispatcher.Instance.RegisterLoadBefore(init);
-            }
+                Microsoft.Extensions.DependencyInjection.ServiceCollection tservices = appBuilder.ServerFeatures.Get<Microsoft.Extensions.DependencyInjection.ServiceCollection>();
+                app.Services.CopyServicesFrom(tservices);
+                init(app);
+            });
 
             appBuilder.Use(next =>
             {

@@ -55,17 +55,33 @@ namespace TemplateAction.Route
         /// <returns></returns>
         public RouterBuilder UseRestfulPlugin()
         {
-            string template = string.Format("{{{1}:exists}}/{{{2}}}/{{id?}}", TAUtility.NS_KEY, TAUtility.CONTROLLER_KEY);
+            string template = string.Format("{{{0}:exists}}/{{{1}}}/{{id?}}", TAUtility.NS_KEY, TAUtility.CONTROLLER_KEY);
             MapRoute(new Router(template, null));
             return this;
         }
-
+        /// <summary>
+        /// 添加路由
+        /// </summary>
+        /// <param name="router"></param>
+        /// <returns></returns>
         public RouterBuilder MapRoute(IRouter router)
         {
             _tmplist.Add(router);
             return this;
         }
-
+        /// <summary>
+        /// 添加指定模块映射路由
+        /// </summary>
+        /// <param name="ns"></param>
+        /// <param name="template"></param>
+        /// <returns></returns>
+        public RouterBuilder MapRoute(string ns, string template)
+        {
+            Dictionary<string, object> getdefaults = new Dictionary<string, object>();
+            getdefaults.Add(TAUtility.NS_KEY, ns);
+            MapRoute(new Router(template, getdefaults));
+            return this;
+        }
         public IPluginRouterBuilder NewPluginBuilder()
         {
             return new PluginRouterBuilder();
