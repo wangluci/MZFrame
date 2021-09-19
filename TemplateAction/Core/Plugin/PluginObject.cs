@@ -60,6 +60,9 @@ namespace TemplateAction.Core
         private static string PluginConfigName = typeof(IPluginConfig).FullName;
 
         private ExtentionDataCollection _data;
+        /// <summary>
+        /// 插件扩展数据
+        /// </summary>
         public ExtentionDataCollection Data
         {
             get { return _data; }
@@ -75,10 +78,10 @@ namespace TemplateAction.Core
             this.mName = assembly.GetName().Name;
             this._services = new ServiceCollection(this.mName);
             this.mVersion = assembly.GetName().Version;
+            this._data = new ExtentionDataCollection();
 
             if (pcdata != null)
             {
-                this._data = new ExtentionDataCollection();
                 pcdata.PluginLoadBefore(this);
 
                 Type[] exports = this._assembly.GetExportedTypes();
