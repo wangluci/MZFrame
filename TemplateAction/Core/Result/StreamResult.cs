@@ -5,25 +5,25 @@ namespace TemplateAction.Core
 {
     public class StreamResult : IResult
     {
-        private ITAAction mHandle;
+        private ITAContext _context;
         private byte[] mdata;
         private string mfilename;
 
 
-        public StreamResult(ITAAction handle,string filename, byte[] data)
+        public StreamResult(ITAContext context, string filename, byte[] data)
         {
-            mHandle = handle;
+            _context = context;
             mfilename = filename;
             mdata = data;
         }
 
         public void Output()
         {
-            mHandle.Context.Response.ContentType = "application/octet-stream";
-            mHandle.Context.Response.AppendHeader("Content-Disposition", "attachment;filename=" + mfilename);
+            _context.Response.ContentType = "application/octet-stream";
+            _context.Response.AppendHeader("Content-Disposition", "attachment;filename=" + mfilename);
             if (mdata != null)
             {
-                mHandle.Context.Response.BinaryWrite(mdata);
+                _context.Response.BinaryWrite(mdata);
             }
         }
     }

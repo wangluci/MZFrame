@@ -72,7 +72,7 @@ namespace TemplateAction.Core
         }
         protected StreamResult Stream(string filename, byte[] data)
         {
-            return new StreamResult(mAction, filename, data);
+            return new StreamResult(mAction.Context, filename, data);
         }
         /// <summary>
         /// 返回指定视图
@@ -90,11 +90,11 @@ namespace TemplateAction.Core
         }
         protected PngResult Png(byte[] data)
         {
-            return new PngResult(mAction, data);
+            return new PngResult(mAction.Context, data);
         }
         protected GifResult Gif(byte[] data)
         {
-            return new GifResult(mAction, data);
+            return new GifResult(mAction.Context, data);
         }
         protected FileResult File(string path)
         {
@@ -132,7 +132,7 @@ namespace TemplateAction.Core
         }
         protected TextResult Content(string content)
         {
-            return new TextResult(mAction, content);
+            return new TextResult(mAction.Context, content);
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace TemplateAction.Core
         /// <returns></returns>
         public virtual IResult Exception(Exception ex)
         {
-            return new ExceptionResult(Context, ex);
+            return new TextResult(mAction.Context, ex.Message + "\r\n" + ex.StackTrace);
         }
         /// <summary>
         /// 路由执行

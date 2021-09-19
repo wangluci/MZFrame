@@ -51,7 +51,14 @@ namespace TemplateAction.Core
                         {
                             ex = t.Exception.InnerExceptions[0];
                         }
-                        res.Completed(new ExceptionResult(_context, ex));
+                        if (_request.ExceptionFun != null)
+                        {
+                            res.Completed(_request.ExceptionFun.Invoke(ex));
+                        }
+                        else
+                        {
+                            res.Completed(new TextResult(_context, ex.Message));
+                        }
                         return;
                     }
                   

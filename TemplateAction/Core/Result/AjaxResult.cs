@@ -12,20 +12,27 @@ namespace TemplateAction.Core
         protected string mData;
         protected ITAContext mContext;
 
-        private static string _codeName = "code";
-        private static string _messageName = "message";
-        private static string _dataName = "data";
-        /// <summary>
-        /// 重新设置code、message、data字段名称
-        /// </summary>
-        /// <param name="codeName"></param>
-        /// <param name="messageName"></param>
-        /// <param name="dataName"></param>
-        public static void Init(string codeName, string messageName, string dataName)
+ 
+        protected virtual string CodeName
         {
-            _codeName = codeName;
-            _messageName = messageName;
-            _dataName = dataName;
+            get
+            {
+                return "code";
+            }
+        }
+        protected virtual string MessageName
+        {
+            get
+            {
+                return "message";
+            }
+        }
+        protected virtual string DataName
+        {
+            get
+            {
+                return "data";
+            }
         }
         /// <summary>
         /// 字符串数据字段
@@ -57,11 +64,11 @@ namespace TemplateAction.Core
             mContext.Response.ContentType = "application/json";
             if (mData == null)
             {
-                mContext.Response.Write("{\"" + _codeName + "\":" + mCode + ",\"" + _messageName + "\":\"" + Common.TAUtility.AllFilter(mMessage) + "\"}");
+                mContext.Response.Write("{\"" + CodeName + "\":" + mCode + ",\"" + MessageName + "\":\"" + Common.TAUtility.AllFilter(mMessage) + "\"}");
             }
             else
             {
-                mContext.Response.Write("{\"" + _codeName + "\":" + mCode + ",\"" + _messageName + "\":\"" + Common.TAUtility.AllFilter(mMessage) + "\",\"" + _dataName + "\":" + mData + "}");
+                mContext.Response.Write("{\"" + CodeName + "\":" + mCode + ",\"" + MessageName + "\":\"" + Common.TAUtility.AllFilter(mMessage) + "\",\"" + DataName + "\":" + mData + "}");
             }
         }
     }

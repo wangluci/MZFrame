@@ -18,6 +18,8 @@ namespace TemplateAction.Core
             {
                 return null;
             }
+            //初始化请求的异常处理
+            request.ExceptionFun = c.Exception;
             try
             {
                 //绑定控制器

@@ -9,24 +9,24 @@ namespace TemplateAction.Core
     public class PngResult : IResult
     {
         private byte[] mData;
-        protected ITAAction mHandle;
+        private ITAContext _context;
         public byte[] Data
         {
             get { return mData; }
         }
 
-        public PngResult(ITAAction handle, byte[] pngdata)
+        public PngResult(ITAContext context, byte[] pngdata)
         {
-            mHandle = handle;
+            _context = context;
             mData = pngdata;
         }
 
         public void Output()
         {
-            mHandle.Context.Response.ContentType = "image/png";
+            _context.Response.ContentType = "image/png";
             if (mData != null)
             {
-                mHandle.Context.Response.BinaryWrite(mData);
+                _context.Response.BinaryWrite(mData);
             }
         }
     }

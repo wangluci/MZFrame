@@ -51,6 +51,10 @@ namespace TemplateAction.Core
         {
             get { return _node; }
         }
+        /// <summary>
+        /// 获取或设置当前请求的异常处理
+        /// </summary>
+        public Func<Exception, IResult> ExceptionFun { get; internal set; }
         private static AsyncLocal<TAAction> _current = new AsyncLocal<TAAction>();
         /// <summary>
         /// 当前Action

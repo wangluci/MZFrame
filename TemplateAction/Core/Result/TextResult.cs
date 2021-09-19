@@ -2,9 +2,12 @@
 
 namespace TemplateAction.Core
 {
+    /// <summary>
+    /// 文本结果
+    /// </summary>
     public class TextResult : IResult
     {
-        private ITAAction mHandle;
+        private ITAContext _context;
         private string mContentType;
         private string mContent;
         public string ContentType
@@ -12,16 +15,12 @@ namespace TemplateAction.Core
             get { return mContentType; }
             set { mContentType = value; }
         }
-        /// <summary>
-        /// Ajax请求结果返回
-        /// </summary>
-        /// <param name="isErr">错误代码</param>
-        /// <param name="message">提示消息</param>
-        /// <param name="jsondata">返回json字符串</param>
-        public TextResult(ITAAction handle, string content)
+
+
+        public TextResult(ITAContext context, string content)
         {
             mContentType = "text/plain";
-            mHandle = handle;
+            _context = context;
             mContent = content;
         }
         public override string ToString()
@@ -30,8 +29,8 @@ namespace TemplateAction.Core
         }
         public void Output()
         {
-            mHandle.Context.Response.ContentType = mContentType;
-            mHandle.Context.Response.Write(mContent);
+            _context.Response.ContentType = mContentType;
+            _context.Response.Write(mContent);
         }
     }
 }

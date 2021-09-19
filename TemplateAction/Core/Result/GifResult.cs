@@ -6,24 +6,24 @@ namespace TemplateAction.Core
     public class GifResult : IResult
     {
         private byte[] mData;
-        protected ITAAction mHandle;
+        private ITAContext _context;
         public byte[] Data
         {
             get { return mData; }
         }
 
-        public GifResult(ITAAction handle, byte[] pngdata)
+        public GifResult(ITAContext context, byte[] pngdata)
         {
-            mHandle = handle;
+            _context = context;
             mData = pngdata;
         }
 
         public void Output()
         {
-            mHandle.Context.Response.ContentType = "image/gif";
+            _context.Response.ContentType = "image/gif";
             if (mData != null)
             {
-                mHandle.Context.Response.BinaryWrite(mData);
+                _context.Response.BinaryWrite(mData);
             }
         }
     }
