@@ -9,17 +9,17 @@ namespace TemplateAction.Extension.Site
 
         public static Dictionary<string, ControllerNode> GetControllerList(this PluginObject obj)
         {
-            return ((SiteExtentionData)obj.Data).ControllerList;
+            return obj.Data.Get<Dictionary<string, ControllerNode>>();
         }
         public static bool ContainController(this PluginObject obj, string key)
         {
-            return ((SiteExtentionData)obj.Data).ControllerList.ContainsKey(key);
+            return obj.Data.Get<Dictionary<string, ControllerNode>>().ContainsKey(key);
         }
         public static ControllerNode GetControllerNodeByKey(this PluginObject obj, string controller)
         {
             ControllerNode rtVal = null;
 
-            if (((SiteExtentionData)obj.Data).ControllerList.TryGetValue(controller.ToLower(), out rtVal))
+            if (obj.Data.Get<Dictionary<string, ControllerNode>>().TryGetValue(controller.ToLower(), out rtVal))
             {
                 return rtVal;
             }
@@ -28,7 +28,7 @@ namespace TemplateAction.Extension.Site
         public static ActionNode GetMethodByKey(this PluginObject obj, string controller, string action)
         {
             ControllerNode rtVal = null;
-            if (((SiteExtentionData)obj.Data).ControllerList.TryGetValue(controller.ToLower(), out rtVal))
+            if (obj.Data.Get<Dictionary<string, ControllerNode>>().TryGetValue(controller.ToLower(), out rtVal))
             {
                 ActionNode an = rtVal.GetChildNode(action) as ActionNode;
                 if (an != null)
@@ -41,12 +41,12 @@ namespace TemplateAction.Extension.Site
 
         public static IDictionary<string, object> Route(this PluginObject obj, ITAContext context)
         {
-            SiteExtentionData sitedata = (SiteExtentionData)obj.Data;
-            if (sitedata.RouterCollection == null)
+            IRouterCollection rc = obj.Data.Get<IRouterCollection>();
+            if (rc == null)
             {
                 return null;
             }
-            return sitedata.RouterCollection.Route(context);
+            return rc.Route(context);
         }
     }
 }

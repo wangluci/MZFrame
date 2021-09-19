@@ -1,12 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ResumeML
 {
-    class LoginToken
+    public class LoginToken
     {
+        /// <summary>
+        /// 令牌信息
+        /// </summary>
+        public LoginTokenInfo Info { get; set; }
+        /// <summary>
+        /// 签名数据
+        /// </summary>
+        public string Sign { get; set; }
     }
 }

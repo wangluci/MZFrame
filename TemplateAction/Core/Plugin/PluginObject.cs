@@ -57,9 +57,13 @@ namespace TemplateAction.Core
         {
             get { return _plgPath; }
         }
-        private IExtentionData _data;
-        public IExtentionData Data { get { return _data; } }
         private static string PluginConfigName = typeof(IPluginConfig).FullName;
+
+        private ExtentionDataCollection _data;
+        public ExtentionDataCollection Data
+        {
+            get { return _data; }
+        }
 
         public PluginObject(IPluginCollectionExtData pcdata, Assembly assembly, string pluginpath)
         {
@@ -74,8 +78,8 @@ namespace TemplateAction.Core
 
             if (pcdata != null)
             {
-                this._data = pcdata.CreateExtentionData();
-                this._data.LoadBefore(pcdata, assembly, pluginpath);
+                this._data = new ExtentionDataCollection();
+                pcdata.PluginLoadBefore(this);
 
                 Type[] exports = this._assembly.GetExportedTypes();
                 foreach (Type t in exports)
@@ -83,7 +87,7 @@ namespace TemplateAction.Core
                     //判断非抽像
                     if (!t.IsAbstract)
                     {
-                        if (!this._data.LoadItem(this.mName, t))
+                        if (!pcdata.PluginLoadType(this, t))
                         {
                             if (t.GetInterface(PluginConfigName) != null)
                             {
@@ -99,7 +103,7 @@ namespace TemplateAction.Core
                     }
 
                 }
-                this._data.LoadAfter(pcdata, assembly, pluginpath);
+                pcdata.PluginLoadAfter(this);
             }
             else
             {

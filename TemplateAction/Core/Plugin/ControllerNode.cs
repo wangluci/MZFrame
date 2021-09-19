@@ -23,23 +23,23 @@ namespace TemplateAction.Core
         {
             get { return mPluginName; }
         }
-        public ControllerNode(string pluginName, IExtentionData data, Type type)
+        public ControllerNode(PluginObject plg, Type type)
         {
             mKey = type.Name;
-            mPluginName = pluginName;
+            mPluginName = plg.Name;
             DesAttribute ad = (DesAttribute)type.GetCustomAttribute(typeof(DesAttribute));
             if (ad != null)
             {
                 mDescript = ad.Des;
             }
             mType = type;
-            InitActions(pluginName, data);
+            InitActions(plg);
         }
 
         /// <summary>
         /// 初始化动作节点
         /// </summary>
-        private void InitActions(string pluginName, IExtentionData data)
+        private void InitActions(PluginObject plg)
         {
             MethodInfo[] methodArray = mType.GetMethods(BindingFlags.Public | BindingFlags.Instance);
             foreach (MethodInfo method in methodArray)
@@ -76,7 +76,7 @@ namespace TemplateAction.Core
                 {
                     continue;
                 }
-                ActionNode an = new ActionNode(pluginName, data, mKey, method);
+                ActionNode an = new ActionNode(plg, mKey, method);
                 AddChildNode(an.Key, an);
             }
         }

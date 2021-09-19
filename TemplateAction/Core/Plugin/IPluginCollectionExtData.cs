@@ -1,10 +1,13 @@
 ﻿
+using System;
 using System.Reflection;
 
 namespace TemplateAction.Core
 {
     public interface IPluginCollectionExtData
     {
-        IExtentionData CreateExtentionData();
+        void PluginLoadBefore(PluginObject plg);
+        bool PluginLoadType(PluginObject plg, Type t);
+        void PluginLoadAfter(PluginObject plg);
     }
 }
