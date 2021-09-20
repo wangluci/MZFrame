@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Web;
@@ -85,7 +85,7 @@ namespace TemplateAction.NetCore
             {
                 path = path.Replace("/", "\\");
             }
-            IHostingEnvironment env = _context.RequestServices.GetService(typeof(IHostingEnvironment)) as IHostingEnvironment;
+            IHostingEnvironment env = _context.RequestServices.GetService<IHostingEnvironment>();
             return Path.Combine(env.WebRootPath, path);
         }
 

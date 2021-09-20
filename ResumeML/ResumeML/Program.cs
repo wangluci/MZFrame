@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.ML;
 using ResumeMLML.Model;
 using System;
@@ -6,6 +7,8 @@ using System.IO;
 using System.Reflection;
 using TemplateAction.NetCore;
 using TemplateAction.Route;
+using TemplateAction.Core;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ResumeML
 {
@@ -22,13 +25,17 @@ namespace ResumeML
     .FromFile(modelName: "ResumeModel", filePath: "MLModel.zip", watchForChanges: true);
             }).Configure((IApplicationBuilder builder) =>
             {
+                IConfiguration config = builder.ApplicationServices.GetService<IConfiguration>();
+                string connstr = config.GetSection("connstr").Value;
                 builder.UseStaticFiles();
                 builder.UseTAMvc(app =>
                 {
-                    string defns = Assembly.GetEntryAssembly().GetName().Name;
+                    //注册字符串
+                    app.Services.AddString("connstr", connstr);
+
                     RouterBuilder rbuilder = new RouterBuilder();
-                    rbuilder.MapRoute(defns, "vue-element-admin/{controller=Home}/{action=Index}/{id?}");
-                    rbuilder.UseDefault(defns);
+                    rbuilder.MapRoute("AuthService", "vue-element-admin/{controller=Home}/{action=Index}/{id?}");
+                    rbuilder.UseDefault(Assembly.GetEntryAssembly().GetName().Name);
                     app.UseRouterBuilder(rbuilder);
                 });
             }).Build().Run();

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ResumeML
+namespace AuthService
 {
     public class LoginToken
     {

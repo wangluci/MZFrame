@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MyAccess\MyAccess.csproj" />
+    <ProjectReference Include="..\TemplateAction\TemplateAction.csproj" />
   </ItemGroup>
 
   <ItemGroup>

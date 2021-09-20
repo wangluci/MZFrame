@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\Common.csproj" />
+    <ProjectReference Include="..\..\MyAccess\MyAccess.csproj" />
+    <ProjectReference Include="..\..\TemplateAction\TemplateAction.csproj" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /y $(ProjectDir)bin\net5.0\$(TargetName).dll $(SolutionDir)ResumeML\bin\net5.0\Plugin&#xD;&#xA;xcopy /y $(ProjectDir)bin\net5.0\$(TargetName).pdb $(SolutionDir)ResumeML\bin\net5.0\Plugin" />
+  </Target>
+
+</Project>
