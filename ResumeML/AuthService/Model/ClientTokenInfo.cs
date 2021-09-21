@@ -2,7 +2,7 @@
 
 namespace AuthService
 {
-    public class LoginTokenInfo
+    public class ClientTokenInfo
     {
         /// <summary>
         /// 用户Id
@@ -11,7 +11,7 @@ namespace AuthService
         /// <summary>
         /// 账号
         /// </summary>
-        public string AccountName { get; set; }
+        public string Account { get; set; }
         /// <summary>
         /// 令牌签发时间
         /// </summary>

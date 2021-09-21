@@ -2,6 +2,7 @@
 using Common.Redis;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace AuthService
 {
@@ -69,13 +70,44 @@ namespace AuthService
             return false;
         }
         /// <summary>
+        /// 生成签名
+        /// </summary>
+        /// <param name="info"></param>
+        /// <param name="tk"></param>
+        /// <returns></returns>
+        public virtual string _MakeClientSign(ClientTokenInfo info, string tk)
+        {
+            StringBuilder sb = new StringBuilder(200);
+            sb.Append(info.Account);
+            sb.Append(info.TokenExpire);
+            sb.Append(info.TokenStart);
+            sb.Append(info.UserId);
+            sb.Append(tk);
+            return MyAccess.Core.Crypter.SHA1(sb.ToString(), System.Text.Encoding.UTF8);
+        }
+        /// <summary>
+        /// 生成客户端令牌
+        /// </summary>
+        /// <param name="info"></param>
+        /// <param name="tk"></param>
+        /// <returns></returns>
+        public virtual string _MakeClientToken(ClientTokenInfo info, string tk)
+        {
+            ClientToken clientToken = new ClientToken();
+            info.TokenStart = MyAccess.Core.TypeConvert.Time2JavaLong(DateTime.Now);
+            info.TokenExpire = MyAccess.Core.TypeConvert.Time2JavaLong(DateTime.Now.AddDays(7));
+            clientToken.Info = info;
+            clientToken.Sign = _MakeClientSign(info, tk);
+            return MyAccess.Core.Crypter.EncodeBase64(MyAccess.Json.Json.Encode(clientToken), System.Text.Encoding.UTF8);
+        }
+        /// <summary>
         /// 登录
         /// </summary>
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <param name="terminal">登录终端</param>
         /// <returns></returns>
-        public BusResponse<string> Login(string username, string password, string terminal)
+        public virtual BusResponse<string> Login(string username, string password, string terminal)
         {
             AdminInfo account = _auth.GetAdminByName(username);
             if (account == null) return BusResponse<string>.Error(-11, "用户不存在！");
@@ -108,7 +140,7 @@ namespace AuthService
             }
 
             //新建令牌
-            LoginTokenInfo tkinfo = new LoginTokenInfo();
+            ClientTokenInfo tkinfo = new ClientTokenInfo();
             string newtoken = Guid.NewGuid().ToString("N");
             try
             {
@@ -120,18 +152,20 @@ namespace AuthService
             {
                 return BusResponse<string>.Error(-16, ex.Message);
             }
-            usr.AccountName = account.LoginID;
-            usr.UserId = account.UserID;
-            usr.UserType = LoginType.Person;
-            string newtoken = _MakeClientToken(usr, newtoken);
+            tkinfo.Account = account.UserName;
+            tkinfo.UserId = account.Id;
+            string clienttoken = _MakeClientToken(tkinfo, newtoken);
             if (!string.IsNullOrEmpty(newtoken))
             {
-                _adminDAl.LogSys(account.Id, 1, "登录成功", context.Request.ClientIP);
-                ITACookie tokencookie = context.Request.CreateCookie("AdminToken");
-                tokencookie.SetExpires(DateTime.Now.AddDays(1));
-                tokencookie.SetValue(newtoken);
-                context.Response.SaveCookie(tokencookie);
-                return DBReturn<string>.Success();
+                SysLog log = new SysLog();
+                log.UserId = account.Id;
+                log.CreateDate = DateTime.Now;
+                log.LogType = 1;
+                log.IPAddress = terminal;
+                log.Info = "登录成功";
+                _auth.AddSysLog(log);
+
+                return BusResponse<string>.Success(clienttoken);
             }
             else
             {

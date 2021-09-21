@@ -10,20 +10,20 @@ namespace AuthService
     {
         public AuthDAL(string connstr) : base(connstr) { }
         
-        public AdminInfo GetAdminByName(string username)
+        public virtual AdminInfo GetAdminByName(string username)
         {
             help.AddInParam("@UserName", MySqlDbType.VarChar, username);
             DoQuerySql<AdminInfo> execsql = new DoQuerySql<AdminInfo>("select * from mz_admin where UserName=@UserName");
             help.DoCommand(execsql);
             return execsql.ToFirst();
         }
-        public int AddSysLog(SysLog log)
+        public virtual int AddSysLog(SysLog log)
         {
             DoInsert<SysLog> di = new DoInsert<SysLog>(log, "mz_sys_log");
             help.DoCommand(di);
             return di.RowCount;
         }
-        public string LimitLoginTime(long uid)
+        public virtual string LimitLoginTime(long uid)
         {
             DateTime limitTime = DateTime.Now;
             help.AddInParam("@UserId", MySqlDbType.Int64, uid);

@@ -2,12 +2,12 @@
 
 namespace AuthService
 {
-    public class LoginToken
+    public class ClientToken
     {
         /// <summary>
         /// 令牌信息
         /// </summary>
-        public LoginTokenInfo Info { get; set; }
+        public ClientTokenInfo Info { get; set; }
         /// <summary>
         /// 签名数据
         /// </summary>

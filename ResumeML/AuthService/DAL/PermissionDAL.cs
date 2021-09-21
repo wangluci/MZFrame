@@ -9,7 +9,7 @@ namespace AuthService
     public class PermissionDAL : MySqlSupport
     {
         public PermissionDAL(string connstr) : base(connstr) { }
-        public List<UserPermission> GetUserPermissionByCode(long uid, string code)
+        public virtual List<UserPermission> GetUserPermissionByCode(long uid, string code)
         {
             help.AddInParam("@UserId", MySqlDbType.Int64, uid);
             help.AddInParam("@RightCode", MySqlDbType.VarChar, code);
@@ -17,7 +17,7 @@ namespace AuthService
             help.DoCommand(execsql);
             return execsql.ToList();
         }
-        public bool HasRolePermissionByCode(long uid, string code)
+        public virtual bool HasRolePermissionByCode(long uid, string code)
         {
             help.AddInParam("@UserId", MySqlDbType.Int64, uid);
             help.AddInParam("@RightCode", MySqlDbType.VarChar, code);
@@ -26,7 +26,7 @@ namespace AuthService
             return execsql.Count() > 0;
         }
 
-        public bool HasUserPermission(long uid, string module)
+        public virtual bool HasUserPermission(long uid, string module)
         {
             help.AddInParam("@UserId", MySqlDbType.Int64, uid);
             help.AddInParam("@RightCode", MySqlDbType.VarChar, MyAccess.Filter.HtmlFilter.SqlLikeFilter(module) + "/%");
@@ -34,7 +34,7 @@ namespace AuthService
             help.DoCommand(execsql);
             return execsql.Count() > 0;
         }
-        public bool HasRolePermission(long uid, string module)
+        public virtual bool HasRolePermission(long uid, string module)
         {
             help.AddInParam("@UserId", MySqlDbType.Int64, uid);
             string xx = MyAccess.Filter.HtmlFilter.SqlLikeFilter(module);
