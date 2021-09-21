@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using TemplateAction.Core;
 
 namespace ResumeML.Controller

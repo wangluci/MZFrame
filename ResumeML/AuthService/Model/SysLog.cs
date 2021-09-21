@@ -8,9 +8,9 @@ namespace AuthService
         [ID(true)]
         public long SysLogID { get; set; }
         /// <summary>
-        /// 登录名
+        /// 用户名
         /// </summary>
-        public string LoginName { get; set; }
+        public long UserId { get; set; }
         public DateTime CreateDate { get; set; }
         /// <summary>
         /// 日志类型0为成功，1为失败

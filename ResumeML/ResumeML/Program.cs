@@ -9,6 +9,7 @@ using TemplateAction.NetCore;
 using TemplateAction.Route;
 using TemplateAction.Core;
 using Microsoft.Extensions.DependencyInjection;
+using Common.Redis;
 
 namespace ResumeML
 {
@@ -26,13 +27,12 @@ namespace ResumeML
             }).Configure((IApplicationBuilder builder) =>
             {
                 IConfiguration config = builder.ApplicationServices.GetService<IConfiguration>();
-                string connstr = config.GetSection("connstr").Value;
                 builder.UseStaticFiles();
                 builder.UseTAMvc(app =>
                 {
                     //注册字符串
-                    app.Services.AddString("connstr", connstr);
-
+                    app.Services.AddString("connstr", config.GetSection("connstr").Value);
+                    app.Services.AddSingleton<RedisHelper>(new RedisHelper(config.GetSection("redisconn").Value));
                     RouterBuilder rbuilder = new RouterBuilder();
                     rbuilder.MapRoute("AuthService", "vue-element-admin/{controller=Home}/{action=Index}/{id?}");
                     rbuilder.UseDefault(Assembly.GetEntryAssembly().GetName().Name);
