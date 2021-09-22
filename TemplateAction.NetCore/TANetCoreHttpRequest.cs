@@ -17,18 +17,17 @@ namespace TemplateAction.NetCore
         private Uri _urlReferrer;
         private string _serverip;
         private string _clientip;
-        private TANetCoreHttpApplication _app;
         public TANetCoreHttpRequest(HttpContext context)
         {
             _request = context.Request;
             _header = new TANetCoreHttpHeader(_request.Headers);
             _query = new TANetCoreHttpQueryCollection(_request.Query);
-            _app = context.Features.Get<TANetCoreHttpApplication>();
         }
         //初始化form
         private void InitForm()
         {
-            LinkedListNode<ITANetCoreFormParser> node = _app.FirstFormParser();
+            TANetCoreHttpApplication app = _request.HttpContext.Features.Get<TANetCoreHttpApplication>();
+            LinkedListNode<ITANetCoreFormParser> node = app.FirstFormParser();
             _form = node.Value.ParseForm(_request, node.Next);
         }
         public ITAObjectCollection Query
