@@ -19,6 +19,26 @@ namespace TemplateAction.NetCore
         private Dictionary<string, AssemblyLoadContext> _assemblyContexts = new Dictionary<string, AssemblyLoadContext>();
         private bool _useUnload = false;
         /// <summary>
+        /// 表单解释器
+        /// </summary>
+        private LinkedList<ITANetCoreFormParser> _formParsers = new LinkedList<ITANetCoreFormParser>();
+        /// <summary>
+        /// 首个表单解释器
+        /// </summary>
+        /// <returns></returns>
+        public LinkedListNode<ITANetCoreFormParser> FirstFormParser()
+        {
+            return _formParsers.First;
+        }
+        /// <summary>
+        /// 新增表单解释器
+        /// </summary>
+        /// <param name="parser"></param>
+        public void UseFormParser(ITANetCoreFormParser parser)
+        {
+            _formParsers.AddLast(parser);
+        }
+        /// <summary>
         /// 是否允许释放插件内存
         /// </summary>
         /// <returns></returns>
@@ -74,6 +94,8 @@ namespace TemplateAction.NetCore
         {
             _requestDelegate = appbuilder.Build();
             _appbuilder = appbuilder;
+            _formParsers.AddLast(new TANetCoreDefaultFormParser());
+            _formParsers.AddLast(new TANetCoreJsonFormParser());
         }
 
         public HttpContext CreateContext(IFeatureCollection contextFeatures)

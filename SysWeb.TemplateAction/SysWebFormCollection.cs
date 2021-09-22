@@ -2,16 +2,22 @@
 using System;
 using System.Collections;
 using System.Collections.Specialized;
+using System.Web;
 using TemplateAction.Core;
-
 namespace SysWeb.TemplateAction
 {
-    public class SysWebObjectCollection : ITAObjectCollection
+    public class SysWebFormCollection : ITAFormCollection
     {
         private NameValueCollection _nvc;
-        public SysWebObjectCollection(NameValueCollection nvc)
+        private IRequestFile[] _files;
+        public SysWebFormCollection(NameValueCollection nvc, HttpFileCollection files)
         {
             _nvc = nvc;
+            _files = new IRequestFile[files.Count];
+            for (int i = 0; i < files.Count; i++)
+            {
+                _files[i] = new SysWebRequestFile(files[i]);
+            }
         }
         public object this[string key]
         {
@@ -24,6 +30,11 @@ namespace SysWeb.TemplateAction
         public int Count
         {
             get { return _nvc.Count; }
+        }
+
+        public IRequestFile[] Files
+        {
+            get { return _files; }
         }
 
         public IEnumerator GetEnumerator()

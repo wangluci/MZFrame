@@ -119,7 +119,7 @@ namespace AuthService
                 return BusResponse<string>.Error(-12, limitmsg);
             }
 
-            password = MyAccess.Core.Crypter.MD5(string.Concat(password.Trim(), "@TANetAuth"));
+            password = MyAccess.Core.Crypter.MD5(string.Concat(password, "@TANetAuth"));
             if (!password.Equals(account.Password, StringComparison.OrdinalIgnoreCase))
             {
                 SysLog log = new SysLog();

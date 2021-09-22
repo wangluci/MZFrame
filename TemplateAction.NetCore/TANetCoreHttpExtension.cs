@@ -47,9 +47,31 @@ namespace TemplateAction.NetCore
         {
             await ((TANetCoreHttpFile)file).SaveAsAsync(filename);
         }
+        /// <summary>
+        /// 允许CORS请求
+        /// </summary>
+        /// <param name="appBuilder"></param>
+        /// <returns></returns>
+        public static IApplicationBuilder UseAllowCORS(this IApplicationBuilder appBuilder)
+        {
+            appBuilder.Use(next =>
+            {
+                return context =>
+                {
+                    if (context.Request.Method == "OPTIONS")
+                    {
+                        context.Response.Headers.Add("Access-Control-Allow-Origin", context.Request.Headers["Origin"]);
+                        context.Response.Headers.Add("Access-Control-Allow-Methods", "*");
+                        context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
+                        context.Response.Headers.Add("Access-Control-Allow-Headers", "authorization, content-type,Cookie");
+                        return Task.CompletedTask;
+                    }
+                    return next(context);
+                };
+            });
+            return appBuilder;
+        }
 
-
-      
         /// <summary>
         /// 设置使用TA的MVC
         /// </summary>
@@ -92,6 +114,7 @@ namespace TemplateAction.NetCore
                         {
                             return next(context);
                         }
+                     
                         TANetCoreHttpContext tacontext = new TANetCoreHttpContext(taapp, context);
                         TAActionBuilder builder = tacontext.Application.Route(tacontext);
                         if (builder != null)

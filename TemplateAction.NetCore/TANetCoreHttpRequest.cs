@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
-using System.Text;
 using TemplateAction.Core;
 
 namespace TemplateAction.NetCore
@@ -12,40 +10,47 @@ namespace TemplateAction.NetCore
     public class TANetCoreHttpRequest : ITARequest
     {
         private HttpRequest _request;
-        private TANetCoreHttpQueryCollection _query;
-        private TANetCoreHttpFormCollection _form;
-        private TANetCoreHttpHeader _header;
-        private IRequestFile[] _requestFiles;
+        private ITAObjectCollection _query;
+        private ITAFormCollection _form;
+        private NameValueCollection _header;
         private Uri _url;
         private Uri _urlReferrer;
         private string _serverip;
         private string _clientip;
+        private TANetCoreHttpApplication _app;
         public TANetCoreHttpRequest(HttpContext context)
         {
             _request = context.Request;
             _header = new TANetCoreHttpHeader(_request.Headers);
             _query = new TANetCoreHttpQueryCollection(_request.Query);
-
-            if (_request.HasFormContentType)
-            {
-                IFormCollection fc = _request.ReadFormAsync().GetAwaiter().GetResult();
-                _form = new TANetCoreHttpFormCollection(fc);
-                int filecount = _request.Form.Files.Count;
-                _requestFiles = new TANetCoreHttpFile[filecount];
-                for (int i = 0; i < filecount; i++)
-                {
-                    _requestFiles[i] = new TANetCoreHttpFile(_request.Form.Files[i]);
-                }
-            }
+            _app = context.Features.Get<TANetCoreHttpApplication>();
+        }
+        //初始化form
+        private void InitForm()
+        {
+            LinkedListNode<ITANetCoreFormParser> node = _app.FirstFormParser();
+            _form = node.Value.ParseForm(_request, node.Next);
         }
         public ITAObjectCollection Query
         {
             get { return _query; }
         }
 
-        public ITAObjectCollection Form
+        public ITAFormCollection Form
         {
-            get { return _form; }
+            get
+            {
+                if (_form == null)
+                {
+                    InitForm();
+                    return _form;
+                }
+                else
+                {
+                    return _form;
+                }
+
+            }
         }
 
         public NameValueCollection Header
@@ -126,10 +131,7 @@ namespace TemplateAction.NetCore
             get { return ClientIP; }
         }
 
-        public IRequestFile[] RequestFiles
-        {
-            get { return _requestFiles; }
-        }
+
 
         public Stream InputStream
         {

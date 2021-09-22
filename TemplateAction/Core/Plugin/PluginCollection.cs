@@ -377,11 +377,13 @@ namespace TemplateAction.Core
                 //开始选择构造函数
                 ConstructorInfo activationConstructor = null;
                 object[] parameters = null;
+                string err_param_name = null;
                 foreach (ConstructorInfo tmpConstructor in constructors)
                 {
+                    err_param_name = null;
                     ParameterInfo[] tmpParameterInfos = tmpConstructor.GetParameters();
                     object[] tmpParameters = new object[tmpParameterInfos.Length];
-                    bool isFullInstance = true;
+
                     for (int i = 0; i < tmpParameterInfos.Length; i++)
                     {
                         ParameterInfo parameter = tmpParameterInfos[i];
@@ -406,13 +408,13 @@ namespace TemplateAction.Core
                                 }
                                 else
                                 {
-                                    isFullInstance = false;
+                                    err_param_name = parameter.Name;
                                     break;
                                 }
                             }
                         }
                     }
-                    if (isFullInstance)
+                    if (err_param_name == null)
                     {
                         if (activationConstructor == null)
                         {
@@ -429,7 +431,7 @@ namespace TemplateAction.Core
 
                 if (activationConstructor == null)
                 {
-                    throw new ArgumentException(string.Format("{0} 构造函数的参数无法注入", serviceType.Name));
+                    throw new ArgumentException(string.Format("{0} 构造函数的参数无法注入,请确保 {1} 已加入服务容器", serviceType.Name, err_param_name));
                 }
 
                 if (factory != null)

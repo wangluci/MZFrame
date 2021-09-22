@@ -1,29 +1,25 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Primitives;
-using System;
-using System.Collections;
+﻿using System.Collections;
+using System.Collections.Generic;
 using TemplateAction.Core;
-
 namespace TemplateAction.NetCore
 {
-    public class TANetCoreHttpFormCollection : ITAFormCollection
+    public class TANetCoreHttpFormDictionary : ITAFormCollection
     {
-        private IFormCollection _form;
+        private IDictionary<string, object> _form;
         private IRequestFile[] _files;
-        public TANetCoreHttpFormCollection(IFormCollection collection, IRequestFile[] files)
+        public TANetCoreHttpFormDictionary(IDictionary<string, object> collection, IRequestFile[] files)
         {
             _form = collection;
-            _files = files;
         }
 
         public object this[string key]
         {
             get
             {
-                StringValues sv;
+                object sv;
                 if (_form.TryGetValue(key, out sv))
                 {
-                    return sv.ToString();
+                    return sv;
                 }
                 else
                 {
@@ -36,7 +32,6 @@ namespace TemplateAction.NetCore
         {
             get { return _form.Count; }
         }
-
         public IRequestFile[] Files
         {
             get { return _files; }
@@ -46,16 +41,16 @@ namespace TemplateAction.NetCore
         {
             foreach (string key in _form.Keys)
             {
-                yield return new TAObject(key, _form[key].ToString());
+                yield return new TAObject(key, _form[key]);
             }
         }
 
         public bool TryGet(string key, out object result)
         {
-            StringValues val;
+            object val;
             if (_form.TryGetValue(key, out val))
             {
-                result = val.ToString();
+                result = val;
                 return true;
             }
             else

@@ -7,7 +7,7 @@ namespace TemplateAction.Core
     public interface ITARequest
     {
         ITAObjectCollection Query { get;}
-        ITAObjectCollection Form { get; }
+        ITAFormCollection Form { get; }
         NameValueCollection Header { get; }
         string ServerIP { get; }
         int ServerPort { get; }
@@ -20,7 +20,7 @@ namespace TemplateAction.Core
         /// 包含代理的Ip信息
         /// </summary>
         string ClientAgentIP { get; }
-        IRequestFile[] RequestFiles { get; }
+
         Stream InputStream { get; }
         Uri Url { get; }
         Uri UrlReferrer { get; }

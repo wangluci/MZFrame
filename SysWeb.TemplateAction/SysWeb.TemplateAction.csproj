@@ -50,6 +50,7 @@
     <Compile Include="SysWebContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SysWebExtensions.cs" />
+    <Compile Include="SysWebFormCollection.cs" />
     <Compile Include="SysWebObjectCollection.cs" />
     <Compile Include="SysWebRequest.cs" />
     <Compile Include="SysWebRequestFile.cs" />

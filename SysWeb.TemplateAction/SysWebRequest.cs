@@ -11,22 +11,17 @@ namespace SysWeb.TemplateAction
     public class SysWebRequest : ITARequest
     {
         private HttpRequest _req;
-        private ITAObjectCollection _form;
+        private ITAFormCollection _form;
         private ITAObjectCollection _query;
-        private IRequestFile[] _requestFiles;
+
         public SysWebRequest(HttpRequest request)
         {
             _req = request;
             //初始化参数列表
-            _form = new SysWebObjectCollection(_req.Form);
+            _form = new SysWebFormCollection(_req.Form, _req.Files);
             _query = new SysWebObjectCollection(_req.QueryString);
-         
-            HttpFileCollection files = _req.Files;
-            _requestFiles = new IRequestFile[files.Count];
-            for (int i = 0; i < files.Count; i++)
-            {
-                _requestFiles[i] = new SysWebRequestFile(files[i]);
-            }
+
+
         }
         public string ClientAgentIP
         {
@@ -68,7 +63,7 @@ namespace SysWeb.TemplateAction
             }
         }
 
-        public ITAObjectCollection Form
+        public ITAFormCollection Form
         {
             get
             {
@@ -108,13 +103,6 @@ namespace SysWeb.TemplateAction
             }
         }
 
-        public IRequestFile[] RequestFiles
-        {
-            get
-            {
-                return _requestFiles;
-            }
-        }
 
         public Uri Url
         {

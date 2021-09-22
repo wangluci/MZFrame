@@ -27,6 +27,7 @@ namespace ResumeML
             }).Configure((IApplicationBuilder builder) =>
             {
                 IConfiguration config = builder.ApplicationServices.GetService<IConfiguration>();
+                builder.UseAllowCORS();
                 builder.UseStaticFiles();
                 builder.UseTAMvc(app =>
                 {
