@@ -26,14 +26,10 @@ namespace ResumeML
     .FromFile(modelName: "ResumeModel", filePath: "MLModel.zip", watchForChanges: true);
             }).Configure((IApplicationBuilder builder) =>
             {
-                IConfiguration config = builder.ApplicationServices.GetService<IConfiguration>();
                 builder.UseAllowCORS();
                 builder.UseStaticFiles();
                 builder.UseTAMvc(app =>
                 {
-                    //注册字符串
-                    app.Services.AddString("connstr", config.GetSection("connstr").Value);
-                    app.Services.AddSingleton<RedisHelper>(new RedisHelper(config.GetSection("redisconn").Value));
                     RouterBuilder rbuilder = new RouterBuilder();
                     rbuilder.MapRoute("AuthService", "vue-element-admin/{controller=Home}/{action=Index}/{id?}");
                     rbuilder.UseDefault(Assembly.GetEntryAssembly().GetName().Name);

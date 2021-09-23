@@ -72,5 +72,9 @@ namespace TemplateAction.NetCore
             services.AddSingleton<IConfigureOptions<TOptions>>(new NamedConfigureFromConfigurationOptions<TOptions>(name, config));
             return services;
         }
+        public static IServiceCollection Configure<TOptions>(this IServiceCollection services, IConfiguration config) where TOptions : class
+        {
+            return services.Configure<TOptions>(string.Empty, config);
+        }
     }
 }

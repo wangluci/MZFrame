@@ -1,5 +1,8 @@
 ﻿using System;
 using TemplateAction.Core;
+using TemplateAction.NetCore;
+using Microsoft.Extensions.Configuration;
+using Common.Redis;
 
 namespace AuthService
 {
@@ -19,8 +22,12 @@ namespace AuthService
             {
                 return MyAccess.Aop.InterceptFactory.CreateDAL(typeof(PermissionDAL), arguments);
             });
+            services.AddSingleton<AuthRedisHelper>();
         }
-        public void Loaded(ITAApplication app, IEventRegister register) { }
+        public void Loaded(ITAApplication app, IEventRegister register) {
+            //IConfiguration config = app.ServiceProvider.GetService<IConfiguration>();
+            //app.Services.Configure<AuthOption>("ddd",config.GetSection("AuthService"));
+        }
         public void Unload() { }
     }
 }

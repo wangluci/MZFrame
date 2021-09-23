@@ -8,8 +8,8 @@ namespace AuthService
 {
     public class AuthDAL : MySqlSupport
     {
-        public AuthDAL(string connstr) : base(connstr) { }
-        
+        public AuthDAL(AuthOption conf) : base(conf.connstr) { }
+
         public virtual AdminInfo GetAdminByName(string username)
         {
             help.AddInParam("@UserName", MySqlDbType.VarChar, username);

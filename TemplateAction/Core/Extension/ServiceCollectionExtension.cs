@@ -116,6 +116,7 @@ namespace TemplateAction.Core
             collection.Add(impType.FullName, new ServiceDescriptor(serviceType, ServiceLifetime.Singleton, null, null));
             return collection;
         }
+
         public static IServiceCollection TryAddSingleton(this IServiceCollection collection, Type impType, Type serviceType, ProxyFactory factory = null)
         {
             collection.TryAdd(impType.FullName, new ServiceDescriptor(serviceType, ServiceLifetime.Singleton, null, null));
@@ -130,6 +131,16 @@ namespace TemplateAction.Core
         public static IServiceCollection TryAddSingleton<T1>(this IServiceCollection collection, object impInstance)
         {
             collection.TryAdd(typeof(T1).FullName, new ServiceDescriptor(typeof(T1), ServiceLifetime.Singleton, null, impInstance));
+            return collection;
+        }
+        public static IServiceCollection AddSingleton(this IServiceCollection collection, Type impType, object impInstance)
+        {
+            collection.Add(impType.FullName, new ServiceDescriptor(impType, ServiceLifetime.Singleton, null, impInstance));
+            return collection;
+        }
+        public static IServiceCollection TryAddSingleton(this IServiceCollection collection, Type impType, object impInstance)
+        {
+            collection.TryAdd(impType.FullName, new ServiceDescriptor(impType, ServiceLifetime.Singleton, null, impInstance));
             return collection;
         }
         #endregion

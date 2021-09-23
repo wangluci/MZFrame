@@ -13,12 +13,8 @@ namespace AuthService
         /// </summary>
         public string Account { get; set; }
         /// <summary>
-        /// 令牌签发时间
-        /// </summary>
-        public long TokenStart { get; set; }
-        /// <summary>
         /// 令牌过期时间
         /// </summary>
-        public long TokenExpire { get; set; }
+        public long Expire { get; set; }
     }
 }

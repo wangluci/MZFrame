@@ -8,7 +8,7 @@ namespace AuthService
 {
     public class PermissionDAL : MySqlSupport
     {
-        public PermissionDAL(string connstr) : base(connstr) { }
+        public PermissionDAL(AuthOption conf) : base(conf.connstr) { }
         public virtual List<UserPermission> GetUserPermissionByCode(long uid, string code)
         {
             help.AddInParam("@UserId", MySqlDbType.Int64, uid);

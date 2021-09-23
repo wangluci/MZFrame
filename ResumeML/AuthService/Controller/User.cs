@@ -20,7 +20,7 @@ namespace AuthService
         /// <returns></returns>
         public AjaxResult login(string username, string password)
         {
-            BusResponse<string> response = _authBLL.Login(username, password, GetTerminal());
+            BusResponse<LoginData> response = _authBLL.Login(username, password, GetTerminal());
             return response.ToAjaxResult(Context);
         }
     }
