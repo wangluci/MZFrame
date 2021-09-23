@@ -2,6 +2,7 @@
 using MyAccess.DB.Attr;
 using System;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace MyAccess.DB
@@ -22,6 +23,7 @@ namespace MyAccess.DB
         private void ObjToStr(DbHelp help, ref string where, out string updatestr)
         {
             updatestr = "";
+            StringBuilder sb = new StringBuilder();
             bool autowhere = string.IsNullOrEmpty(where);
             Type curObjType = mUpdated.GetType();
 
@@ -50,9 +52,13 @@ namespace MyAccess.DB
                 }
                 if (canupdated)
                 {
-                    updatestr += "," + pi.Name + "=" + help.AddParamAndReturn(pi.Name, pi.GetValue(mUpdated));
+                    sb.Append(",");
+                    sb.Append(pi.Name);
+                    sb.Append("=");
+                    sb.Append(help.AddParamAndReturn(pi.Name, pi.GetValue(mUpdated)));
                 }
             }
+            updatestr = sb.ToString();
             if (updatestr.StartsWith(","))
             {
                 updatestr = updatestr.Substring(1);
@@ -65,6 +71,10 @@ namespace MyAccess.DB
             if (string.IsNullOrEmpty(tablename))
             {
                 _tablename = InterceptFactory.GetProxyTypeName(updated);
+            }
+            else
+            {
+                _tablename = tablename;
             }
         }
         public DoUpdate(object updated, string tablename) : this(updated, tablename, "") { }

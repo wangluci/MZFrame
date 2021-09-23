@@ -5,7 +5,6 @@ namespace TemplateAction.Core
     {
         string RootPath { get; }
         string PluginPath { get; }
-        IServiceCollection Services { get; }
         ITAServices ServiceProvider { get; }
         /// <summary>
         /// 获取指定插件的配置文件

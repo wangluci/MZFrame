@@ -3,6 +3,7 @@ using MyAccess.DB.Attr;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace MyAccess.DB
@@ -16,7 +17,7 @@ namespace MyAccess.DB
         protected T[] _inserted;
         protected string _tablename;
 
-       
+
 
         public DoInsert(T inserted, string tablename = "") : base(string.Empty)
         {
@@ -26,6 +27,10 @@ namespace MyAccess.DB
             {
                 _tablename = InterceptFactory.GetProxyTypeName(inserted);
             }
+            else
+            {
+                _tablename = tablename;
+            }
         }
         public DoInsert(T[] inserted, string tablename = "") : base(string.Empty)
         {
@@ -34,6 +39,10 @@ namespace MyAccess.DB
             {
                 _tablename = InterceptFactory.GetProxyTypeName(inserted);
             }
+            else
+            {
+                _tablename = tablename;
+            }
         }
         public DoInsert(List<T> inserted, string tablename = "") : base(string.Empty)
         {
@@ -41,6 +50,10 @@ namespace MyAccess.DB
             if (string.IsNullOrEmpty(tablename))
             {
                 _tablename = InterceptFactory.GetProxyTypeName(inserted);
+            }
+            else
+            {
+                _tablename = tablename;
             }
         }
         /// <summary>
@@ -54,6 +67,9 @@ namespace MyAccess.DB
         {
             rtfields = string.Empty;
             rtvalues = string.Empty;
+            StringBuilder sbfields = new StringBuilder();
+            StringBuilder sbvalues = new StringBuilder();
+
             if (_inserted == null || _inserted.Length == 0) return;
             Type curObjType = InterceptFactory.GetProxyType(_inserted[0]);
 
@@ -63,7 +79,8 @@ namespace MyAccess.DB
             for (int idx = 0; idx < _inserted.Length; idx++)
             {
                 T iitem = _inserted[idx];
-                rtvalues += ",(";
+                sbvalues.Append(",(");
+                bool isfirst = true;
                 for (int i = 0; i < myProInfos.Length; i++)
                 {
                     PropertyInfo pi = myProInfos[i];
@@ -77,24 +94,31 @@ namespace MyAccess.DB
                     {
                         if (idx == 0)
                         {
-                            rtfields += "," + pi.Name;
-                            rtvalues += help.AddParamAndReturn("iptparam_" + idx + "_" + i, pi.GetValue(iitem));
+                            sbfields.Append(",");
+                            sbfields.Append(pi.Name);
+                        }
+                        if (isfirst)
+                        {
+                            isfirst = false;
+                            sbvalues.Append(help.AddParamAndReturn("iptparam_" + idx + "_" + i, pi.GetValue(iitem)));
                         }
                         else
                         {
-                            rtvalues += "," + help.AddParamAndReturn("iptparam_" + idx + "_" + i, pi.GetValue(iitem));
+                            sbvalues.Append(",");
+                            sbvalues.Append(help.AddParamAndReturn("iptparam_" + idx + "_" + i, pi.GetValue(iitem)));
                         }
                     }
                 }
-                rtvalues += ")";
+                sbvalues.Append(")");
             }
 
-
+            rtfields = sbfields.ToString();
             if (rtfields.StartsWith(","))
             {
                 rtfields = rtfields.Substring(1);
             }
             rtfields = "(" + rtfields + ")";
+            rtvalues = sbvalues.ToString();
             if (rtvalues.StartsWith(","))
             {
                 rtvalues = rtvalues.Substring(1);
@@ -109,7 +133,7 @@ namespace MyAccess.DB
                 string fields;
                 string values;
                 ObjToStr(help, out fields, out values);
-                mSqlText = string.Format("insert into {0} {1} values ({2})", _tablename, fields, values);
+                mSqlText = string.Format("insert into {0} {1} values {2}", _tablename, fields, values);
             }
 
         }

@@ -6,6 +6,7 @@
     /// </summary>
     public interface IPluginConfig
     {
+
         /// <summary>
         /// 注册插件的服务和事件
         /// </summary>

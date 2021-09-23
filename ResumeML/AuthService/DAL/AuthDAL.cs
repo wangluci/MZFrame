@@ -1,4 +1,5 @@
 ﻿using Common.MySql;
+using Microsoft.Extensions.Options;
 using MyAccess.DB;
 using MySqlConnector;
 using System;
@@ -8,7 +9,7 @@ namespace AuthService
 {
     public class AuthDAL : MySqlSupport
     {
-        public AuthDAL(AuthOption conf) : base(conf.connstr) { }
+        public AuthDAL(IOptions<AuthOption> conf) : base(conf.Value.connstr) { }
 
         public virtual AdminInfo GetAdminByName(string username)
         {

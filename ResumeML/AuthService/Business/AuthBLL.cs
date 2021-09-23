@@ -10,8 +10,8 @@ namespace AuthService
     {
         private AuthDAL _auth;
         private PermissionDAL _permission;
-        private RedisHelper _redis;
-        public AuthBLL(AuthDAL auth, PermissionDAL permission, RedisHelper redis)
+        private AuthRedisHelper _redis;
+        public AuthBLL(AuthDAL auth, PermissionDAL permission, AuthRedisHelper redis)
         {
             _auth = auth;
             _permission = permission;

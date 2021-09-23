@@ -1,4 +1,5 @@
 ﻿using Common.MySql;
+using Microsoft.Extensions.Options;
 using MyAccess.DB;
 using MySqlConnector;
 using System;
@@ -8,7 +9,7 @@ namespace AuthService
 {
     public class PermissionDAL : MySqlSupport
     {
-        public PermissionDAL(AuthOption conf) : base(conf.connstr) { }
+        public PermissionDAL(IOptions<AuthOption> conf) : base(conf.Value.connstr) { }
         public virtual List<UserPermission> GetUserPermissionByCode(long uid, string code)
         {
             help.AddInParam("@UserId", MySqlDbType.Int64, uid);

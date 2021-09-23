@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace MyAccess.DB
@@ -24,11 +25,13 @@ namespace MyAccess.DB
         }
         private void ExcuteDoExecSqlInInit(DbHelp help)
         {
-            string inwhere = string.Empty;
+            StringBuilder sb = new StringBuilder();
             for (int i = 0; i < mInArr.Length; i++)
             {
-                inwhere += "," + help.AddParamAndReturn("inparam_" + i, mInArr[i]);
+                sb.Append(",");
+                sb.Append(help.AddParamAndReturn("inparam_" + i, mInArr[i]));
             }
+            string inwhere = sb.ToString();
             if (inwhere.StartsWith(","))
             {
                 inwhere = inwhere.Substring(1);

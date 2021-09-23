@@ -10,6 +10,7 @@ using TemplateAction.Route;
 using TemplateAction.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Common.Redis;
+using Microsoft.Extensions.Options;
 
 namespace ResumeML
 {
