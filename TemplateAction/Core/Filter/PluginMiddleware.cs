@@ -12,16 +12,16 @@ namespace TemplateAction.Core
         {
             _key = key;
         }
-        public object Excute(TAAction request, FilterMiddlewareNode next)
+        public object Excute(TAAction ac, FilterMiddlewareNode next)
         {
-            IFilterMiddleware filter = request.Context.Application.ServiceProvider.GetService(_key) as IFilterMiddleware;
+            IFilterMiddleware filter = ac.Context.Application.ServiceProvider.GetService(_key) as IFilterMiddleware;
             if (filter != null)
             {
-                return filter.Excute(request, next);
+                return filter.Excute(ac, next);
             }
             else
             {
-                return next.Excute(request);
+                return next.Excute(ac);
             }
         }
     }

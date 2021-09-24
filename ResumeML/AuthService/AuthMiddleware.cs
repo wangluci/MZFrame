@@ -1,16 +1,20 @@
 ﻿using System;
 using TemplateAction.Core;
 
-namespace TestService
+namespace AuthService
 {
     public class AuthMiddleware : IFilterMiddleware
     {
         public object Excute(TAAction ac, FilterMiddlewareNode next)
         {
-            if (ac.NameSpace == "TestService" && ac.Controller == "Home" && ac.Action == "Test")
+            if (ac.NameSpace != "AuthService")
             {
                 //需要身份认证
-                ac.Context.Response.Write("带有身份认证\n");
+                string tk = ac.Context.Request.Header["X-Token"];
+                if (string.IsNullOrEmpty(tk))
+                {
+                    return new AjaxResult(ac.Context, -999, "您目前是在登出状态");
+                }
                 return next.Excute(ac);
             }
             else

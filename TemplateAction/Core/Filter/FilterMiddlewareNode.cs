@@ -22,9 +22,9 @@ namespace TemplateAction.Core
             _filter = filter;
         }
 
-        public object Excute(TAAction request)
+        public object Excute(TAAction ac)
         {
-            return _filter.Excute(request, _next);
+            return _filter.Excute(ac, _next);
         }
     }
 }

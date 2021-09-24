@@ -4,6 +4,6 @@ namespace TemplateAction.Core
 {
     public interface IFilterMiddleware
     {
-        object Excute(TAAction request, FilterMiddlewareNode next);
+        object Excute(TAAction ac, FilterMiddlewareNode next);
     }
 }

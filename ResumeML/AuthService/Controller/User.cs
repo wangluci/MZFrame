@@ -23,5 +23,10 @@ namespace AuthService
             BusResponse<LoginData> response = _authBLL.Login(username, password, GetTerminal());
             return response.ToAjaxResult(Context);
         }
+        public AjaxResult info(string token = "")
+        {
+            Request.Header[""];
+            return Err("dd");
+        }
     }
 }

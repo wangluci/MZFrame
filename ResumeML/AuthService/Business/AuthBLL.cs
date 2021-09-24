@@ -191,5 +191,14 @@ namespace AuthService
                 return BusResponse<LoginData>.Error(-21, "登录令牌生成失败！");
             }
         }
+        /// <summary>
+        /// 校验令牌
+        /// </summary>
+        /// <param name="tk"></param>
+        /// <returns></returns>
+        public virtual BusResponse<string> CheckToken(string tk)
+        {
+            return BusResponse<string>.Success(string.Empty);
+        }
     }
 }

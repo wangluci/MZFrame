@@ -6,26 +6,26 @@ namespace TemplateAction.Core
 {
     public class MvcMiddleware : IFilterMiddleware
     {
-        public object Excute(TAAction request, FilterMiddlewareNode next)
+        public object Excute(TAAction ac, FilterMiddlewareNode next)
         {
-            if (request.ControllerNode == null) return null;
-            if (request.ActionNode == null) return null;
-            ITAContext context = request.Context;
-            Type ct = request.ControllerNode.ControllerType;
+            if (ac.ControllerNode == null) return null;
+            if (ac.ActionNode == null) return null;
+            ITAContext context = ac.Context;
+            Type ct = ac.ControllerNode.ControllerType;
             //创建控制器
-            IController c = context.Application.ServiceProvider.CreateScopeService(request, ct) as IController;
+            IController c = context.Application.ServiceProvider.CreateScopeService(ac, ct) as IController;
             if (c == null)
             {
                 return null;
             }
             //初始化请求的异常处理
-            request.ExceptionFun = c.Exception;
+            ac.ExceptionFun = c.Exception;
             try
             {
                 //绑定控制器
-                c.Init(request);
-                if (!request.ActionNode.JudgeHttpMethod(context.Request.HttpMethod)) return null;
-                MethodInfo method = request.ActionNode.Method;
+                c.Init(ac);
+                if (!ac.ActionNode.JudgeHttpMethod(context.Request.HttpMethod)) return null;
+                MethodInfo method = ac.ActionNode.Method;
                 ParameterInfo[] pinfos = method.GetParameters();
                 List<object> paramlist = new List<object>();
                 //开始遍历参数进行验证
@@ -38,9 +38,9 @@ namespace TemplateAction.Core
                 {
                     gc = new TAGroupCollection(context.Request.Query, context.Request.Form);
                 }
-                if (!Equals(request.ExtParams, null))
+                if (!Equals(ac.ExtParams, null))
                 {
-                    gc = new TAGroupCollection(gc, request.ExtParams);
+                    gc = new TAGroupCollection(gc, ac.ExtParams);
                 }
 
                 for (int i = 0; i < pinfos.Length; i++)
