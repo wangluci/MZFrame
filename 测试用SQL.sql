@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50713
 File Encoding         : 65001
 
-Date: 2021-09-19 10:34:56
+Date: 2021-09-24 12:13:51
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -48,10 +48,10 @@ CREATE TABLE `mz_role` (
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Table structure for mz_role_right
+-- Table structure for mz_role_permission
 -- ----------------------------
-DROP TABLE IF EXISTS `mz_role_right`;
-CREATE TABLE `mz_role_right` (
+DROP TABLE IF EXISTS `mz_role_permission`;
+CREATE TABLE `mz_role_permission` (
   `RoleRightID` bigint(20) NOT NULL AUTO_INCREMENT,
   `RoleID` bigint(20) DEFAULT NULL,
   `RightCode` varchar(255) DEFAULT NULL,
@@ -59,10 +59,25 @@ CREATE TABLE `mz_role_right` (
 ) ENGINE=InnoDB AUTO_INCREMENT=895 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Table structure for mz_user_right
+-- Table structure for mz_sys_log
 -- ----------------------------
-DROP TABLE IF EXISTS `mz_user_right`;
-CREATE TABLE `mz_user_right` (
+DROP TABLE IF EXISTS `mz_sys_log`;
+CREATE TABLE `mz_sys_log` (
+  `SysLogID` bigint(11) NOT NULL AUTO_INCREMENT,
+  `UserId` bigint(20) DEFAULT NULL COMMENT '登录名',
+  `CreateDate` datetime DEFAULT NULL,
+  `LogType` smallint(6) DEFAULT NULL COMMENT '日志类型:0为登录',
+  `IPAddress` varchar(50) DEFAULT NULL COMMENT 'ip地址',
+  `Info` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`SysLogID`),
+  KEY `syslogloginname` (`UserId`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for mz_user_permission
+-- ----------------------------
+DROP TABLE IF EXISTS `mz_user_permission`;
+CREATE TABLE `mz_user_permission` (
   `UserRightID` bigint(20) NOT NULL AUTO_INCREMENT,
   `UserId` bigint(20) DEFAULT NULL,
   `RightCode` varchar(255) DEFAULT NULL,
