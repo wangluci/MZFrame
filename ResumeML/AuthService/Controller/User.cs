@@ -4,7 +4,7 @@ using TemplateAction.Core;
 
 namespace AuthService
 {
-    public class User : FatherController
+    public class User : TABaseController
     {
         private AuthBLL _authBLL;
         public User(AuthBLL auth)
@@ -20,12 +20,11 @@ namespace AuthService
         /// <returns></returns>
         public AjaxResult login(string username, string password)
         {
-            BusResponse<LoginData> response = _authBLL.Login(username, password, GetTerminal());
+            BusResponse<LoginData> response = _authBLL.Login(username, password, Context.GetTerminal());
             return response.ToAjaxResult(Context);
         }
         public AjaxResult info(string token = "")
         {
-            Request.Header[""];
             return Err("dd");
         }
     }
