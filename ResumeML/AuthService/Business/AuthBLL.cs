@@ -20,14 +20,8 @@ namespace AuthService
             _redis = redis;
             _conf = conf;
         }
-        /// <summary>
-        /// 判断是否有权限
-        /// </summary>
-        /// <param name="uid"></param>
-        /// <param name="controller"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public virtual bool ExistPermission(long uid, string module, string action)
+
+        private bool _ExistPermission(long uid, string module, string action)
         {
             //判断是否有权限声明
             if (!string.IsNullOrEmpty(action))
@@ -78,7 +72,7 @@ namespace AuthService
         /// <param name="info"></param>
         /// <param name="tk"></param>
         /// <returns></returns>
-        public virtual string _MakeClientSign(ClientTokenInfo info, string tk)
+        private string _MakeClientSign(ClientTokenInfo info, string tk)
         {
             StringBuilder sb = new StringBuilder(200);
             sb.Append(info.Account);
@@ -93,7 +87,7 @@ namespace AuthService
         /// <param name="info"></param>
         /// <param name="tk"></param>
         /// <returns></returns>
-        public virtual string _MakeClientToken(ClientTokenInfo info, string tk)
+        private string _MakeClientToken(ClientTokenInfo info, string tk)
         {
             ClientToken clientToken = new ClientToken();
             if (_conf.Value.expire_hours > 0)
@@ -113,7 +107,7 @@ namespace AuthService
         /// </summary>
         /// <param name="tk"></param>
         /// <returns></returns>
-        public virtual ClientToken _ParseClientToken(string tk)
+        private ClientToken _ParseClientToken(string tk)
         {
             ClientToken ct = null;
             try
@@ -124,15 +118,38 @@ namespace AuthService
             catch { }
             return ct;
         }
+
+        /// <summary>
+        /// 刷新过期时间
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <param name="terminal"></param>
+        private void _RefreshTokenExpire(long uid, string terminal)
+        {
+            string tkey = string.Format("Token{0}_{1}", uid, terminal);
+            TimeSpan ts = DateTime.Now.AddHours(_conf.Value.expire_hours) - DateTime.Now;
+            _redis.KeyExpire(tkey, ts);
+        }
         /// <summary>
         /// 生成刷新令牌
         /// </summary>
         /// <param name="info"></param>
         /// <param name="tk"></param>
         /// <returns></returns>
-        public virtual string _MakeRefreshToken(ClientTokenInfo info, string tk)
+        private string _MakeRefreshToken(ClientTokenInfo info, string tk)
         {
             return MyAccess.Core.Crypter.SHA1(info.UserId + tk, System.Text.Encoding.UTF8);
+        }
+        /// <summary>
+        /// 判断是否有权限
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <param name="controller"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public virtual bool ExistPermission(long uid, string module, string action)
+        {
+            return _ExistPermission(uid, module, action);
         }
         /// <summary>
         /// 登录
@@ -170,7 +187,7 @@ namespace AuthService
                 //权限验证是否可登录
                 if (_conf.Value.enable_permission)
                 {
-                    if (!ExistPermission(account.Id, "/AuthService/User", "login"))
+                    if (!_ExistPermission(account.Id, "/AuthService/User", "login"))
                     {
                         return BusResponse<LoginData>.Error(-15, "该用户被禁止登录！");
                     }
@@ -240,7 +257,7 @@ namespace AuthService
             ClientToken ct = _ParseClientToken(tk);
             if (ct == null)
             {
-                return BusResponse<ClientTokenInfo>.Error(-998, "登录令牌信息错误");
+                return BusResponse<ClientTokenInfo>.Error(50008, "登录令牌信息错误");
             }
 
             string tkey = string.Format("Token{0}_{1}", ct.Info.UserId, terminal);
@@ -254,7 +271,7 @@ namespace AuthService
                 catch { }
                 if (string.IsNullOrEmpty(intoken))
                 {
-                    return BusResponse<ClientTokenInfo>.Error(-998, "登录状态已过期！");
+                    return BusResponse<ClientTokenInfo>.Error(50014, "登录令牌过期");
                 }
             }
             else
@@ -266,7 +283,7 @@ namespace AuthService
             string tkstr = _MakeClientSign(ct.Info, intoken);
             if (!tkstr.Equals(ct.Sign))
             {
-                return BusResponse<ClientTokenInfo>.Error(-997, "登录状态已过期！");
+                return BusResponse<ClientTokenInfo>.Error(50012, "其他客户端登录了");
             }
 
             if (_conf.Value.expire_hours > 0)
@@ -275,24 +292,13 @@ namespace AuthService
                 DateTime exp = MyAccess.Core.TypeConvert.JavaLongTime2CSharp(ct.Info.Expire);
                 if (exp < DateTime.Now)
                 {
-                    return BusResponse<ClientTokenInfo>.Error(-996, "登录令牌过期");
+                    return BusResponse<ClientTokenInfo>.Error(50014, "登录令牌过期");
                 }
             }
- 
 
             return BusResponse<ClientTokenInfo>.Success(ct.Info);
         }
-        /// <summary>
-        /// 刷新过期时间
-        /// </summary>
-        /// <param name="uid"></param>
-        /// <param name="terminal"></param>
-        public virtual void _RefreshTokenExpire(long uid, string terminal)
-        {
-            string tkey = string.Format("Token{0}_{1}", uid, terminal);
-            TimeSpan ts = DateTime.Now.AddHours(_conf.Value.expire_hours) - DateTime.Now;
-            _redis.KeyExpire(tkey, ts);
-        }
+
         /// <summary>
         /// 刷新令牌
         /// </summary>
@@ -305,7 +311,7 @@ namespace AuthService
             ClientToken ct = _ParseClientToken(tk);
             if (ct == null)
             {
-                return BusResponse<LoginData>.Error(-998, "登录令牌信息错误");
+                return BusResponse<LoginData>.Error(50008, "登录令牌信息错误");
             }
             string tkey = string.Format("Token{0}_{1}", ct.Info.UserId, terminal);
             string intoken = null;
@@ -316,12 +322,12 @@ namespace AuthService
             catch { }
             if (string.IsNullOrEmpty(intoken))
             {
-                return BusResponse<LoginData>.Error(-998, "登录状态已过期！");
+                return BusResponse<LoginData>.Error(50014, "登录令牌过期");
             }
             string mkrefreshtk = _MakeRefreshToken(ct.Info, intoken);
             if (!mkrefreshtk.Equals(refreshtk))
             {
-                return BusResponse<LoginData>.Error(-977, "刷新令牌错误！");
+                return BusResponse<LoginData>.Error(-977, "刷新令牌错误");
             }
 
             _RefreshTokenExpire(ct.Info.UserId, terminal);

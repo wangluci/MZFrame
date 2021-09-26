@@ -2,21 +2,31 @@
 using Microsoft.Extensions.Options;
 using System;
 using TemplateAction.Core;
-
+using System.Collections.Generic;
 namespace AuthService
 {
     public class AuthMiddleware : IFilterMiddleware
     {
         private AuthBLL _authBLL;
         private IOptions<AuthOption> _conf;
+        private HashSet<string> _authModules;
         public AuthMiddleware(AuthBLL auth, IOptions<AuthOption> conf)
         {
             _authBLL = auth;
             _conf = conf;
+            _authModules = new HashSet<string>();
+            if (conf.Value.AuthModules != null)
+            {
+                foreach (string m in conf.Value.AuthModules)
+                {
+                    _authModules.Add(m.ToLower());
+                }
+            }
+   
         }
         public object Excute(TAAction ac, FilterMiddlewareNode next)
         {
-            if (ac.NameSpace != "AuthService")
+            if (_authModules.Contains(ac.NameSpace.ToLower()))
             {
                 //需要身份认证
                 string tk = ac.Context.Request.Header["X-Token"];

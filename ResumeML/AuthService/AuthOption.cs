@@ -4,6 +4,7 @@ namespace AuthService
 {
     public class AuthOption
     {
+        public string[] AuthModules { get; set; }
         public string connstr { get; set; }
         public string redisconn { get; set; }
         /// <summary>

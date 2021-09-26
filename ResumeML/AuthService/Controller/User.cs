@@ -4,6 +4,7 @@ using TemplateAction.Core;
 
 namespace AuthService
 {
+    [Des("系统权限")]
     public class User : TABaseController
     {
         private AuthBLL _authBLL;
@@ -18,12 +19,13 @@ namespace AuthService
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
+        [Des("登录权限")]
         public AjaxResult login(string username, string password)
         {
             BusResponse<LoginData> response = _authBLL.Login(username, password, Context.GetTerminal());
             return response.ToAjaxResult(Context);
         }
-        public AjaxResult info(string token = "")
+        public AjaxResult info(string token)
         {
             return Err("dd");
         }
