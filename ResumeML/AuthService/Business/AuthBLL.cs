@@ -13,9 +13,11 @@ namespace AuthService
         private PermissionDAL _permission;
         private AuthRedisHelper _redis;
         private IOptions<AuthOption> _conf;
-        public AuthBLL(AuthDAL auth, PermissionDAL permission, AuthRedisHelper redis, IOptions<AuthOption> conf)
+        private UserDAL _user;
+        public AuthBLL(AuthDAL auth, UserDAL user, PermissionDAL permission, AuthRedisHelper redis, IOptions<AuthOption> conf)
         {
             _auth = auth;
+            _user = user;
             _permission = permission;
             _redis = redis;
             _conf = conf;
@@ -160,7 +162,7 @@ namespace AuthService
         /// <returns></returns>
         public virtual BusResponse<LoginData> Login(string username, string password, string terminal)
         {
-            AdminInfo account = _auth.GetAdminByName(username);
+            AdminInfo account = _user.GetAdminByName(username);
             if (account == null) return BusResponse<LoginData>.Error(-11, "用户不存在！");
 
             string limitmsg = _auth.LimitLoginTime(account.Id);
@@ -278,8 +280,8 @@ namespace AuthService
             {
                 intoken = _conf.Value.sign_key;
             }
-           
-       
+
+
             string tkstr = _MakeClientSign(ct.Info, intoken);
             if (!tkstr.Equals(ct.Sign))
             {

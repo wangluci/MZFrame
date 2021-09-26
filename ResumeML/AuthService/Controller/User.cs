@@ -8,9 +8,11 @@ namespace AuthService
     public class User : TABaseController
     {
         private AuthBLL _authBLL;
-        public User(AuthBLL auth)
+        private UserBLL _usrBLL;
+        public User(AuthBLL auth,UserBLL usr)
         {
             _authBLL = auth;
+            _usrBLL = usr;
         }
        
         /// <summary>
@@ -25,9 +27,20 @@ namespace AuthService
             BusResponse<LoginData> response = _authBLL.Login(username, password, Context.GetTerminal());
             return response.ToAjaxResult(Context);
         }
+        /// <summary>
+        /// 获取用户信息
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public AjaxResult info(string token)
         {
-            return Err("dd");
+            BusResponse<ClientTokenInfo> response = _authBLL.CheckToken(token, Context.GetTerminal());
+            if (!response.IsSuccess())
+            {
+                return response.ToAjaxResult(Context);
+            }
+
+            return _usrBLL.GetUserInfo(response.Data.UserId).ToAjaxResult(Context);
         }
     }
 }

@@ -21,6 +21,8 @@ namespace AuthService
         /// </summary>
         [JsonIgnore()]
         public virtual string Password { get; set; }
+        public virtual string Avatar { get; set; }
+        public virtual string Introduction { get; set; }
         /// <summary>
         /// 绑定对象
         /// </summary>
