@@ -84,7 +84,7 @@ namespace TemplateAction.Core
 
             string tdesact = "";
             string taboutmodule = string.Format("/{0}/{1}", plg.Name, controller);
-            string taboutaction = mKey;
+            string taboutaction = string.Empty;//默认关联控制器权限
 
             //判断是否为异步
             _async = method.ReturnType != typeof(void) && typeof(Task).IsAssignableFrom(method.ReturnType);
@@ -94,8 +94,8 @@ namespace TemplateAction.Core
             if (ad != null)
             {
                 tdesact = ad.Des;
+                taboutaction = mKey;
             }
-
 
             //关联特性
             AboutAttribute ab = (AboutAttribute)method.GetCustomAttribute(typeof(AboutAttribute));

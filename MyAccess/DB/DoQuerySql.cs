@@ -133,6 +133,10 @@ namespace MyAccess.DB
                     {
                         continue;
                     }
+                    if (dr.IsDBNull(i))
+                    {
+                        continue;
+                    }
                     string mapval;
                     if (_mappings.TryGetValue(propertyInfo.PropertyType, out mapval))
                     {
@@ -205,6 +209,10 @@ namespace MyAccess.DB
                 {
                     PropertyInfo propertyInfo = targT.GetProperty(dr.GetName(i));
                     if (propertyInfo == null)
+                    {
+                        continue;
+                    }
+                    if (await dr.IsDBNullAsync(i))
                     {
                         continue;
                     }

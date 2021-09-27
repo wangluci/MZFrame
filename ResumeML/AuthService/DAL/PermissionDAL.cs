@@ -44,5 +44,24 @@ namespace AuthService
             help.DoCommand(execsql);
             return execsql.Count() > 0;
         }
+        /// <summary>
+        /// 获取用户所有角色权限
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <returns></returns>
+        public virtual List<string> GetRolePermissions(long uid)
+        {
+            help.AddInParam("@UserId", MySqlDbType.Int64, uid);
+            DoQuerySql<string> execsql = new DoQuerySql<string>("select distinct nrr.RightCode from mz_role_permission nrr left join mz_user_role nur on nrr.RoleID = nur.RoleID where UserId=@UserId");
+            help.DoCommand(execsql);
+            return execsql.ToList();
+        }
+        public virtual List<UserPermission> GetUserPermissions(long uid)
+        {
+            help.AddInParam("@UserId", MySqlDbType.Int64, uid);
+            DoQuerySql<UserPermission> execsql = new DoQuerySql<UserPermission>("select * from mz_user_permission where UserId=@UserId");
+            help.DoCommand(execsql);
+            return execsql.ToList();
+        }
     }
 }

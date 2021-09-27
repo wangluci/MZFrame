@@ -26,42 +26,24 @@ namespace AuthService
         private bool _ExistPermission(long uid, string module, string action)
         {
             //判断是否有权限声明
-            if (!string.IsNullOrEmpty(action))
+            string comparecode = string.Format("{0}/{1}", module, action);
+            List<UserPermission> nurlist = _permission.GetUserPermissionByCode(uid, comparecode);
+            if (nurlist.Count > 0)
             {
-                string comparecode = string.Format("{0}/{1}", module, action);
-
-                List<UserPermission> nurlist = _permission.GetUserPermissionByCode(uid, comparecode);
-                if (nurlist.Count > 0)
+                bool hasright = true;
+                foreach (UserPermission nur in nurlist)
                 {
-                    bool hasright = true;
-                    foreach (UserPermission nur in nurlist)
+                    if (nur.RightType == 1)
                     {
-                        if (nur.RightType == 1)
-                        {
-                            hasright = false;
-                            break;
-                        }
-                    }
-                    return hasright;
-                }
-                else
-                {
-                    if (_permission.HasRolePermissionByCode(uid, comparecode))
-                    {
-                        return true;
+                        hasright = false;
+                        break;
                     }
                 }
+                return hasright;
             }
             else
             {
-                //进行用户权限的判断
-                bool haspower = _permission.HasUserPermission(uid, module);
-                if (haspower)
-                {
-                    return true;
-                }
-                //进行角色权限的判断
-                if (_permission.HasRolePermission(uid, module))
+                if (_permission.HasRolePermissionByCode(uid, comparecode))
                 {
                     return true;
                 }

@@ -16,6 +16,14 @@ namespace AuthService
             {
                 return MyAccess.Aop.InterceptFactory.CreateBLL(typeof(AuthBLL), arguments);
             });
+            services.AddSingleton<UserBLL>((object[] arguments, ITAServices provider) =>
+            {
+                return MyAccess.Aop.InterceptFactory.CreateBLL(typeof(UserBLL), arguments);
+            });
+            services.AddSingleton<UserDAL>((object[] arguments, ITAServices provider) =>
+            {
+                return MyAccess.Aop.InterceptFactory.CreateDAL(typeof(UserDAL), arguments);
+            });
             services.AddSingleton<AuthDAL>((object[] arguments, ITAServices provider) =>
             {
                 return MyAccess.Aop.InterceptFactory.CreateDAL(typeof(AuthDAL), arguments);
