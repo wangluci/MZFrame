@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+
 namespace TemplateAction.Cache
 {
     public class TimeOutSchedule : TimerTask
@@ -13,11 +15,10 @@ namespace TemplateAction.Cache
         public string ItemKey { get; set; }
         public void Run(IWheelTimeout timeout)
         {
-            try
-            {
+            Task.Run(() => {
                 Pool.Remove(ItemKey);
-            }
-            catch (Exception) { }
+            });
+      
         }
     }
 }

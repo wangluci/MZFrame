@@ -83,10 +83,11 @@ namespace TemplateAction.Cache
             {
                 return;
             }
-
-            Task.Run(() => {
+            try
+            {
                 _task.Run(this);
-            });
+            }
+            catch { }
         }
     }
 }

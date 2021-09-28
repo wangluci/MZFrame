@@ -45,20 +45,19 @@ namespace TemplateAction.NetCore
         public TANetCoreHttpApplication UseMemoryUnload()
         {
             if (!_useUnload)
-            {
+            {                
                 _useUnload = true;
-                //监听插件卸载
-                TAEventDispatcher.Instance.RegisterPluginUnloadAfter<PluginObject>(PluginUnloadAfterEvt);
             }
             return this;
         }
         /// <summary>
         /// 插件卸载处理
         /// </summary>
-        /// <param name="obj"></param>
-        private void PluginUnloadAfterEvt(PluginObject obj)
+        /// <param name="plg"></param>
+        protected override void PluginUnload(PluginObject plg)
         {
-            string tkey = Assembly2Key(obj.TargetAssembly);
+            base.PluginUnload(plg);
+            string tkey = Assembly2Key(plg.TargetAssembly);
             PushConcurrentTask(() =>
             {
                 AssemblyLoadContext asscontext;
@@ -69,6 +68,7 @@ namespace TemplateAction.NetCore
                 }
             }, TimeSpan.FromMinutes(1));
         }
+
         private string Assembly2Key(Assembly assembly)
         {
             string guid = assembly.ManifestModule.ModuleVersionId.ToString();

@@ -11,7 +11,9 @@ namespace TemplateAction.Core
         private LinkedList<IDispatcher> _scopelist = new LinkedList<IDispatcher>();
         private Dictionary<string, object> _handlers;
         public const string BEFORE_EVENT = "TA_BEFORE_LOAD";
-        public const string PLUGIN_UNLOAD_AFTER_EVENT = "TA_PLUGIN_UNLOAD_AFTER_EVENT";
+        public const string PLUGIN_CONFIG_EVENT = "TA_PLUGIN_CONFIG_EVENT";
+        public const string PLUGIN_LOAD_EVENT = "TA_PLUGIN_LOAD_EVENT";
+        public const string PLUGIN_UNLOAD_EVENT = "TA_PLUGIN_UNLOAD_EVENT";
         private class Nested
         {
             // 显式静态构造告诉C＃编译器未标记类型BeforeFieldInit
@@ -76,24 +78,67 @@ namespace TemplateAction.Core
         {
             Register<T, DefaultHandler<T>>(BEFORE_EVENT, new DefaultHandler<T>(ac));
         }
+
+
+
         /// <summary>
-        /// 监听插件卸载后事件
+        /// 监听插件配置服务事件
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="ac"></param>
-        public void RegisterPluginUnloadAfter<T>(Action<T> ac) where T : PluginObject
+        public void RegisterPluginConfig(Action<PluginObject> ac)
         {
-            Register<T, DefaultHandler<T>>(PLUGIN_UNLOAD_AFTER_EVENT, new DefaultHandler<T>(ac));
+            Register<PluginObject, DefaultHandler<PluginObject>>(PLUGIN_CONFIG_EVENT, new DefaultHandler<PluginObject>(ac));
         }
         /// <summary>
-        /// 分发插件卸载后事件
+        /// 分发插件配置服务事件
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="plugin"></param>
-        internal void DispathPluginUnload<T>(T plugin) where T : PluginObject
+        internal void DispathPluginConfig(PluginObject plugin)
         {
-            Dispatch(PLUGIN_UNLOAD_AFTER_EVENT, plugin);
+            Dispatch(PLUGIN_CONFIG_EVENT, plugin);
         }
+
+
+        /// <summary>
+        /// 监听插件加载事件
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="ac"></param>
+        public void RegisterPluginLoad(Action<PluginObject> ac)
+        {
+            Register<PluginObject, DefaultHandler<PluginObject>>(PLUGIN_LOAD_EVENT, new DefaultHandler<PluginObject>(ac));
+        }
+        /// <summary>
+        /// 分发插件加载事件
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="plugin"></param>
+        internal void DispathPluginLoad(PluginObject plugin)
+        {
+            Dispatch(PLUGIN_LOAD_EVENT, plugin);
+        }
+        /// <summary>
+        /// 监听插件卸载事件
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="ac"></param>
+        public void RegisterPluginUnload(Action<PluginObject> ac)
+        {
+            Register<PluginObject, DefaultHandler<PluginObject>>(PLUGIN_UNLOAD_EVENT, new DefaultHandler<PluginObject>(ac));
+        }
+        /// <summary>
+        /// 分发插件卸载事件
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="plugin"></param>
+        internal void DispathPluginUnload(PluginObject plugin)
+        {
+            Dispatch(PLUGIN_UNLOAD_EVENT, plugin);
+        }
+
+
         /// <summary>
         /// 分发应用加载前初始化事件
         /// </summary>

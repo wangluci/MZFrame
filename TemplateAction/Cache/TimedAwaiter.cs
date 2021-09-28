@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace TemplateAction.Cache
 {
@@ -20,8 +21,10 @@ namespace TemplateAction.Cache
 
         public void Run(IWheelTimeout timeout)
         {
-            IsCompleted = true;
-            Interlocked.Exchange(ref _continuation, null)?.Invoke();
+            Task.Run(() => {
+                IsCompleted = true;
+                Interlocked.Exchange(ref _continuation, null)?.Invoke();
+            });
         }
 
         public TimedAwaiter GetAwaiter()

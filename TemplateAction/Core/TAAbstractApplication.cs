@@ -62,6 +62,27 @@ namespace TemplateAction.Core
             _pluginsnode = TAEventDispatcher.Instance.AddScope(_plugins);
             AppDomain.CurrentDomain.AssemblyResolve += (sender, e) => LoadEmbeddedAssembly(e.Name);
         }
+        protected virtual void PluginConfig(PluginObject plg)
+        {
+            PushConcurrentTask(() =>
+            {
+                plg.Config.Configure(plg.Services);
+            });
+        }
+        protected virtual void PluginLoad(PluginObject plg)
+        {
+            PushConcurrentTask(() =>
+            {
+                plg.Config.Loaded(this, plg.Dispatcher);
+            });
+        }
+        protected virtual void PluginUnload(PluginObject plg)
+        {
+            PushConcurrentTask(() =>
+            {
+                plg.Config.Unload();
+            });
+        }
         protected abstract IPluginCollectionExtData CreatePluginCollectionExtData();
         /// <summary>
         /// 模块引用其它模块时调用
@@ -82,14 +103,7 @@ namespace TemplateAction.Core
                 }
                 Assembly assem = LoadAssembly(filepath);
                 plg = _plugins.CreatePlugin(assem, filepath);
-                if (plg != null)
-                {
-                    PushConcurrentTask(() =>
-                    {
-                        AfterPluginChanged(plg);
-                    });
-                }
-                else
+                if (plg == null)
                 {
                     return null;
                 }
@@ -118,15 +132,12 @@ namespace TemplateAction.Core
         }
 
         /// <summary>
-        /// 同步卸载指定插件
+        /// 卸载指定插件
         /// </summary>
         /// <param name="ns"></param>
         public void UnloadPlugin(string ns)
         {
-            PushConcurrentTask(() =>
-            {
-                _plugins.RemovePlugin(ns);
-            });
+            _plugins.RemovePlugin(ns);
         }
 
         /// <summary>
@@ -163,33 +174,11 @@ namespace TemplateAction.Core
         {
             return Assembly.Load(System.IO.File.ReadAllBytes(path));
         }
-        /// <summary>
-        /// 插件更新时
-        /// </summary>
-        /// <param name="plg"></param>
-        protected virtual void AfterPluginChanged(PluginObject plg)
-        {
-            plg.Config.Loaded(this, plg.Dispatcher);
-        }
+
         /// <summary>
         /// 初始化前
         /// </summary>
-        protected virtual void BeforeInit()
-        {
-            //激活配置文件
-            TAEventDispatcher.Instance.DispathLoadBefore(this);
-        }
-        /// <summary>
-        /// 初始化后
-        /// </summary>
-        protected virtual void AfterInit(List<PluginObject> plglist)
-        {
-            //执行加载完成事件
-            foreach (PluginObject plg in plglist)
-            {
-                plg.Config.Loaded(this, plg.Dispatcher);
-            }
-        }
+        protected virtual void BeforeInit() { }
         /// <summary>
         /// 初始化并加载目录下的插件
         /// </summary>
@@ -213,11 +202,17 @@ namespace TemplateAction.Core
             _rootPath = rootpath;
             //默认插件路径
             _pluginPath = Path.Combine(_rootPath, "Plugin");
+            //初始化定时器
+            _timer = new HashedWheelTimer(TimeSpan.FromMilliseconds(400), 100000, 0);
+
             BeforeInit();
+            //监听插件事件
+            TAEventDispatcher.Instance.RegisterPluginConfig(PluginConfig);
+            TAEventDispatcher.Instance.RegisterPluginLoad(PluginLoad);
+            TAEventDispatcher.Instance.RegisterPluginUnload(PluginUnload);
             //从应用程序域的程序集中初始化插件集
             _plugins.InitFromEntryAssembly();
             //加载插件
-            List<PluginObject> tmpPlugins = new List<PluginObject>();
             DirectoryInfo info = new DirectoryInfo(_pluginPath);
             if (info.Exists)
             {
@@ -231,11 +226,7 @@ namespace TemplateAction.Core
                         if (_plugins.GetPlugin(filename) == null)
                         {
                             Assembly assem = LoadAssembly(fi.FullName);
-                            PluginObject plg = _plugins.CreatePlugin(assem, fi.FullName);
-                            if (plg != null)
-                            {
-                                tmpPlugins.Add(plg);
-                            }
+                            _plugins.CreatePlugin(assem, fi.FullName);
                         }
                     }
                 }
@@ -244,7 +235,6 @@ namespace TemplateAction.Core
             {
                 Directory.CreateDirectory(_pluginPath);
             }
-            AfterInit(tmpPlugins);
 
             //开启监控插件更改
             _watcher = new FileSystemWatcher();
@@ -255,7 +245,6 @@ namespace TemplateAction.Core
             _watcher.IncludeSubdirectories = true;
             _watcher.Changed += OnPluginListener;
 
-            _timer = new HashedWheelTimer(TimeSpan.FromMilliseconds(400), 100000, 0);
             return;
         }
 
@@ -302,11 +291,7 @@ namespace TemplateAction.Core
             foreach (string tpath in backup)
             {
                 Assembly assem = LoadAssembly(tpath);
-                PluginObject obj = _plugins.CreatePlugin(assem, tpath);
-                if (obj != null)
-                {
-                    AfterPluginChanged(obj);
-                }
+                _plugins.CreatePlugin(assem, tpath);
             }
             if (backup.Count > 0)
             {

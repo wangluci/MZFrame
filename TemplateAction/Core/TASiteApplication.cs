@@ -165,13 +165,15 @@ namespace TemplateAction.Core
         {
             return _plugins.ExistController(controller);
         }
-        protected override void AfterPluginChanged(PluginObject plg)
+        protected override void PluginLoad(PluginObject plg)
         {
-            if (_readAssetsFromPlugin)
-            {
-                UpdateDocument(plg);
-            }
-            base.AfterPluginChanged(plg);
+            PushConcurrentTask(()=>{
+                if (_readAssetsFromPlugin)
+                {
+                    UpdateDocument(plg);
+                }
+            });
+            base.PluginLoad(plg);
         }
         protected override void BeforeInit()
         {
@@ -179,14 +181,6 @@ namespace TemplateAction.Core
             TemplateApp.Instance.Init(_rootPath);
             //激活配置文件
             TAEventDispatcher.Instance.DispathLoadBefore(this);
-        }
-        protected override void AfterInit(List<PluginObject> plglist)
-        {
-            foreach (PluginObject plg in plglist)
-            {
-                UpdateDocument(plg);
-            }
-            base.AfterInit(plglist);
         }
         /// <summary>
         /// 更新模块资源

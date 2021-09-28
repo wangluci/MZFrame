@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
 using TemplateAction.Cache;
 
@@ -18,6 +17,10 @@ namespace TemplateAction.Core
         private Version mVersion;
 
         private IServiceCollection _services;
+        public IServiceCollection Services
+        {
+            get { return _services; }
+        }
         /// <summary>
         /// 插件的局部事件分发器
         /// </summary>
@@ -98,7 +101,7 @@ namespace TemplateAction.Core
                                 this._config = Activator.CreateInstance(t) as IPluginConfig;
                                 if (this._config != null)
                                 {
-                                    this._config.Configure(this._services);
+                                    TAEventDispatcher.Instance.DispathPluginConfig(this);
                                 }
                             }
                         }
@@ -122,14 +125,14 @@ namespace TemplateAction.Core
                             this._config = Activator.CreateInstance(t) as IPluginConfig;
                             if (this._config != null)
                             {
-                                this._config.Configure(this._services);
+                                TAEventDispatcher.Instance.DispathPluginConfig(this);
                             }
                         }
                     }
 
                 }
             }
-
+            TAEventDispatcher.Instance.DispathPluginLoad(this);
         }
 
         /// <summary>
@@ -147,10 +150,6 @@ namespace TemplateAction.Core
         /// </summary>
         public void Unload()
         {
-            if (_config != null)
-            {
-                _config.Unload();
-            }
             TAEventDispatcher.Instance.DispathPluginUnload(this);
         }
     }

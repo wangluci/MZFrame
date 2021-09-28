@@ -12,6 +12,12 @@ namespace TemplateAction.Core
             _pluginPath = path;
             return this;
         }
+
+        protected override void BeforeInit()
+        {
+            //激活配置文件
+            TAEventDispatcher.Instance.DispathLoadBefore(this);
+        }
         protected override IPluginCollectionExtData CreatePluginCollectionExtData()
         {
             return null;
