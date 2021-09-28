@@ -10,8 +10,9 @@ namespace ResumeML
             {
                 return MyAccess.Aop.InterceptFactory.CreateBLL(typeof(TestBusiness), arguments);
             });
-  
-   
+
+
+            services.AddSingleton<FieldDict>();
         }
         public void Loaded(ITAApplication app, IEventRegister register) { }
         public void Unload() { }

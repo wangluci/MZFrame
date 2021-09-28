@@ -15,8 +15,10 @@ namespace ResumeML
     {
         private TestBusiness _business;
         private readonly PredictionEnginePool<ModelInput, ModelOutput> _predictionEnginePool;
-        public Home(TestBusiness business, PredictionEnginePool<ModelInput, ModelOutput> prediction)
+        private FieldDict _dict;
+        public Home(FieldDict dict, TestBusiness business, PredictionEnginePool<ModelInput, ModelOutput> prediction)
         {
+            _dict = dict;
             _predictionEnginePool = prediction;
             _business = business;
         }
@@ -83,7 +85,7 @@ namespace ResumeML
                 {
                     string tmps = linkNodeString.Value;
                     linkNodeString = linkNodeString.Next;
-                    if (!FieldDict.Instance.IsFieldName(tmps))
+                    if (!_dict.IsFieldName(tmps))
                     {
                         PanGu.Segment segment = new PanGu.Segment();
                         ICollection<WordInfo> words = segment.DoSegment(tmps);
@@ -320,7 +322,7 @@ namespace ResumeML
                         continue;
                     }
 
-                    if (FieldDict.Instance.IsDiploma(s))
+                    if (_dict.IsDiploma(s))
                     {
                         int tmpdip = ParseDiploma(s);
                         if (resume.Diploma == -1)
