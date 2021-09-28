@@ -84,7 +84,10 @@ namespace TemplateAction.Core
                 plg = _plugins.CreatePlugin(assem, filepath);
                 if (plg != null)
                 {
-                    AfterPluginChanged(plg);
+                    PushConcurrentTask(() =>
+                    {
+                        AfterPluginChanged(plg);
+                    });
                 }
                 else
                 {

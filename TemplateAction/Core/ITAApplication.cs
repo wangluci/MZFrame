@@ -3,8 +3,17 @@ namespace TemplateAction.Core
 {
     public interface ITAApplication
     {
+        /// <summary>
+        /// 应用根目录
+        /// </summary>
         string RootPath { get; }
+        /// <summary>
+        /// 插件目录
+        /// </summary>
         string PluginPath { get; }
+        /// <summary>
+        /// 服务提供
+        /// </summary>
         ITAServices ServiceProvider { get; }
         /// <summary>
         /// 获取指定插件的配置文件
@@ -20,11 +29,6 @@ namespace TemplateAction.Core
         /// <param name="ns"></param>
         /// <returns></returns>
         bool ExistPlugin(string ns);
-        /// <summary>
-        /// 处理同步任务
-        /// </summary>
-        /// <param name="ac"></param>
-        void PushConcurrentTask(Action ac);
         /// <summary>
         /// 处理定时同步任务
         /// </summary>
