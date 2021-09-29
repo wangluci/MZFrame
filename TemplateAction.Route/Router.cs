@@ -48,13 +48,23 @@ namespace TemplateAction.Route
         public Router(string template) : this(template, null)
         {
         }
-        public Router(string template, IDictionary<string, object> defaults)
+        public Router(string template, IDictionary<string, object> defaults, IDictionary<string, IRouteConstraint> constraints)
         {
             ParsedTemplate = RouteTemplateParser.Parse(template);
             Constraints = GetConstraints(ParsedTemplate);
             Defaults = GetDefaults(ParsedTemplate, defaults);
+            if (constraints != null && Constraints != null)
+            {
+                foreach (KeyValuePair<string, IRouteConstraint> kvp in constraints)
+                {
+                    Constraints.Add(kvp.Key, kvp.Value);
+                }
+            }
         }
-        public Router(string template, object defaults)
+        public Router(string template, IDictionary<string, object> defaults) : this(template, defaults, null)
+        {
+        }
+        public Router(string template, object defaults, object constraints)
         {
             Dictionary<string, object> dic = new Dictionary<string, object>();
             PropertyInfo[] props = defaults.GetType().GetProperties();
@@ -65,6 +75,17 @@ namespace TemplateAction.Route
             ParsedTemplate = RouteTemplateParser.Parse(template);
             Constraints = GetConstraints(ParsedTemplate);
             Defaults = GetDefaults(ParsedTemplate, dic);
+
+            Dictionary<string, IRouteConstraint> constdic = new Dictionary<string, IRouteConstraint>();
+            PropertyInfo[] constprops = defaults.GetType().GetProperties();
+            foreach (PropertyInfo p in constprops)
+            {
+                constdic.Add(p.Name, (IRouteConstraint)p.GetValue(constraints, null));
+            }
+            foreach (KeyValuePair<string, IRouteConstraint> kvp in constdic)
+            {
+                Constraints.Add(kvp.Key, kvp.Value);
+            }
         }
         /// <summary>
         /// 获取默认值
