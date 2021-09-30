@@ -2,9 +2,9 @@
 
 namespace AuthService
 {
-    public class UserPermission
+    public class MZ_UserPermission
     {
-        public UserPermission()
+        public MZ_UserPermission()
         {
             UserId = 0;
             RightCode = "";

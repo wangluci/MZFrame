@@ -10,11 +10,11 @@ namespace AuthService
     public class PermissionDAL : MySqlSupport
     {
         public PermissionDAL(IOptions<AuthOption> conf) : base(conf.Value.connstr) { }
-        public virtual List<UserPermission> GetUserPermissionByCode(long uid, string code)
+        public virtual List<MZ_UserPermission> GetUserPermissionByCode(long uid, string code)
         {
             help.AddInParam("@UserId", MySqlDbType.Int64, uid);
             help.AddInParam("@RightCode", MySqlDbType.VarChar, code);
-            DoQuerySql<UserPermission> execsql = new DoQuerySql<UserPermission>("select * from mz_user_permission where UserId=@UserId and RightCode=@RightCode");
+            DoQuerySql<MZ_UserPermission> execsql = new DoQuerySql<MZ_UserPermission>("select * from mz_user_permission where UserId=@UserId and RightCode=@RightCode");
             help.DoCommand(execsql);
             return execsql.ToList();
         }
@@ -56,10 +56,10 @@ namespace AuthService
             help.DoCommand(execsql);
             return execsql.ToList();
         }
-        public virtual List<UserPermission> GetUserPermissions(long uid)
+        public virtual List<MZ_UserPermission> GetUserPermissions(long uid)
         {
             help.AddInParam("@UserId", MySqlDbType.Int64, uid);
-            DoQuerySql<UserPermission> execsql = new DoQuerySql<UserPermission>("select * from mz_user_permission where UserId=@UserId");
+            DoQuerySql<MZ_UserPermission> execsql = new DoQuerySql<MZ_UserPermission>("select * from mz_user_permission where UserId=@UserId");
             help.DoCommand(execsql);
             return execsql.ToList();
         }

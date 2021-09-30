@@ -12,9 +12,9 @@ namespace AuthService
         public AuthDAL(IOptions<AuthOption> conf) : base(conf.Value.connstr) { }
 
 
-        public virtual int AddSysLog(SysLog log)
+        public virtual int AddSysLog(MZ_SysLog log)
         {
-            DoInsert<SysLog> di = new DoInsert<SysLog>(log, "mz_sys_log");
+            DoInsert<MZ_SysLog> di = new DoInsert<MZ_SysLog>(log, "mz_sys_log");
             help.DoCommand(di);
             return di.RowCount;
         }
@@ -26,11 +26,11 @@ namespace AuthService
             help.AddInParam("@SuccessLogType", MySqlDbType.Int16, 1);
             help.AddInParam("@CreateDate", MySqlDbType.DateTime, DateTime.Now.AddHours(-24));
 
-            DoQuerySql<SysLog> execsql = new DoQuerySql<SysLog>("select * from mz_sys_log where UserId=@UserId and (LogType=@ErrLogType or LogType=@SuccessLogType) and CreateDate>@CreateDate order by CreateDate desc limit 5");
+            DoQuerySql<MZ_SysLog> execsql = new DoQuerySql<MZ_SysLog>("select * from mz_sys_log where UserId=@UserId and (LogType=@ErrLogType or LogType=@SuccessLogType) and CreateDate>@CreateDate order by CreateDate desc limit 5");
             help.DoCommand(execsql);
-            List<SysLog> sysloglist = execsql.ToList();
+            List<MZ_SysLog> sysloglist = execsql.ToList();
             int errcount = 0;
-            foreach (SysLog lg in sysloglist)
+            foreach (MZ_SysLog lg in sysloglist)
             {
                 if (lg.LogType == 1)
                 {

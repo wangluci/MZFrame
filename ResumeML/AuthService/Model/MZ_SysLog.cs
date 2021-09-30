@@ -3,7 +3,7 @@ using System;
 
 namespace AuthService
 {
-    public class SysLog
+    public class MZ_SysLog
     {
         [ID(true)]
         public long SysLogID { get; set; }

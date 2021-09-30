@@ -4,7 +4,7 @@ using System;
 
 namespace AuthService
 {
-    public class AdminInfo
+    public class MZ_AdminInfo
     {
         [ID(true)]
         public virtual long Id { get; set; }

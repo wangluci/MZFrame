@@ -24,7 +24,7 @@ namespace AuthService
         [Des("登录权限")]
         public AjaxResult login(string username, string password)
         {
-            BusResponse<LoginData> response = _authBLL.Login(username, password, Context.GetTerminal());
+            BusResponse<Data_Login> response = _authBLL.Login(username, password, Context.GetTerminal());
             return response.ToAjaxResult(Context);
         }
         /// <summary>

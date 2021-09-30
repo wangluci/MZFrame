@@ -28,11 +28,11 @@ namespace AuthService
         {
             //判断是否有权限声明
             string comparecode = string.Format("{0}/{1}", module, action);
-            List<UserPermission> nurlist = _permission.GetUserPermissionByCode(uid, comparecode);
+            List<MZ_UserPermission> nurlist = _permission.GetUserPermissionByCode(uid, comparecode);
             if (nurlist.Count > 0)
             {
                 bool hasright = true;
-                foreach (UserPermission nur in nurlist)
+                foreach (MZ_UserPermission nur in nurlist)
                 {
                     if (nur.RightType == 1)
                     {
@@ -143,29 +143,29 @@ namespace AuthService
         /// <param name="password"></param>
         /// <param name="terminal">登录终端</param>
         /// <returns></returns>
-        public virtual BusResponse<LoginData> Login(string username, string password, string terminal)
+        public virtual BusResponse<Data_Login> Login(string username, string password, string terminal)
         {
-            AdminInfo account = _user.GetAdminByName(username);
-            if (account == null) return BusResponse<LoginData>.Error(-11, "用户不存在！");
+            MZ_AdminInfo account = _user.GetAdminByName(username);
+            if (account == null) return BusResponse<Data_Login>.Error(-11, "用户不存在！");
 
             string limitmsg = _auth.LimitLoginTime(account.Id);
 
             if (!string.IsNullOrEmpty(limitmsg))
             {
-                return BusResponse<LoginData>.Error(-12, limitmsg);
+                return BusResponse<Data_Login>.Error(-12, limitmsg);
             }
 
             password = MyAccess.Core.Crypter.MD5(string.Concat(password, "@TANetAuth"));
             if (!password.Equals(account.Password, StringComparison.OrdinalIgnoreCase))
             {
-                SysLog log = new SysLog();
+                MZ_SysLog log = new MZ_SysLog();
                 log.UserId = account.Id;
                 log.CreateDate = DateTime.Now;
                 log.LogType = 0;
                 log.IPAddress = terminal;
                 log.Info = "登录密码错误";
                 _auth.AddSysLog(log);
-                return BusResponse<LoginData>.Error(-13, "登录密码错误！");
+                return BusResponse<Data_Login>.Error(-13, "登录密码错误！");
             }
             else
             {
@@ -174,7 +174,7 @@ namespace AuthService
                 {
                     if (!_ExistPermission(account.Id, "/AuthService/User", "login"))
                     {
-                        return BusResponse<LoginData>.Error(-15, "该用户被禁止登录！");
+                        return BusResponse<Data_Login>.Error(-15, "该用户被禁止登录！");
                     }
                 }
             }
@@ -193,7 +193,7 @@ namespace AuthService
                 }
                 catch (Exception ex)
                 {
-                    return BusResponse<LoginData>.Error(-16, ex.Message);
+                    return BusResponse<Data_Login>.Error(-16, ex.Message);
                 }
             }
             else
@@ -206,7 +206,7 @@ namespace AuthService
             string clienttoken = _MakeClientToken(tkinfo, intoken);
             if (!string.IsNullOrEmpty(intoken))
             {
-                SysLog log = new SysLog();
+                MZ_SysLog log = new MZ_SysLog();
                 log.UserId = account.Id;
                 log.CreateDate = DateTime.Now;
                 log.LogType = 1;
@@ -214,22 +214,22 @@ namespace AuthService
                 log.Info = "登录成功";
                 _auth.AddSysLog(log);
 
-                LoginData lgdata = new LoginData();
+                Data_Login lgdata = new Data_Login();
                 lgdata.expire = tkinfo.Expire;
                 lgdata.refresh_token = _MakeRefreshToken(tkinfo, intoken);
                 lgdata.token = clienttoken;
-                return BusResponse<LoginData>.Success(lgdata);
+                return BusResponse<Data_Login>.Success(lgdata);
             }
             else
             {
-                SysLog log = new SysLog();
+                MZ_SysLog log = new MZ_SysLog();
                 log.UserId = account.Id;
                 log.CreateDate = DateTime.Now;
                 log.LogType = 0;
                 log.IPAddress = terminal;
                 log.Info = "登录令牌生成失败";
                 _auth.AddSysLog(log);
-                return BusResponse<LoginData>.Error(-21, "登录令牌生成失败！");
+                return BusResponse<Data_Login>.Error(-21, "登录令牌生成失败！");
             }
         }
         /// <summary>
@@ -291,12 +291,12 @@ namespace AuthService
         /// <param name="tk"></param>
         /// <param name="terminal"></param>
         /// <returns></returns>
-        public virtual BusResponse<LoginData> RefreshToken(string refreshtk, string tk, string terminal)
+        public virtual BusResponse<Data_Login> RefreshToken(string refreshtk, string tk, string terminal)
         {
             ClientToken ct = _ParseClientToken(tk);
             if (ct == null)
             {
-                return BusResponse<LoginData>.Error(50008, "登录令牌信息错误");
+                return BusResponse<Data_Login>.Error(50008, "登录令牌信息错误");
             }
             string tkey = string.Format("Token{0}_{1}", ct.Info.UserId, terminal);
             string intoken = null;
@@ -307,21 +307,21 @@ namespace AuthService
             catch { }
             if (string.IsNullOrEmpty(intoken))
             {
-                return BusResponse<LoginData>.Error(50014, "登录令牌过期");
+                return BusResponse<Data_Login>.Error(50014, "登录令牌过期");
             }
             string mkrefreshtk = _MakeRefreshToken(ct.Info, intoken);
             if (!mkrefreshtk.Equals(refreshtk))
             {
-                return BusResponse<LoginData>.Error(-977, "刷新令牌错误");
+                return BusResponse<Data_Login>.Error(-977, "刷新令牌错误");
             }
 
             _RefreshTokenExpire(ct.Info.UserId, terminal);
 
-            LoginData lgdata = new LoginData();
+            Data_Login lgdata = new Data_Login();
             lgdata.refresh_token = _MakeRefreshToken(ct.Info, intoken);
             lgdata.token = _MakeClientToken(ct.Info, intoken);
             lgdata.expire = ct.Info.Expire;
-            return BusResponse<LoginData>.Success(lgdata);
+            return BusResponse<Data_Login>.Success(lgdata);
         }
     }
 }

@@ -16,14 +16,14 @@ namespace AuthService
         private string[] GetUserRoles(long uid)
         {
             List<string> roles = _permission.GetRolePermissions(uid);
-            List<UserPermission> usr_permissions = _permission.GetUserPermissions(uid);
+            List<MZ_UserPermission> usr_permissions = _permission.GetUserPermissions(uid);
 
             HashSet<string> hs = new HashSet<string>();
             foreach(string s in roles)
             {
                 hs.Add(s);
             }
-            foreach(UserPermission up in usr_permissions)
+            foreach(MZ_UserPermission up in usr_permissions)
             {
                 if (up.RightType == 1)
                 {
@@ -40,7 +40,7 @@ namespace AuthService
         }
         public virtual BusResponse<Data_UserInfo> GetUserInfo(long uid)
         {
-            AdminInfo info = _user.GetAdminById(uid);
+            MZ_AdminInfo info = _user.GetAdminById(uid);
             if (info == null)
             {
                 return BusResponse<Data_UserInfo>.Error(-101, "用户信息不存在");

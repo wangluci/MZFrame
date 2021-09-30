@@ -2,7 +2,7 @@
 
 namespace AuthService
 {
-    public class LoginData
+    public class Data_Login
     {
         /// <summary>
         /// 令牌
