@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using TemplateAction.Core;
 
 namespace AuthService
 {
@@ -11,15 +12,15 @@ namespace AuthService
     {
         private AuthDAL _auth;
         private PermissionDAL _permission;
-        private AuthRedisHelper _redis;
         private IOptions<AuthOption> _conf;
         private UserDAL _user;
-        public AuthBLL(AuthDAL auth, UserDAL user, PermissionDAL permission, AuthRedisHelper redis, IOptions<AuthOption> conf)
+        private ITAServices _provider;
+        public AuthBLL(ITAServices provider, AuthDAL auth, UserDAL user, PermissionDAL permission, IOptions<AuthOption> conf)
         {
+            _provider = provider;
             _auth = auth;
             _user = user;
             _permission = permission;
-            _redis = redis;
             _conf = conf;
         }
 
@@ -112,7 +113,7 @@ namespace AuthService
         {
             string tkey = string.Format("Token{0}_{1}", uid, terminal);
             TimeSpan ts = DateTime.Now.AddHours(_conf.Value.expire_hours) - DateTime.Now;
-            _redis.KeyExpire(tkey, ts);
+            _provider.GetService<AuthRedisHelper>().KeyExpire(tkey, ts);
         }
         /// <summary>
         /// 生成刷新令牌
@@ -188,7 +189,7 @@ namespace AuthService
                     intoken = Guid.NewGuid().ToString("N");
                     string tkey = string.Format("Token{0}_{1}", account.Id, terminal);
                     TimeSpan ts = DateTime.Now.AddHours(_conf.Value.expire_hours) - DateTime.Now;
-                    _redis.StringSet(tkey, intoken, ts);
+                    _provider.GetService<AuthRedisHelper>().StringSet(tkey, intoken, ts);
                 }
                 catch (Exception ex)
                 {
@@ -250,7 +251,7 @@ namespace AuthService
             {
                 try
                 {
-                    intoken = _redis.StringGet(tkey);
+                    intoken = _provider.GetService<AuthRedisHelper>().StringGet(tkey);
                 }
                 catch { }
                 if (string.IsNullOrEmpty(intoken))
@@ -301,7 +302,7 @@ namespace AuthService
             string intoken = null;
             try
             {
-                intoken = _redis.StringGet(tkey);
+                intoken = _provider.GetService<AuthRedisHelper>().StringGet(tkey);
             }
             catch { }
             if (string.IsNullOrEmpty(intoken))
