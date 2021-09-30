@@ -15,7 +15,7 @@ namespace AuthService
         }
         private string[] GetUserRoles(long uid)
         {
-            List<string> roles = _permission.GetRolePermissions(uid);
+            List<string> roles = _permission.GetRolePermissionsByUser(uid);
             List<MZ_UserPermission> usr_permissions = _permission.GetUserPermissions(uid);
 
             HashSet<string> hs = new HashSet<string>();

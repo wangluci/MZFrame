@@ -49,7 +49,7 @@ namespace AuthService
         /// </summary>
         /// <param name="uid"></param>
         /// <returns></returns>
-        public virtual List<string> GetRolePermissions(long uid)
+        public virtual List<string> GetRolePermissionsByUser(long uid)
         {
             help.AddInParam("@UserId", MySqlDbType.Int64, uid);
             DoQuerySql<string> execsql = new DoQuerySql<string>("select distinct nrr.RightCode from mz_role_permission nrr left join mz_user_role nur on nrr.RoleID = nur.RoleID where UserId=@UserId");
@@ -60,6 +60,13 @@ namespace AuthService
         {
             help.AddInParam("@UserId", MySqlDbType.Int64, uid);
             DoQuerySql<MZ_UserPermission> execsql = new DoQuerySql<MZ_UserPermission>("select * from mz_user_permission where UserId=@UserId");
+            help.DoCommand(execsql);
+            return execsql.ToList();
+        }
+        public virtual List<string> GetRolePermissions(long role)
+        {
+            help.AddInParam("@RoleID", MySqlDbType.Int64, role);
+            DoQuerySql<string> execsql = new DoQuerySql<string>("select RightCode from mz_role_permission where RoleID=@RoleID");
             help.DoCommand(execsql);
             return execsql.ToList();
         }

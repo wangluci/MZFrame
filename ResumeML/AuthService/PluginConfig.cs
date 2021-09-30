@@ -12,6 +12,10 @@ namespace AuthService
         public void Configure(IServiceCollection services)
         {
             _services = services;
+            services.AddSingleton<PermissionBLL>((object[] arguments, ITAServices provider) =>
+            {
+                return MyAccess.Aop.InterceptFactory.CreateBLL(typeof(PermissionBLL), arguments);
+            });
             services.AddSingleton<AuthBLL>((object[] arguments, ITAServices provider) =>
             {
                 return MyAccess.Aop.InterceptFactory.CreateBLL(typeof(AuthBLL), arguments);
