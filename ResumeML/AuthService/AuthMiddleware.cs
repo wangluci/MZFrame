@@ -22,11 +22,12 @@ namespace AuthService
                     _authModules.Add(m.ToLower());
                 }
             }
-   
+
         }
         public object Excute(TAAction ac, FilterMiddlewareNode next)
         {
-            if (_authModules.Contains(ac.NameSpace.ToLower()))
+            string modname = ac.NameSpace.ToLower();
+            if (_authModules.Contains(modname) || (modname.Equals("authservice") && ac.Controller == "Role"))
             {
                 //需要身份认证
                 string tk = ac.Context.Request.Header["X-Token"];
