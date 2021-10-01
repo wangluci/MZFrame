@@ -266,20 +266,30 @@ namespace MyAccess.DB
                 return model;
             }
         }
-        protected virtual void PreExcute(DbHelp help)
+        protected virtual DbCommand PreExcute(DbHelp help)
         {
-            help.Command.CommandType = CommandType.Text;
-            help.Command.CommandText = mSql;
-            help.InitParams();
+            DbCommand command = help.CreateCommand();
+            command.Connection = help.Connection;
+            if (help.DbTrans != null)
+            {
+                command.Transaction = help.DbTrans;
+            }
+            command.CommandType = CommandType.Text;
+            command.CommandText = mSql;
+            foreach (DbParameter p in help.DbParamters)
+            {
+                if (!command.Parameters.Contains(p.ParameterName))
+                {
+                    command.Parameters.Add(p);
+                }
+            }
+            return command;
         }
-        protected virtual void AfterExcute(DbHelp help)
-        {
-            help.ClearParams();
-        }
+        protected virtual void AfterExcute(DbCommand command){}
         public virtual void Excute(DbHelp help)
         {
-            PreExcute(help);
-            DbDataReader dataReader = help.Command.ExecuteReader();
+            DbCommand command = PreExcute(help);
+            DbDataReader dataReader = command.ExecuteReader();
             using (dataReader)
             {
                 bool drbl = true;
@@ -294,14 +304,15 @@ namespace MyAccess.DB
                     drbl = dataReader.NextResult();
                 }
             }
-            AfterExcute(help);
+            AfterExcute(command);
+            help.ClearParams();
         }
 
 
         public virtual async Task ExcuteAsync(DbHelp help)
         {
-            PreExcute(help);
-            DbDataReader dataReader = await help.Command.ExecuteReaderAsync();
+            DbCommand command = PreExcute(help);
+            DbDataReader dataReader = await command.ExecuteReaderAsync();
             using (dataReader)
             {
                 bool drbl = true;
@@ -316,7 +327,8 @@ namespace MyAccess.DB
                     drbl = dataReader.NextResult();
                 }
             }
-            AfterExcute(help);
+            AfterExcute(command);
+            help.ClearParams();
         }
     }
 }

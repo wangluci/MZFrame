@@ -19,7 +19,7 @@ namespace AuthService
         /// <summary>
         /// 后台密码
         /// </summary>
-        [JsonIgnore()]
+        [JsonIgnore]
         public virtual string Password { get; set; }
         public virtual string Avatar { get; set; }
         public virtual string Introduction { get; set; }

@@ -1,6 +1,7 @@
 ﻿using MyAccess.Core;
 using System;
 using System.Data;
+using System.Data.Common;
 using System.Threading.Tasks;
 
 namespace MyAccess.DB
@@ -28,19 +29,47 @@ namespace MyAccess.DB
         }
         public virtual void Excute(DbHelp help)
         {
-            help.Command.CommandType = CommandType.StoredProcedure;
-            help.Command.CommandText = mName;
-            help.InitParams();
-            mRowCount = help.Command.ExecuteNonQuery();
+            DbCommand command = help.CreateCommand();
+            command.Connection = help.Connection;
+            if (help.DbTrans != null)
+            {
+                command.Transaction = help.DbTrans;
+            }
+            command.CommandType = CommandType.StoredProcedure;
+            command.CommandText = mName;
+
+            foreach (DbParameter p in help.DbParamters)
+            {
+                if (!command.Parameters.Contains(p.ParameterName))
+                {
+                    command.Parameters.Add(p);
+                }
+            }
+
+            mRowCount = command.ExecuteNonQuery();
             help.ClearParams();
         }
 
         public virtual async Task ExcuteAsync(DbHelp help)
         {
-            help.Command.CommandType = CommandType.StoredProcedure;
-            help.Command.CommandText = mName;
-            help.InitParams();
-            mRowCount = await help.Command.ExecuteNonQueryAsync();
+            DbCommand command = help.CreateCommand();
+            command.Connection = help.Connection;
+            if (help.DbTrans != null)
+            {
+                command.Transaction = help.DbTrans;
+            }
+            command.CommandType = CommandType.StoredProcedure;
+            command.CommandText = mName;
+
+            foreach (DbParameter p in help.DbParamters)
+            {
+                if (!command.Parameters.Contains(p.ParameterName))
+                {
+                    command.Parameters.Add(p);
+                }
+            }
+
+            mRowCount = await command.ExecuteNonQueryAsync();
             help.ClearParams();
         }
     }

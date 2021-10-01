@@ -13,7 +13,6 @@ namespace MyAccess.DB
     /// </summary>
     public class DoInsert<T> : DoExecSql where T : class
     {
-        protected IDoSqlCommand mDo;
         protected T[] _inserted;
         protected string _tablename;
 

@@ -11,22 +11,22 @@ namespace MyAccess.DB
     public abstract class DbHelp : IDisposable, IDbHelp
     {
         protected DbConnection mConn;
-        protected DbCommand mCommand;
         protected string mConnString;
         protected DbTransaction mDbTrans;
+        public DbTransaction DbTrans
+        {
+            get { return mDbTrans; }
+        }
         /// <summary>
         /// 是否禁止清参数
         /// </summary>
         protected bool mDiableClearParam;
-        public bool IsTran()
-        {
-            return mDbTrans != null;
-        }
 
         /// <summary>
         /// 当前参数集
         /// </summary>
         protected List<DbParameter> mDbParamters;
+        public List<DbParameter> DbParamters { get { return mDbParamters; } }
         ~DbHelp()
         {
             Dispose(false);
@@ -60,10 +60,6 @@ namespace MyAccess.DB
             mConnString = connectionStr;
             mDbParamters = new List<DbParameter>();
         }
-        protected abstract DbConnection CreateConnection();
-        protected abstract DbCommand CreateCommand();
-        protected abstract DbDataAdapter CreateDataAdapter();
-
 
 
         public string ConnectionString
@@ -77,10 +73,6 @@ namespace MyAccess.DB
         public DbConnection Connection
         {
             get { return mConn; }
-        }
-        public DbCommand Command
-        {
-            get { return mCommand; }
         }
 
         private void InitBeginTran(Isolation level)
@@ -103,7 +95,6 @@ namespace MyAccess.DB
                     mDbTrans = mConn.BeginTransaction(IsolationLevel.Serializable);
                     break;
             }
-            mCommand.Transaction = mDbTrans;
         }
         public void BeginTran(Isolation level = Isolation.DEFAULT)
         {
@@ -145,14 +136,40 @@ namespace MyAccess.DB
         {
             mConn = CreateConnection();
             mConn.ConnectionString = mConnString;
-            mCommand = CreateCommand();
-            mCommand.Connection = mConn;
             if (mConn.State == ConnectionState.Closed)
             {
                 mConn.Open();
             }
         }
-
+        /// <summary>
+        /// 批量执行Command
+        /// </summary>
+        /// <param name="docommands"></param>
+        public void DoCommandBatch(params IDoCommand[] docommands)
+        {
+            if (!Equals(mDbTrans, null))
+            {
+                foreach (IDoCommand dc in docommands)
+                {
+                    dc.Excute(this);
+                }
+            }
+            else
+            {
+                Open();
+                try
+                {
+                    foreach (IDoCommand dc in docommands)
+                    {
+                        dc.Excute(this);
+                    }
+                }
+                finally
+                {
+                    Close();
+                }
+            }
+        }
         /// <summary>
         /// 执行Sql操作
         /// </summary>
@@ -177,16 +194,6 @@ namespace MyAccess.DB
             }
         }
 
-        public void InitParams()
-        {
-            foreach (DbParameter p in mDbParamters)
-            {
-                if (!mCommand.Parameters.Contains(p.ParameterName))
-                {
-                    mCommand.Parameters.Add(p);
-                }
-            }
-        }
 
 
         public void ClearParams()
@@ -194,10 +201,6 @@ namespace MyAccess.DB
             if (!mDiableClearParam)
             {
                 mDbParamters.Clear();
-            }
-            if (!Equals(mCommand, null))
-            {
-                mCommand.Parameters.Clear();
             }
         }
 
@@ -211,19 +214,7 @@ namespace MyAccess.DB
                 }
                 finally
                 {
-                    mDbTrans = mCommand.Transaction = null;
-                }
-            }
-
-            if (!Equals(mCommand, null))
-            {
-                try
-                {
-                    mCommand.Dispose();
-                }
-                finally
-                {
-                    mCommand = null;
+                    mDbTrans = null;
                 }
             }
 
@@ -254,8 +245,6 @@ namespace MyAccess.DB
         {
             mConn = CreateConnection();
             mConn.ConnectionString = mConnString;
-            mCommand = CreateCommand();
-            mCommand.Connection = mConn;
             if (mConn.State == ConnectionState.Closed)
             {
                 await mConn.OpenAsync();
@@ -281,6 +270,31 @@ namespace MyAccess.DB
                 }
             }
         }
+        public async Task DoCommandBatchAsync(params IDoCommand[] docommands)
+        {
+            if (!Equals(mDbTrans, null))
+            {
+                foreach (IDoCommand dc in docommands)
+                {
+                    await dc.ExcuteAsync(this);
+                }
+            }
+            else
+            {
+                await OpenAsync();
+                try
+                {
+                    foreach (IDoCommand dc in docommands)
+                    {
+                        await dc.ExcuteAsync(this);
+                    }
+                }
+                finally
+                {
+                    Close();
+                }
+            }
+        }
         #endregion
 
         public void CopyDbParamFrom(DbParameter[] parameters)
@@ -296,7 +310,7 @@ namespace MyAccess.DB
         /// 通过对象设置sql语句的输入参数生成的参数名字以@开头
         /// </summary>
         /// <param name="obj"></param>
-        public void CopyParamFrom(object obj)
+        public void AddParamFrom(object obj)
         {
             Type curObjType = obj.GetType();
             PropertyInfo[] myProInfos = curObjType.GetProperties();
@@ -310,12 +324,12 @@ namespace MyAccess.DB
         /// 会先判断是否为IBaseEntity实体，再拷贝参数
         /// </summary>
         /// <param name="obj"></param>
-        public void AddParamFrom(object obj)
+        public void AddParamFromEntity(object obj)
         {
             IBaseEntity be = obj as IBaseEntity;
             if (be == null)
             {
-                CopyParamFrom(obj);
+                AddParamFrom(obj);
             }
             else
             {
@@ -349,6 +363,9 @@ namespace MyAccess.DB
         /// <returns></returns>
         protected abstract string NameToDbParam(string param);
 
+        public abstract DbConnection CreateConnection();
+        public abstract DbCommand CreateCommand();
+        public abstract DbDataAdapter CreateDataAdapter();
 
     }
 }

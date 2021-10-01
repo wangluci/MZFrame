@@ -61,7 +61,7 @@ namespace MyAccess.Aop
                 {
                     return Task.CompletedTask;
                 }
-                if (!dbhelp.IsTran())
+                if (dbhelp.DbTrans != null)
                 {
                     return Task.CompletedTask;
                 }

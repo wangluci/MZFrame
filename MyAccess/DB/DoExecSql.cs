@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Threading.Tasks;
 
 namespace MyAccess.DB
@@ -11,14 +13,14 @@ namespace MyAccess.DB
     {
         protected string mSqlText;
         protected int mRowCount;
-        protected IDoSqlCommand mDoCommand;
+        protected IDoSqlCommand mContactCommand;
         /// <summary>
         /// 关联执行的IDoSqlCommand
         /// </summary>
         /// <param name="command"></param>
         public void ContactCommand(IDoSqlCommand command)
         {
-            mDoCommand = command;
+            mContactCommand = command;
         }
         /// <summary>
         /// 影响的行数
@@ -30,7 +32,7 @@ namespace MyAccess.DB
 
         public DoExecSql(string sql)
         {
-            mDoCommand = null;
+            mContactCommand = null;
             mSqlText = sql;
             mRowCount = -1;
         }
@@ -38,20 +40,38 @@ namespace MyAccess.DB
         {
             mSqlText = sql;
         }
-
+        public string GetSql()
+        {
+            return mSqlText;
+        }
+        protected virtual void AfterExcute(DbCommand command) { }
         public virtual void Excute(DbHelp help)
         {
-            if (mDoCommand != null)
+            if (mContactCommand != null)
             {
-                mDoCommand.SetSql(GetSql());
-                mDoCommand.Excute(help);
+                mContactCommand.SetSql(GetSql());
+                mContactCommand.Excute(help);
             }
             else
             {
-                help.Command.CommandType = CommandType.Text;
-                help.Command.CommandText = mSqlText;
-                help.InitParams();
-                mRowCount = help.Command.ExecuteNonQuery();
+                DbCommand command = help.CreateCommand();
+                command.Connection = help.Connection;
+                if (help.DbTrans != null)
+                {
+                    command.Transaction = help.DbTrans;
+                }
+                command.CommandType = CommandType.Text;
+                command.CommandText = mSqlText;
+
+                foreach (DbParameter p in help.DbParamters)
+                {
+                    if (!command.Parameters.Contains(p.ParameterName))
+                    {
+                        command.Parameters.Add(p);
+                    }
+                }
+                mRowCount = command.ExecuteNonQuery();
+                AfterExcute(command);
                 help.ClearParams();
             }
 
@@ -59,24 +79,35 @@ namespace MyAccess.DB
 
         public virtual async Task ExcuteAsync(DbHelp help)
         {
-            if (mDoCommand != null)
+            if (mContactCommand != null)
             {
-                mDoCommand.SetSql(GetSql());
-                await mDoCommand.ExcuteAsync(help);
+                mContactCommand.SetSql(GetSql());
+                await mContactCommand.ExcuteAsync(help);
             }
             else
             {
-                help.Command.CommandType = CommandType.Text;
-                help.Command.CommandText = mSqlText;
-                help.InitParams();
-                mRowCount = await help.Command.ExecuteNonQueryAsync();
+                DbCommand command = help.CreateCommand();
+                command.Connection = help.Connection;
+                if (help.DbTrans != null)
+                {
+                    command.Transaction = help.DbTrans;
+                }
+                command.CommandType = CommandType.Text;
+                command.CommandText = mSqlText;
+                foreach (DbParameter p in help.DbParamters)
+                {
+                    if (!command.Parameters.Contains(p.ParameterName))
+                    {
+                        command.Parameters.Add(p);
+                    }
+                }
+
+                mRowCount = await command.ExecuteNonQueryAsync();
+                AfterExcute(command);
                 help.ClearParams();
             }
         }
 
-        public string GetSql()
-        {
-            return mSqlText;
-        }
+
     }
 }

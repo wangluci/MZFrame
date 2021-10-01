@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.Common;
 using System.Threading.Tasks;
 
 namespace MyAccess.DB
@@ -18,7 +19,7 @@ namespace MyAccess.DB
     }
     public interface IDbHelp
     {
-        bool IsTran();
+        DbTransaction DbTrans { get; }
         void BeginTran(Isolation level = Isolation.DEFAULT);
         Task BeginTranAsync(Isolation level = Isolation.DEFAULT);
         void Commit();

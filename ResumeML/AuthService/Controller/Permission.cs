@@ -8,9 +8,11 @@ namespace AuthService
     public class Permission : TABaseController
     {
         private PermissionBLL _permission;
-        public Permission(PermissionBLL permission)
+        private UserBLL _user;
+        public Permission(PermissionBLL permission, UserBLL user)
         {
             _permission = permission;
+            _user = user;
         }
         /// <summary>
         /// 获取权限列表
@@ -69,14 +71,22 @@ namespace AuthService
         /// <returns></returns>
         public AjaxResult GetRoles()
         {
-            return Success();
+            return _user.GetAllRole().ToAjaxResult(Context);
         }
 
         [HttpPost]
         [Des("新增角色")]
-        public AjaxResult PostRole()
+        public AjaxResult PostRole(string key, string name, string description)
         {
-            return Success();
+            ClientTokenInfo dataInfo = Context.Items["AuthToken"] as ClientTokenInfo;
+
+            MZ_Role role = new MZ_Role();
+            role.RoleName = name;
+            role.RoleDesc = description;
+            role.RoleType = 0;
+            role.CreateUserId = dataInfo.UserId;
+            role.CreateDate = DateTime.Now;
+            return _user.AddRole(role).ToAjaxResult(Context);
         }
         [HttpPut]
         [Des("修改角色")]

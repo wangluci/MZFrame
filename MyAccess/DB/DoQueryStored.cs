@@ -41,22 +41,35 @@ namespace MyAccess.DB
         {
             get { return mOutDict[key]; }
         }
-        protected override void PreExcute(DbHelp help)
+        protected override DbCommand PreExcute(DbHelp help)
         {
-            help.Command.CommandType = CommandType.StoredProcedure;
-            help.Command.CommandText = mSql;
-            help.InitParams();
+            DbCommand command = help.CreateCommand();
+            command.Connection = help.Connection;
+            if (help.DbTrans != null)
+            {
+                command.Transaction = help.DbTrans;
+            }
+            command.CommandType = CommandType.StoredProcedure;
+            command.CommandText = mSql;
+            foreach (DbParameter p in help.DbParamters)
+            {
+                if (!command.Parameters.Contains(p.ParameterName))
+                {
+                    command.Parameters.Add(p);
+                }
+            }
+            return command;
+
         }
-        protected override void AfterExcute(DbHelp help)
+        protected override void AfterExcute(DbCommand command)
         {
-            foreach (DbParameter dbp in help.Command.Parameters)
+            foreach (DbParameter dbp in command.Parameters)
             {
                 if (dbp.Direction == ParameterDirection.InputOutput || dbp.Direction == ParameterDirection.Output)
                 {
                     mOutDict.Add(dbp.ParameterName, dbp.Value);
                 }
             }
-            base.AfterExcute(help);
         }
 
     }

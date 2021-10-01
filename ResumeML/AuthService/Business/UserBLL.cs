@@ -19,11 +19,11 @@ namespace AuthService
             List<MZ_UserPermission> usr_permissions = _permission.GetUserPermissions(uid);
 
             HashSet<string> hs = new HashSet<string>();
-            foreach(string s in roles)
+            foreach (string s in roles)
             {
                 hs.Add(s);
             }
-            foreach(MZ_UserPermission up in usr_permissions)
+            foreach (MZ_UserPermission up in usr_permissions)
             {
                 if (up.RightType == 1)
                 {
@@ -51,6 +51,14 @@ namespace AuthService
             usrInfo.avatar = info.Avatar;
             usrInfo.roles = GetUserRoles(uid);
             return BusResponse<Data_UserInfo>.Success(usrInfo);
+        }
+        public virtual BusResponse<List<MZ_Role>> GetAllRole()
+        {
+            return BusResponse<List<MZ_Role>>.Success(_user.GetAllRole());
+        }
+        public virtual BusResponse<long> AddRole(MZ_Role role)
+        {
+            return BusResponse<long>.Success(_user.AddRole(role));
         }
     }
 }

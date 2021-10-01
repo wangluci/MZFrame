@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Data.Common;
 using System.Threading.Tasks;
 
 namespace MyAccess.DB
@@ -83,20 +84,44 @@ namespace MyAccess.DB
         }
         public void Excute(DbHelp help)
         {
-            help.Command.CommandType = CommandType.Text;
-            help.Command.CommandText = mSql;
-            help.InitParams();
-            mValue = help.Command.ExecuteScalar();
+            DbCommand command = help.CreateCommand();
+            command.Connection = help.Connection;
+            if (help.DbTrans != null)
+            {
+                command.Transaction = help.DbTrans;
+            }
+            command.CommandType = CommandType.Text;
+            command.CommandText = mSql;
+            foreach (DbParameter p in help.DbParamters)
+            {
+                if (!command.Parameters.Contains(p.ParameterName))
+                {
+                    command.Parameters.Add(p);
+                }
+            }
+            mValue = command.ExecuteScalar();
             help.ClearParams();
         }
 
   
         public async Task ExcuteAsync(DbHelp help)
         {
-            help.Command.CommandType = CommandType.Text;
-            help.Command.CommandText = mSql;
-            help.InitParams();
-            mValue = await help.Command.ExecuteScalarAsync();
+            DbCommand command = help.CreateCommand();
+            command.Connection = help.Connection;
+            if (help.DbTrans != null)
+            {
+                command.Transaction = help.DbTrans;
+            }
+            command.CommandType = CommandType.Text;
+            command.CommandText = mSql;
+            foreach (DbParameter p in help.DbParamters)
+            {
+                if (!command.Parameters.Contains(p.ParameterName))
+                {
+                    command.Parameters.Add(p);
+                }
+            }
+            mValue = await command.ExecuteScalarAsync();
             help.ClearParams();
         }
     }

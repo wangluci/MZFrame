@@ -15,17 +15,17 @@ namespace Common.MySql
         public MySqlHelp(string host, string userName, string password, string dbName) :
             base(string.Format("server={0};user id={1};password={2};database={3};", host, userName, password, dbName))
         { }
-        protected override DbCommand CreateCommand()
+        public override DbCommand CreateCommand()
         {
             return new MySqlCommand();
         }
 
-        protected override DbConnection CreateConnection()
+        public override DbConnection CreateConnection()
         {
             return new MySqlConnection();
         }
 
-        protected override DbDataAdapter CreateDataAdapter()
+        public override DbDataAdapter CreateDataAdapter()
         {
             return new MySqlDataAdapter();
         }
