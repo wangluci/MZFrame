@@ -132,7 +132,6 @@ namespace TemplateAction.Core
 
                 }
             }
-            TAEventDispatcher.Instance.DispathPluginLoad(this);
         }
 
         /// <summary>

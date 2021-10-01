@@ -535,6 +535,7 @@ namespace TemplateAction.Core
                 if (newObj != null)
                 {
                     mPluginList[newObj.Name.ToLower()] = newObj;
+                    TAEventDispatcher.Instance.DispathPluginLoad(newObj);
                 }
             }
         }
@@ -562,11 +563,14 @@ namespace TemplateAction.Core
                 {
                     _lockslim.ExitWriteLock();
                 }
+        
                 if (oldPlugin != null)
                 {
                     oldPlugin.CacheDependency.NoticeChange();
                     oldPlugin.Unload();
                 }
+
+                TAEventDispatcher.Instance.DispathPluginLoad(newObj);
             }
 
             return newObj;

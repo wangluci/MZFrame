@@ -64,24 +64,45 @@ namespace TemplateAction.Core
         }
         protected virtual void PluginConfig(PluginObject plg)
         {
-            PushConcurrentTask(() =>
+            if (_inited)
+            {
+                PushConcurrentTask(() =>
+                {
+                    plg.Config.Configure(plg.Services);
+                });
+            }
+            else
             {
                 plg.Config.Configure(plg.Services);
-            });
+            }
         }
         protected virtual void PluginLoad(PluginObject plg)
         {
-            PushConcurrentTask(() =>
+            if (_inited)
+            {
+                PushConcurrentTask(() =>
+                {
+                    plg.Config.Loaded(this, plg.Dispatcher);
+                });
+            }
+            else
             {
                 plg.Config.Loaded(this, plg.Dispatcher);
-            });
+            }
         }
         protected virtual void PluginUnload(PluginObject plg)
         {
-            PushConcurrentTask(() =>
+            if (_inited)
+            {
+                PushConcurrentTask(() =>
+                {
+                    plg.Config.Unload();
+                });
+            }
+            else
             {
                 plg.Config.Unload();
-            });
+            }
         }
         protected abstract IPluginCollectionExtData CreatePluginCollectionExtData();
         /// <summary>
@@ -180,6 +201,10 @@ namespace TemplateAction.Core
         /// </summary>
         protected virtual void BeforeInit() { }
         /// <summary>
+        /// 判断是否初始化完成
+        /// </summary>
+        private bool _inited = false;
+        /// <summary>
         /// 初始化并加载目录下的插件
         /// </summary>
         /// <param name="rootpath"></param>
@@ -235,7 +260,7 @@ namespace TemplateAction.Core
             {
                 Directory.CreateDirectory(_pluginPath);
             }
-
+            _inited = true;
             //开启监控插件更改
             _watcher = new FileSystemWatcher();
             _watcher.Filter = "*" + ModExt;
