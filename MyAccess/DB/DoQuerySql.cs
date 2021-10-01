@@ -305,7 +305,6 @@ namespace MyAccess.DB
                 }
             }
             AfterExcute(command);
-            help.ClearParams();
         }
 
 
@@ -328,7 +327,6 @@ namespace MyAccess.DB
                 }
             }
             AfterExcute(command);
-            help.ClearParams();
         }
     }
 }

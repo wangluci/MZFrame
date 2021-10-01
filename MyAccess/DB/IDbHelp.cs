@@ -24,6 +24,6 @@ namespace MyAccess.DB
         Task BeginTranAsync(Isolation level = Isolation.DEFAULT);
         void Commit();
         void RollBack();
-        void EnableAndClearParam();
+        void Close();
     }
 }

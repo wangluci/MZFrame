@@ -100,7 +100,6 @@ namespace MyAccess.DB
                 }
             }
             mValue = command.ExecuteScalar();
-            help.ClearParams();
         }
 
   
@@ -122,7 +121,6 @@ namespace MyAccess.DB
                 }
             }
             mValue = await command.ExecuteScalarAsync();
-            help.ClearParams();
         }
     }
 }

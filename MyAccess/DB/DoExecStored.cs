@@ -47,7 +47,6 @@ namespace MyAccess.DB
             }
 
             mRowCount = command.ExecuteNonQuery();
-            help.ClearParams();
         }
 
         public virtual async Task ExcuteAsync(DbHelp help)
@@ -70,7 +69,6 @@ namespace MyAccess.DB
             }
 
             mRowCount = await command.ExecuteNonQueryAsync();
-            help.ClearParams();
         }
     }
 }

@@ -17,10 +17,6 @@ namespace MyAccess.DB
         {
             get { return mDbTrans; }
         }
-        /// <summary>
-        /// 是否禁止清参数
-        /// </summary>
-        protected bool mDiableClearParam;
 
         /// <summary>
         /// 当前参数集
@@ -40,15 +36,6 @@ namespace MyAccess.DB
             }
         }
 
-        public void DiableClearParam()
-        {
-            mDiableClearParam = true;
-        }
-        public void EnableAndClearParam()
-        {
-            mDiableClearParam = false;
-            ClearParams();
-        }
         public void Dispose()
         {
             Dispose(true);
@@ -56,7 +43,6 @@ namespace MyAccess.DB
         }
         public DbHelp(string connectionStr)
         {
-            mDiableClearParam = false;
             mConnString = connectionStr;
             mDbParamters = new List<DbParameter>();
         }
@@ -134,42 +120,24 @@ namespace MyAccess.DB
         }
         public void Open()
         {
-            mConn = CreateConnection();
-            mConn.ConnectionString = mConnString;
-            if (mConn.State == ConnectionState.Closed)
+            if (mConn == null)
             {
-                mConn.Open();
-            }
-        }
-        /// <summary>
-        /// 批量执行Command
-        /// </summary>
-        /// <param name="docommands"></param>
-        public void DoCommandBatch(params IDoCommand[] docommands)
-        {
-            if (!Equals(mDbTrans, null))
-            {
-                foreach (IDoCommand dc in docommands)
+                mConn = CreateConnection();
+                mConn.ConnectionString = mConnString;
+                if (mConn.State == ConnectionState.Closed)
                 {
-                    dc.Excute(this);
+                    mConn.Open();
                 }
             }
             else
             {
-                Open();
-                try
+                if (mConn.State == ConnectionState.Closed)
                 {
-                    foreach (IDoCommand dc in docommands)
-                    {
-                        dc.Excute(this);
-                    }
-                }
-                finally
-                {
-                    Close();
+                    mConn.Open();
                 }
             }
         }
+        
         /// <summary>
         /// 执行Sql操作
         /// </summary>
@@ -178,7 +146,14 @@ namespace MyAccess.DB
         {
             if (!Equals(mDbTrans, null))
             {
-                docommand.Excute(this);
+                try
+                {
+                    docommand.Excute(this);
+                }
+                finally
+                {
+                    mDbParamters.Clear();
+                }
             }
             else
             {
@@ -189,21 +164,14 @@ namespace MyAccess.DB
                 }
                 finally
                 {
-                    Close();
+                    mDbParamters.Clear();
                 }
             }
         }
 
 
 
-        public void ClearParams()
-        {
-            if (!mDiableClearParam)
-            {
-                mDbParamters.Clear();
-            }
-        }
-
+ 
         public void Close()
         {
             if (!Equals(mDbTrans, null))
@@ -218,17 +186,19 @@ namespace MyAccess.DB
                 }
             }
 
-            if (!Equals(mConn, null) && mConn.State == ConnectionState.Open)
+            if (!Equals(mConn, null))
             {
-                try
+                if(mConn.State == ConnectionState.Open)
                 {
-                    mConn.Close();
+                    try
+                    {
+                        mConn.Close();
+                    }
+                    catch { }
                 }
-                finally
-                {
-                    mConn = null;
-                }
+                mConn = null;
             }
+         
         }
 
 
@@ -243,19 +213,37 @@ namespace MyAccess.DB
         }
         public async Task OpenAsync()
         {
-            mConn = CreateConnection();
-            mConn.ConnectionString = mConnString;
-            if (mConn.State == ConnectionState.Closed)
+            if (mConn == null)
             {
-                await mConn.OpenAsync();
+                mConn = CreateConnection();
+                mConn.ConnectionString = mConnString;
+                if (mConn.State == ConnectionState.Closed)
+                {
+                    await mConn.OpenAsync();
+                }
             }
+            else
+            {
+                if (mConn.State == ConnectionState.Closed)
+                {
+                    await mConn.OpenAsync();
+                }
+            }
+           
         }
 
         public async Task DoCommandAsync(IDoCommand docommand)
         {
             if (!Equals(mDbTrans, null))
             {
-                await docommand.ExcuteAsync(this);
+                try
+                {
+                    await docommand.ExcuteAsync(this);
+                }
+                finally
+                {
+                    mDbParamters.Clear();
+                }
             }
             else
             {
@@ -266,44 +254,16 @@ namespace MyAccess.DB
                 }
                 finally
                 {
-                    Close();
+                    mDbParamters.Clear();
                 }
             }
         }
-        public async Task DoCommandBatchAsync(params IDoCommand[] docommands)
-        {
-            if (!Equals(mDbTrans, null))
-            {
-                foreach (IDoCommand dc in docommands)
-                {
-                    await dc.ExcuteAsync(this);
-                }
-            }
-            else
-            {
-                await OpenAsync();
-                try
-                {
-                    foreach (IDoCommand dc in docommands)
-                    {
-                        await dc.ExcuteAsync(this);
-                    }
-                }
-                finally
-                {
-                    Close();
-                }
-            }
-        }
+        
         #endregion
 
         public void CopyDbParamFrom(DbParameter[] parameters)
         {
-            if (!Equals(parameters, null))
-            {
-                ClearParams();
-                mDbParamters.AddRange(parameters);
-            }
+            mDbParamters.AddRange(parameters);
         }
 
         /// <summary>

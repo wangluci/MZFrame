@@ -42,7 +42,7 @@ namespace MyAccess.Aop
                     }
                     //同步
                     //结束后自动清参数
-                    dbHelp?.EnableAndClearParam();
+                    dbHelp?.Close();
                 }
             }
             else
@@ -86,7 +86,7 @@ namespace MyAccess.Aop
                     }
                     //同步
                     //结束后自动清参数
-                    dbHelp?.EnableAndClearParam();
+                    dbHelp?.Close();
                 }
             }
             else

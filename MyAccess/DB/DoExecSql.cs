@@ -72,7 +72,6 @@ namespace MyAccess.DB
                 }
                 mRowCount = command.ExecuteNonQuery();
                 AfterExcute(command);
-                help.ClearParams();
             }
 
         }
@@ -104,7 +103,6 @@ namespace MyAccess.DB
 
                 mRowCount = await command.ExecuteNonQueryAsync();
                 AfterExcute(command);
-                help.ClearParams();
             }
         }
 
