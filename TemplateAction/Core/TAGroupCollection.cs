@@ -1,33 +1,43 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using TemplateAction.Common;
 
 namespace TemplateAction.Core
 {
     public class TAGroupCollection : ITAObjectCollection
     {
-        ITAObjectCollection _one;
-        ITAObjectCollection _two;
-        public TAGroupCollection(ITAObjectCollection one, ITAObjectCollection two)
+        private TAAction _ac;
+        public TAGroupCollection(TAAction ac)
         {
-            _one = one;
-            _two = two;
+            _ac = ac;
         }
 
         public object this[string key]
         {
             get
             {
-                object rt = _one[key];
-                if (rt != null)
+                object rt = null;
+                ITARequest req = _ac.Context.Request;
+                if (req.Query != null)
                 {
-                    return rt;
+                    rt = req.Query[key];
+                    if (rt != null)
+                    {
+                        return rt;
+                    }
                 }
-                rt = _two[key];
-                if (rt != null)
+                if (req.Form != null)
                 {
-                    return rt;
+                    rt = req.Form[key];
+                    if (rt != null)
+                    {
+                        return rt;
+                    }
+                }
+
+                if (_ac.ExtParams != null)
+                {
+                    return _ac.ExtParams[key];
                 }
                 return rt;
             }
@@ -35,7 +45,24 @@ namespace TemplateAction.Core
 
         public int Count
         {
-            get { return _one.Count + _two.Count; }
+            get
+            {
+                ITARequest req = _ac.Context.Request;
+                int totalcount = 0;
+                if (req.Query != null)
+                {
+                    totalcount += req.Query.Count;
+                }
+                if (req.Form != null)
+                {
+                    totalcount += req.Form.Count;
+                }
+                if (_ac.ExtParams != null)
+                {
+                    totalcount += _ac.ExtParams.Count;
+                }
+                return totalcount;
+            }
         }
 
         public T Cast<T>(string key, T def)
@@ -73,24 +100,55 @@ namespace TemplateAction.Core
 
         public bool TryGet(string key, out object result)
         {
-            if (_one.TryGet(key, out result))
+            ITARequest req = _ac.Context.Request;
+            if (req.Query != null)
             {
-                return true;
+                if (req.Query.TryGet(key, out result))
+                {
+                    return true;
+                }
+            }
+            if (req.Form != null)
+            {
+                if (req.Form.TryGet(key, out result))
+                {
+                    return true;
+                }
+            }
+            if (_ac.ExtParams != null)
+            {
+                return _ac.ExtParams.TryGet(key, out result);
             }
             else
             {
-                return _two.TryGet(key, out result);
+                result = null;
+                return false;
             }
         }
         IEnumerator IEnumerable.GetEnumerator()
         {
-            foreach (TAObject obj in _one)
+            ITARequest req = _ac.Context.Request;
+            if (req.Query != null)
             {
-                yield return obj;
+                foreach (TAObject obj in req.Query)
+                {
+                    yield return obj;
+                }
             }
-            foreach (TAObject obj in _two)
+            if (req.Form != null)
             {
-                yield return obj;
+                foreach (TAObject obj in req.Form)
+                {
+                    yield return obj;
+                }
+            }
+          
+            if (_ac.ExtParams != null)
+            {
+                foreach (TAObject obj in _ac.ExtParams)
+                {
+                    yield return obj;
+                }
             }
         }
     }

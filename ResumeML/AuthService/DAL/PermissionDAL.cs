@@ -70,5 +70,12 @@ namespace AuthService
             help.DoCommand(execsql);
             return execsql.ToList();
         }
+        public virtual bool IsRoot(long uid)
+        {
+            help.AddInParam("@UserId", MySqlDbType.Int64, uid);
+            DoQuerySql<long> dqc = new DoQuerySql<long>("select ur.RoleID from mz_user_role ur inner join mz_role r on ur.RoleID=r.RoleID where UserId=@UserId and r.RoleType=1");
+            help.DoCommand(dqc);
+            return dqc.Count() > 0;
+        }
     }
 }

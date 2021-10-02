@@ -352,18 +352,18 @@ namespace TemplateAction.Core
         /// <returns></returns>
         public object CreateServiceInstance(Type serviceType, ProxyFactory factory, ILifetimeFactory scopeFactory)
         {
-            if (serviceType == null) return factory(new object[0], this);
+            if (serviceType == null) return factory(Array.Empty<object>(), this);
             //接口则直接调用factory无参构造
             if (serviceType.IsInterface && factory != null)
             {
-                return factory(new object[0], this);
+                return factory(Array.Empty<object>(), this);
             }
             else if (serviceType.IsPrimitive || serviceType == typeof(string))
             {
                 //string或基本类型返回
                 if (factory != null)
                 {
-                    return factory(new object[0], this);
+                    return factory(Array.Empty<object>(), this);
                 }
                 else
                 {
@@ -447,7 +447,7 @@ namespace TemplateAction.Core
             {
                 if (factory != null)
                 {
-                    return factory(new object[0], this);
+                    return factory(Array.Empty<object>(), this);
                 }
                 else
                 {
@@ -563,7 +563,7 @@ namespace TemplateAction.Core
                 {
                     _lockslim.ExitWriteLock();
                 }
-        
+
                 if (oldPlugin != null)
                 {
                     oldPlugin.CacheDependency.NoticeChange();

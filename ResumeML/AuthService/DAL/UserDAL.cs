@@ -30,11 +30,24 @@ namespace AuthService
             help.DoCommand(dqs);
             return dqs.ToList();
         }
+        public virtual MZ_Role GetRole(long id)
+        {
+            help.AddInParam("@RoleID", MySqlDbType.Int64, id);
+            DoQuerySql<MZ_Role> dqs = new DoQuerySql<MZ_Role>("select * from mz_role where RoleID=@RoleID");
+            help.DoCommand(dqs);
+            return dqs.ToFirst();
+        }
         public virtual long AddRole(MZ_Role role)
         {
             DoInsertOfMySql<MZ_Role> di = new DoInsertOfMySql<MZ_Role>(role, "mz_role");
             help.DoCommand(di);
             return di.LastInsertedId;
+        }
+        public virtual int UpdateRole(MZ_Role role)
+        {
+            DoUpdate du = new DoUpdate(role, "mz_role");
+            help.DoCommand(du);
+            return du.RowCount;
         }
     }
 }

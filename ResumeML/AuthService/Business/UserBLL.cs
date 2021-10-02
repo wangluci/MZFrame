@@ -58,7 +58,37 @@ namespace AuthService
         }
         public virtual BusResponse<long> AddRole(MZ_Role role)
         {
-            return BusResponse<long>.Success(_user.AddRole(role));
+            try
+            {
+                return BusResponse<long>.Success(_user.AddRole(role));
+            }
+            catch (Exception ex)
+            {
+                return BusResponse<long>.Error(-12, ex.Message);
+            }
+
+        }
+        public virtual BusResponse<string> UpdateRole(MZ_Role role, long uid)
+        {
+            try
+            {
+                bool canupdate = _permission.IsRoot(uid);
+                if (!canupdate)
+                {
+                    MZ_Role old = _user.GetRole(role.RoleID);
+                    canupdate = old.CreateUserId.Equals(uid);
+                }
+                if (!canupdate)
+                {
+                    return BusResponse<string>.Error(-11, "无权编辑当前角色");
+                }
+                _user.UpdateRole(role);
+                return BusResponse<string>.Success(null);
+            }
+            catch (Exception ex)
+            {
+                return BusResponse<string>.Error(-12, ex.Message);
+            }
         }
     }
 }

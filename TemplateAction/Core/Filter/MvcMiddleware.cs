@@ -27,34 +27,28 @@ namespace TemplateAction.Core
                 if (!ac.ActionNode.JudgeHttpMethod(context.Request.HttpMethod)) return null;
                 MethodInfo method = ac.ActionNode.Method;
                 ParameterInfo[] pinfos = method.GetParameters();
-                List<object> paramlist = new List<object>();
+
                 //开始遍历参数进行验证
-                ITAObjectCollection gc = null;
-                if (context.Request.Form == null)
+                if (pinfos.Length > 0)
                 {
-                    gc = context.Request.Query;
+                    List<object> paramlist = new List<object>();
+                    ITAObjectCollection gc = new TAGroupCollection(ac);
+                    for (int i = 0; i < pinfos.Length; i++)
+                    {
+                        //创建参数映射
+                        object mapobj = MappingFactory.Mapping(gc, pinfos[i]);
+                        if (Equals(mapobj, null))
+                        {
+                            return null;
+                        }
+                        paramlist.Add(mapobj);
+                    }
+                    return c.CallAction(method, paramlist.ToArray());
                 }
                 else
                 {
-                    gc = new TAGroupCollection(context.Request.Query, context.Request.Form);
+                    return c.CallAction(method, Array.Empty<object>());
                 }
-                if (!Equals(ac.ExtParams, null))
-                {
-                    gc = new TAGroupCollection(gc, ac.ExtParams);
-                }
-
-                for (int i = 0; i < pinfos.Length; i++)
-                {
-                    //创建参数映射
-                    object mapobj = MappingFactory.Mapping(gc, pinfos[i]);
-                    if (Equals(mapobj, null))
-                    {
-                        return null;
-                    }
-                    paramlist.Add(mapobj);
-                }
-
-                return c.CallAction(method, paramlist.ToArray());
             }
             catch (Exception ex)
             {

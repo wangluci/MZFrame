@@ -76,7 +76,7 @@ namespace AuthService
 
         [HttpPost]
         [Des("新增角色")]
-        public AjaxResult PostRole(string key, string name, string description)
+        public AjaxResult PostRole(string name, string description)
         {
             ClientTokenInfo dataInfo = Context.Items["AuthToken"] as ClientTokenInfo;
 
@@ -90,9 +90,16 @@ namespace AuthService
         }
         [HttpPut]
         [Des("修改角色")]
-        public AjaxResult PutRole()
+        public AjaxResult PutRole(long id, string name, string description)
         {
-            return Success();
+            ClientTokenInfo dataInfo = Context.Items["AuthToken"] as ClientTokenInfo;
+
+            MZ_Role role = MyAccess.Aop.InterceptFactory.CreateEntityOp<MZ_Role>();
+            role.RoleID = id;
+            role.RoleName = name;
+            role.RoleDesc = description;
+
+            return _user.UpdateRole(role, dataInfo.UserId).ToAjaxResult(Context);
         }
         [HttpDelete]
         [Des("删除角色")]
