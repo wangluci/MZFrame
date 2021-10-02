@@ -34,27 +34,27 @@ namespace Common.Oracle
         {
             OracleParameter dbParameter = new OracleParameter(name, val);
             dbParameter.Direction = direct;
-            mDbParamters.Add(dbParameter);
+            AddParam(dbParameter);
         }
 
 
         public void CopyMySqlParamFrom(OracleParameter[] parameters)
         {
-            CopyDbParamFrom(parameters);
+            AddParamFromArray(parameters);
         }
 
         public void AddOutParam(string parameterName, OracleType dbType)
         {
             OracleParameter dbParameter = new OracleParameter(parameterName, dbType);
             dbParameter.Direction = ParameterDirection.Output;
-            mDbParamters.Add(dbParameter);
+            AddParam(dbParameter);
         }
         public void AddInParam(string parameterName, OracleType dbType, object value)
         {
             OracleParameter dbParameter = new OracleParameter(parameterName, dbType);
             dbParameter.Value = value;
             dbParameter.Direction = ParameterDirection.Input;
-            mDbParamters.Add(dbParameter);
+            AddParam(dbParameter);
         }
         protected override string NameToDbParam(string param)
         {

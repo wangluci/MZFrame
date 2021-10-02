@@ -51,13 +51,7 @@ namespace MyAccess.DB
             }
             command.CommandType = CommandType.StoredProcedure;
             command.CommandText = mSql;
-            foreach (DbParameter p in help.DbParamters)
-            {
-                if (!command.Parameters.Contains(p.ParameterName))
-                {
-                    command.Parameters.Add(p);
-                }
-            }
+            help.InitParamters(command);
             return command;
 
         }

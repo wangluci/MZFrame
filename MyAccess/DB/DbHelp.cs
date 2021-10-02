@@ -21,8 +21,35 @@ namespace MyAccess.DB
         /// <summary>
         /// 当前参数集
         /// </summary>
-        protected List<DbParameter> mDbParamters;
-        public List<DbParameter> DbParamters { get { return mDbParamters; } }
+        private LinkedList<DbParameter> mDbParamters;
+        private HashSet<string> mParamterHash;
+        public void AddParam(DbParameter p)
+        {
+            if (!mParamterHash.Contains(p.ParameterName))
+            {
+                mDbParamters.AddLast(p);
+                mParamterHash.Add(p.ParameterName);
+            }
+        }
+        public void InitParamters(DbCommand command)
+        {
+            foreach (DbParameter p in mDbParamters)
+            {
+                command.Parameters.Add(p);
+            }
+        }
+        public void AddParamFromArray(DbParameter[] parameters)
+        {
+            foreach (DbParameter p in parameters)
+            {
+                AddParam(p);
+            }
+        }
+        public void ClearDbParamters()
+        {
+            mDbParamters.Clear();
+            mParamterHash.Clear();
+        }
         ~DbHelp()
         {
             Dispose(false);
@@ -44,7 +71,8 @@ namespace MyAccess.DB
         public DbHelp(string connectionStr)
         {
             mConnString = connectionStr;
-            mDbParamters = new List<DbParameter>();
+            mDbParamters = new LinkedList<DbParameter>();
+            mParamterHash = new HashSet<string>();
         }
 
 
@@ -137,7 +165,7 @@ namespace MyAccess.DB
                 }
             }
         }
-        
+
         /// <summary>
         /// 执行Sql操作
         /// </summary>
@@ -152,7 +180,7 @@ namespace MyAccess.DB
                 }
                 finally
                 {
-                    mDbParamters.Clear();
+                    ClearDbParamters();
                 }
             }
             else
@@ -164,14 +192,14 @@ namespace MyAccess.DB
                 }
                 finally
                 {
-                    mDbParamters.Clear();
+                    ClearDbParamters();
                 }
             }
         }
 
 
 
- 
+
         public void Close()
         {
             if (!Equals(mDbTrans, null))
@@ -188,7 +216,7 @@ namespace MyAccess.DB
 
             if (!Equals(mConn, null))
             {
-                if(mConn.State == ConnectionState.Open)
+                if (mConn.State == ConnectionState.Open)
                 {
                     try
                     {
@@ -198,7 +226,7 @@ namespace MyAccess.DB
                 }
                 mConn = null;
             }
-         
+
         }
 
 
@@ -229,7 +257,7 @@ namespace MyAccess.DB
                     await mConn.OpenAsync();
                 }
             }
-           
+
         }
 
         public async Task DoCommandAsync(IDoCommand docommand)
@@ -242,7 +270,7 @@ namespace MyAccess.DB
                 }
                 finally
                 {
-                    mDbParamters.Clear();
+                    ClearDbParamters();
                 }
             }
             else
@@ -254,17 +282,14 @@ namespace MyAccess.DB
                 }
                 finally
                 {
-                    mDbParamters.Clear();
+                    ClearDbParamters();
                 }
             }
         }
-        
+
         #endregion
 
-        public void CopyDbParamFrom(DbParameter[] parameters)
-        {
-            mDbParamters.AddRange(parameters);
-        }
+
 
         /// <summary>
         /// 通过对象设置sql语句的输入参数生成的参数名字以@开头

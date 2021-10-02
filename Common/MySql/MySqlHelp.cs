@@ -39,13 +39,13 @@ namespace Common.MySql
             }
             MySqlParameter dbParameter = new MySqlParameter(name, val);
             dbParameter.Direction = direct;
-            mDbParamters.Add(dbParameter);
+            AddParam(dbParameter);
         }
 
 
         public void CopyMySqlParamFrom(MySqlParameter[] parameters)
         {
-            CopyDbParamFrom(parameters);
+            AddParamFromArray(parameters);
         }
 
         public void AddOutParam(string parameterName, MySqlDbType dbType)
@@ -56,7 +56,7 @@ namespace Common.MySql
             }
             MySqlParameter dbParameter = new MySqlParameter(parameterName, dbType);
             dbParameter.Direction = ParameterDirection.Output;
-            mDbParamters.Add(dbParameter);
+            AddParam(dbParameter);
         }
         public void AddInParam(string parameterName, MySqlDbType dbType, object value)
         {
@@ -67,7 +67,7 @@ namespace Common.MySql
             MySqlParameter dbParameter = new MySqlParameter(parameterName, dbType);
             dbParameter.Value = value;
             dbParameter.Direction = ParameterDirection.Input;
-            mDbParamters.Add(dbParameter);
+            AddParam(dbParameter);
         }
 
         protected override string NameToDbParam(string param)

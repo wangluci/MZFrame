@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Threading.Tasks;
@@ -92,13 +93,7 @@ namespace MyAccess.DB
             }
             command.CommandType = CommandType.Text;
             command.CommandText = mSql;
-            foreach (DbParameter p in help.DbParamters)
-            {
-                if (!command.Parameters.Contains(p.ParameterName))
-                {
-                    command.Parameters.Add(p);
-                }
-            }
+            help.InitParamters(command);
             mValue = command.ExecuteScalar();
         }
 
@@ -113,13 +108,7 @@ namespace MyAccess.DB
             }
             command.CommandType = CommandType.Text;
             command.CommandText = mSql;
-            foreach (DbParameter p in help.DbParamters)
-            {
-                if (!command.Parameters.Contains(p.ParameterName))
-                {
-                    command.Parameters.Add(p);
-                }
-            }
+            help.InitParamters(command);
             mValue = await command.ExecuteScalarAsync();
         }
     }

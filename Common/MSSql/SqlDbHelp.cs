@@ -26,12 +26,12 @@ namespace Common.MSSql
         }
 
         /// <summary>
-        /// 自带清除之前的参数
+        /// 拷贝多个参数
         /// </summary>
         /// <param name="parameters"></param>
         public void CopySqlParamFrom(SqlParameter[] parameters)
         {
-            CopyDbParamFrom(parameters);
+            AddParamFromArray(parameters);
         }
         protected override void AutoDbParam(string name, object val, ParameterDirection direct)
         {
@@ -41,7 +41,7 @@ namespace Common.MSSql
             }
             SqlParameter dbParameter = new SqlParameter(name, val);
             dbParameter.Direction = direct;
-            mDbParamters.Add(dbParameter);
+            AddParam(dbParameter);
         }
 
         public void AddOutParam(string parameterName, SqlDbType dbType)
@@ -52,7 +52,7 @@ namespace Common.MSSql
             }
             SqlParameter dbParameter = new SqlParameter(parameterName, dbType);
             dbParameter.Direction = ParameterDirection.Output;
-            mDbParamters.Add(dbParameter);
+            AddParam(dbParameter);
         }
         public void AddInParam(string parameterName, SqlDbType dbType, object value)
         {
@@ -63,7 +63,7 @@ namespace Common.MSSql
             SqlParameter dbParameter = new SqlParameter(parameterName, dbType);
             dbParameter.Value = value;
             dbParameter.Direction = ParameterDirection.Input;
-            mDbParamters.Add(dbParameter);
+            AddParam(dbParameter);
         }
         protected override string NameToDbParam(string param)
         {

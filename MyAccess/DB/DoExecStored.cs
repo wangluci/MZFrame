@@ -1,5 +1,6 @@
 ﻿using MyAccess.Core;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Threading.Tasks;
@@ -38,14 +39,7 @@ namespace MyAccess.DB
             command.CommandType = CommandType.StoredProcedure;
             command.CommandText = mName;
 
-            foreach (DbParameter p in help.DbParamters)
-            {
-                if (!command.Parameters.Contains(p.ParameterName))
-                {
-                    command.Parameters.Add(p);
-                }
-            }
-
+            help.InitParamters(command);
             mRowCount = command.ExecuteNonQuery();
         }
 
@@ -60,14 +54,7 @@ namespace MyAccess.DB
             command.CommandType = CommandType.StoredProcedure;
             command.CommandText = mName;
 
-            foreach (DbParameter p in help.DbParamters)
-            {
-                if (!command.Parameters.Contains(p.ParameterName))
-                {
-                    command.Parameters.Add(p);
-                }
-            }
-
+            help.InitParamters(command);
             mRowCount = await command.ExecuteNonQueryAsync();
         }
     }
