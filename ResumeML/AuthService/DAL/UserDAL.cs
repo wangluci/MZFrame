@@ -49,5 +49,12 @@ namespace AuthService
             help.DoCommand(du);
             return du.RowCount;
         }
+        public virtual int DeleteRole(long id)
+        {
+            help.AddInParam("@RoleID", MySqlDbType.Int64, id);
+            DoDelete dd = new DoDelete("mz_role", "RoleID=@RoleID");
+            help.DoCommand(dd);
+            return dd.RowCount;
+        }
     }
 }

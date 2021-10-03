@@ -90,5 +90,27 @@ namespace AuthService
                 return BusResponse<string>.Error(-12, ex.Message);
             }
         }
+        public virtual BusResponse<string> DeleteRole(long id, long uid)
+        {
+            try
+            {
+                bool canupdate = _permission.IsRoot(uid);
+                if (!canupdate)
+                {
+                    MZ_Role old = _user.GetRole(id);
+                    canupdate = old.CreateUserId.Equals(uid);
+                }
+                if (!canupdate)
+                {
+                    return BusResponse<string>.Error(-11, "无权删除当前角色");
+                }
+                _user.DeleteRole(id);
+                return BusResponse<string>.Success(null);
+            }
+            catch(Exception ex)
+            {
+                return BusResponse<string>.Error(-12, ex.Message);
+            }
+        }
     }
 }

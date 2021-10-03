@@ -103,9 +103,10 @@ namespace AuthService
         }
         [HttpDelete]
         [Des("删除角色")]
-        public AjaxResult DeleteRole()
+        public AjaxResult DeleteRole(long id)
         {
-            return Success();
+            ClientTokenInfo dataInfo = Context.Items["AuthToken"] as ClientTokenInfo;
+            return _user.DeleteRole(id, dataInfo.UserId).ToAjaxResult(Context);
         }
     }
 }

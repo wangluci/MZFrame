@@ -7,7 +7,6 @@ namespace TemplateAction.Route
 {
     public class RouterBuilder : AbstractRouterBuilder, IRouterBuilder
     {
-
         /// <summary>
         /// 使用默认路由
         /// </summary>

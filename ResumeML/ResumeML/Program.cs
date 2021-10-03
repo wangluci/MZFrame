@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.ML;
 using ResumeMLML.Model;
 using System;
@@ -7,10 +6,6 @@ using System.IO;
 using System.Reflection;
 using TemplateAction.NetCore;
 using TemplateAction.Route;
-using TemplateAction.Core;
-using Microsoft.Extensions.DependencyInjection;
-using Common.Redis;
-using Microsoft.Extensions.Options;
 
 namespace ResumeML
 {
@@ -31,10 +26,7 @@ namespace ResumeML
                 builder.UseStaticFiles();
                 builder.UseTAMvc(app =>
                 {
-                    RouterBuilder rbuilder = new RouterBuilder();
-                    rbuilder.MapRoute("AuthService", "vue-element-admin/{controller=Home}/{action=Index}/{id?}");
-                    rbuilder.UseDefault(Assembly.GetEntryAssembly().GetName().Name);
-                    app.UseRouterBuilder(rbuilder);
+                    app.UseRouterBuilder(new RouterBuilder().UsePlugin().UseDefault(Assembly.GetEntryAssembly().GetName().Name));
                 });
             }).Build().Run();
         }
