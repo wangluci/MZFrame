@@ -7,6 +7,7 @@ namespace TemplateAction.Route
 {
     public class RouterBuilder : AbstractRouterBuilder, IRouterBuilder
     {
+        private static IRouteConstraint _getOrPost = new GetOrPostConstraint();
         /// <summary>
         /// 使用默认路由
         /// </summary>
@@ -19,7 +20,10 @@ namespace TemplateAction.Route
             defaults.Add(TAUtility.CONTROLLER_KEY, "Home");
             defaults.Add(TAUtility.ACTION_KEY, "Index");
             string template = string.Format("{{{0}}}/{{{1}}}/{{id?}}", TAUtility.CONTROLLER_KEY, TAUtility.ACTION_KEY);
-            return MapRoute(new Router(template, defaults));
+
+            Dictionary<string, IRouteConstraint> constraint = new Dictionary<string, IRouteConstraint>();
+            constraint.Add("getorpost", _getOrPost);
+            return MapRoute(new Router(template, defaults, constraint));
         }
         /// <summary>
         /// 使用插件路由
@@ -31,7 +35,10 @@ namespace TemplateAction.Route
             defaults.Add(TAUtility.CONTROLLER_KEY, "Home");
             defaults.Add(TAUtility.ACTION_KEY, "Index");
             string template = string.Format("{{{0}:exists}}/{{{1}}}/{{{2}}}/{{id?}}", TAUtility.NS_KEY, TAUtility.CONTROLLER_KEY, TAUtility.ACTION_KEY);
-            return MapRoute(new Router(template, defaults));
+
+            Dictionary<string, IRouteConstraint> constraint = new Dictionary<string, IRouteConstraint>();
+            constraint.Add("getorpost", _getOrPost);
+            return MapRoute(new Router(template, defaults, constraint));
         }
         /// <summary>
         /// 使用Restful接口
