@@ -9,7 +9,7 @@ namespace TemplateAction.Route
     {
         private static IRouteConstraint _getOrPost = new GetOrPostConstraint();
         /// <summary>
-        /// 使用默认路由
+        /// 使用WebApi默认路由
         /// </summary>
         /// <param name="ns">默认命名空间</param>
         /// <returns></returns>
@@ -26,7 +26,7 @@ namespace TemplateAction.Route
             return MapRoute(new Router(template, defaults, constraint));
         }
         /// <summary>
-        /// 使用插件路由
+        /// 使用WebApi插件路由
         /// </summary>
         /// <returns></returns>
         public RouterBuilder UsePlugin()

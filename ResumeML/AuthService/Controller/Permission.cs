@@ -74,7 +74,6 @@ namespace AuthService
             return _user.GetAllRole().ToAjaxResult(Context);
         }
 
-        [HttpPost]
         [Des("新增角色")]
         public AjaxResult PostRole(string name, string description)
         {
@@ -88,7 +87,6 @@ namespace AuthService
             role.CreateDate = DateTime.Now;
             return _user.AddRole(role).ToAjaxResult(Context);
         }
-        [HttpPut]
         [Des("修改角色")]
         public AjaxResult PutRole(long id, string name, string description)
         {
@@ -101,7 +99,6 @@ namespace AuthService
 
             return _user.UpdateRole(role, dataInfo.UserId).ToAjaxResult(Context);
         }
-        [HttpDelete]
         [Des("删除角色")]
         public AjaxResult DeleteRole(long id)
         {
