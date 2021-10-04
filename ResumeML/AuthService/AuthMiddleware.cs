@@ -27,7 +27,7 @@ namespace AuthService
         public object Excute(TAAction ac, FilterMiddlewareNode next)
         {
             string modname = ac.NameSpace.ToLower();
-            if (_authModules.Contains(modname) || (modname.Equals("authservice") && ac.Controller == "Role"))
+            if (_authModules.Contains(modname) || (modname.Equals("authservice") && ac.Controller == "Permission"))
             {
                 //需要身份认证
                 string tk = ac.Context.Request.Header["X-Token"];

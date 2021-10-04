@@ -24,33 +24,6 @@ namespace AuthService
             _conf = conf;
         }
 
-        private bool _ExistPermission(long uid, string module, string action)
-        {
-            //判断是否有权限声明
-            string comparecode = string.Format("{0}/{1}", module, action);
-            List<MZ_UserPermission> nurlist = _permission.GetUserPermissionByCode(uid, comparecode);
-            if (nurlist.Count > 0)
-            {
-                bool hasright = true;
-                foreach (MZ_UserPermission nur in nurlist)
-                {
-                    if (nur.RightType == 1)
-                    {
-                        hasright = false;
-                        break;
-                    }
-                }
-                return hasright;
-            }
-            else
-            {
-                if (_permission.HasRolePermissionByCode(uid, comparecode))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
         /// <summary>
         /// 生成签名
         /// </summary>
@@ -134,7 +107,7 @@ namespace AuthService
         /// <returns></returns>
         public virtual bool ExistPermission(long uid, string module, string action)
         {
-            return _ExistPermission(uid, module, action);
+            return _permission.ExistPermission(uid, module, action);
         }
         /// <summary>
         /// 登录
@@ -172,7 +145,7 @@ namespace AuthService
                 //权限验证是否可登录
                 if (_conf.Value.enable_permission)
                 {
-                    if (!_ExistPermission(account.Id, "/AuthService/User", "login"))
+                    if (!_permission.ExistPermission(account.Id, "/AuthService/User", "login"))
                     {
                         return BusResponse<Data_Login>.Error(-15, "该用户被禁止登录！");
                     }

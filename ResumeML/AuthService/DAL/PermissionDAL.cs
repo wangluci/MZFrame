@@ -10,40 +10,37 @@ namespace AuthService
     public class PermissionDAL : MySqlSupport
     {
         public PermissionDAL(IOptions<AuthOption> conf) : base(conf.Value.connstr) { }
-        public virtual List<MZ_UserPermission> GetUserPermissionByCode(long uid, string code)
+        public virtual bool ExistPermission(long uid, string module, string action)
         {
+            string code = string.Format("{0}/{1}", module, action);
             help.AddInParam("@UserId", MySqlDbType.Int64, uid);
             help.AddInParam("@RightCode", MySqlDbType.VarChar, code);
             DoQuerySql<MZ_UserPermission> execsql = new DoQuerySql<MZ_UserPermission>("select * from mz_user_permission where UserId=@UserId and RightCode=@RightCode");
             help.DoCommand(execsql);
-            return execsql.ToList();
-        }
-        public virtual bool HasRolePermissionByCode(long uid, string code)
-        {
-            help.AddInParam("@UserId", MySqlDbType.Int64, uid);
-            help.AddInParam("@RightCode", MySqlDbType.VarChar, code);
-            DoQuerySql<long> execsql = new DoQuerySql<long>("select nrr.RoleRightID from mz_role_permission nrr left join mz_user_role nur on nrr.RoleID = nur.RoleID where UserId=@UserId and RightCode=@RightCode");
-            help.DoCommand(execsql);
-            return execsql.Count() > 0;
+            List<MZ_UserPermission> nurlist = execsql.ToList();
+            if (nurlist.Count > 0)
+            {
+                bool hasright = true;
+                foreach (MZ_UserPermission nur in nurlist)
+                {
+                    if (nur.RightType == 1)
+                    {
+                        hasright = false;
+                        break;
+                    }
+                }
+                return hasright;
+            }
+            else
+            {
+                help.AddInParam("@UserId", MySqlDbType.Int64, uid);
+                help.AddInParam("@RightCode", MySqlDbType.VarChar, code);
+                DoQuerySql<long> execsql2 = new DoQuerySql<long>("select nrr.RoleRightID from mz_role_permission nrr left join mz_user_role nur on nrr.RoleID = nur.RoleID where UserId=@UserId and RightCode=@RightCode");
+                help.DoCommand(execsql2);
+                return execsql2.Count() > 0;
+            }
         }
 
-        public virtual bool HasUserPermission(long uid, string module)
-        {
-            help.AddInParam("@UserId", MySqlDbType.Int64, uid);
-            help.AddInParam("@RightCode", MySqlDbType.VarChar, MyAccess.Filter.HtmlFilter.SqlLikeFilter(module) + "/%");
-            DoQuerySql<long> execsql = new DoQuerySql<long>("select UserRightID from mz_user_permission where UserId=@UserId and RightType=0 and RightCode like @RightCode");
-            help.DoCommand(execsql);
-            return execsql.Count() > 0;
-        }
-        public virtual bool HasRolePermission(long uid, string module)
-        {
-            help.AddInParam("@UserId", MySqlDbType.Int64, uid);
-            string xx = MyAccess.Filter.HtmlFilter.SqlLikeFilter(module);
-            help.AddInParam("@RightCode", MySqlDbType.VarChar, MyAccess.Filter.HtmlFilter.SqlLikeFilter(module) + "/%");
-            DoQuerySql<long> execsql = new DoQuerySql<long>("select nrr.RoleRightID from mz_role_permission nrr left join mz_user_role nur on nrr.RoleID = nur.RoleID where UserId=@UserId and RightCode like @RightCode");
-            help.DoCommand(execsql);
-            return execsql.Count() > 0;
-        }
         /// <summary>
         /// 获取用户所有角色权限
         /// </summary>
