@@ -4,7 +4,7 @@ using TemplateAction.Core;
 
 namespace AuthService
 {
-    [Des("系统权限")]
+    [Des("系统权限",-2)]
     public class User : TABaseController
     {
         private AuthBLL _authBLL;

@@ -8,14 +8,9 @@ namespace TemplateAction.Core
     /// </summary>
     public class DescribeInfo
     {
-        public DescribeInfo()
-        {
-            Name = string.Empty;
-            Code = string.Empty;
-            ParentCode = string.Empty;
-        }
         public string Name { get; set; }
         public string Code { get; set; }
+        public int Sort { get; set; }
         public string ParentCode { get; set; }
     }
 }

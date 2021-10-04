@@ -31,6 +31,7 @@ namespace TemplateAction.Core
             if (ad != null)
             {
                 mDescript = ad.Des;
+                mSort = ad.Sort;
             }
             mType = type;
             InitActions(plg);

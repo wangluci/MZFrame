@@ -4,7 +4,7 @@ using TemplateAction.Core;
 
 namespace AuthService
 {
-    [Des("权限设置")]
+    [Des("权限设置", -1)]
     public class Permission : TABaseController
     {
         private PermissionBLL _permission;
@@ -13,6 +13,21 @@ namespace AuthService
         {
             _permission = permission;
             _user = user;
+        }
+        /// <summary>
+        /// 对权限进行排序
+        /// </summary>
+        /// <param name="list"></param>
+        private void PermissionSort(List<Data_Permission> list)
+        {
+            list.Sort((x, y) => { return x.sort - y.sort; });
+            foreach (Data_Permission p in list)
+            {
+                if (p.children != null)
+                {
+                    PermissionSort(p.children);
+                }
+            }
         }
         /// <summary>
         /// 获取权限列表
@@ -30,6 +45,7 @@ namespace AuthService
                     Data_Permission dpparent = new Data_Permission();
                     dpparent.code = db.Code;
                     dpparent.title = db.Name;
+                    dpparent.sort = db.Sort;
                     dpparent.children = new List<Data_Permission>();
                     parent = dpparent;
                     datalist.Add(dpparent);
@@ -41,6 +57,7 @@ namespace AuthService
                         Data_Permission dper = new Data_Permission();
                         dper.code = db.Code;
                         dper.title = db.Name;
+                        dper.sort = db.Sort;
                         parent.children.Add(dper);
                     }
                     else
@@ -48,14 +65,17 @@ namespace AuthService
                         Data_Permission dpparent = new Data_Permission();
                         dpparent.code = db.Code;
                         dpparent.title = db.Name;
+                        dpparent.sort = db.Sort;
                         dpparent.children = new List<Data_Permission>();
                         parent = dpparent;
                         datalist.Add(dpparent);
                     }
                 }
             }
+            PermissionSort(datalist);
             return Success(MyAccess.Json.Json.Encode(datalist));
         }
+
         /// <summary>
         /// 获取角色权限
         /// </summary>

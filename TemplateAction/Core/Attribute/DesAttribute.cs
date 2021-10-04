@@ -14,14 +14,20 @@ namespace TemplateAction.Core
         /// 描述
         /// </summary>
         private string mDes;
+        /// <summary>
+        /// 排序号
+        /// </summary>
+        private int mSort;
 
-        public DesAttribute(string des)
+        public DesAttribute(string des, int sort = 0)
         {
             mDes = des;
+            mSort = sort;
         }
 
 
         public string Des { get { return mDes; } }
- 
+        public int Sort { get { return mSort; } }
+
     }
 }

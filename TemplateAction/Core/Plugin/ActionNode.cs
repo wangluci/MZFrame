@@ -81,8 +81,6 @@ namespace TemplateAction.Core
             mKey = method.Name;
             mMethod = method;
    
-
-            string tdesact = "";
             string taboutmodule = string.Format("/{0}/{1}", plg.Name, controller);
             string taboutaction = string.Empty;//默认关联控制器权限
 
@@ -93,7 +91,8 @@ namespace TemplateAction.Core
             DesAttribute ad = (DesAttribute)method.GetCustomAttribute(typeof(DesAttribute));
             if (ad != null)
             {
-                tdesact = ad.Des;
+                mDescript = ad.Des;
+                mSort = ad.Sort;
                 taboutaction = mKey;
             }
 
@@ -146,10 +145,8 @@ namespace TemplateAction.Core
             }
 
 
-            mDescript = tdesact;
             mAboutModule = taboutmodule;
             mAboutAction = taboutaction;
-
         }
     }
 }

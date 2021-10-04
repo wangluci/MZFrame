@@ -14,6 +14,8 @@ namespace AuthService
         /// 权限代码
         /// </summary>
         public string code { get; set; }
+        [JsonIgnore]
+        public int sort { get; set; }
         /// <summary>
         /// 子权限
         /// </summary>

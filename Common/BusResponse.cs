@@ -53,11 +53,11 @@ namespace Common
         }
         public bool IsSuccess()
         {
-            return mCode == 20000;
+            return mCode == 0;
         }
         public static BusResponse<T> Success(T value = default(T))
         {
-            return new BusResponse<T>(20000, string.Empty, value);
+            return new BusResponse<T>(0, string.Empty, value);
         }
         public static BusResponse<T> Error(int code, string message)
         {

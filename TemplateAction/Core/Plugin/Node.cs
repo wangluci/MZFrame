@@ -10,7 +10,16 @@ namespace TemplateAction.Core
         {
             get { return mDescript; }
         }
- 
+
+        protected int mSort;
+        public int Sort
+        {
+            get
+            {
+                return mSort;
+            }
+        }
+
         /// <summary>
         /// 节点键
         /// </summary>

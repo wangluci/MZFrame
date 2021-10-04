@@ -61,6 +61,7 @@ namespace TemplateAction.Extension.Site
                     {
                         DescribeInfo ai = new DescribeInfo();
                         ai.Name = kpcn.Value.Descript;
+                        ai.Sort = kpcn.Value.Sort;
                         ai.Code = string.Format("/{0}/{1}/", plg.Name, kpcn.Key);
                         ai.ParentCode = string.Format("/{0}/", plg.Name);
                         rtlist.Add(ai);
@@ -72,6 +73,7 @@ namespace TemplateAction.Extension.Site
                             {
                                 DescribeInfo aii = new DescribeInfo();
                                 aii.Name = kpn.Value.Descript;
+                                aii.Sort = kpn.Value.Sort;
                                 aii.Code = string.Format("/{0}/{1}/{2}",plg.Name, kpcn.Key, kpn.Key);
                                 aii.ParentCode = ai.Code;
                                 rtlist.Add(aii);
