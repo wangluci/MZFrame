@@ -22,12 +22,14 @@ namespace MyAccess.Json.Processing.Nodes
                 object key;
                 object value;
                 bool isparsed = false;
+                bool ignore = false;
                 for (int index = 0; index < properties.Length; index++)
                 {
                     System.Reflection.PropertyInfo item = properties[index];
                     key = item.Name;
                     value = item.GetValue(context.Value, null);
 
+                    ignore = false;
                     JsonAttr[] jsarr = (JsonAttr[])item.GetCustomAttributes(typeof(JsonAttr), false);
                     foreach(JsonAttr ja in jsarr)
                     {
@@ -37,11 +39,13 @@ namespace MyAccess.Json.Processing.Nodes
                         {
                             if (ign.Flag == 0)
                             {
-                                continue;
+                                ignore = true;
+                                break;
                             }
                             else if (ign.Flag == HideFlag.HideCondition && ign.Fun(value))
                             {
-                                continue;
+                                ignore = true;
+                                break;
                             }
                         }
 
@@ -57,6 +61,8 @@ namespace MyAccess.Json.Processing.Nodes
                             key = jsname.Name;
                         }
                     }
+
+                    if (ignore) continue;
 
                     if (isparsed)
                     {
