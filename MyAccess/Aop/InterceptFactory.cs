@@ -77,7 +77,7 @@ namespace MyAccess.Aop
         /// <summary>
         /// 创建实体
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T">被拦截实体的属性必需为virtual</typeparam>
         /// <returns></returns>
         public static T CreateEntityOp<T>() where T : class
         {

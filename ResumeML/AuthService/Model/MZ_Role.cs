@@ -8,16 +8,16 @@ namespace AuthService
     {
         [JsonName("key")]
         [ID(true)]
-        public long RoleID { get; set; }
+        public virtual long RoleID { get; set; }
         [JsonName("name")]
-        public string RoleName { get; set; }
+        public virtual string RoleName { get; set; }
         [JsonName("description")]
-        public string RoleDesc { get; set; }
+        public virtual string RoleDesc { get; set; }
         [JsonIgnore]
-        public int RoleType { get; set; }
+        public virtual int RoleType { get; set; }
         [JsonIgnore]
-        public long CreateUserId { get; set; }
+        public virtual long CreateUserId { get; set; }
         [JsonIgnore]
-        public DateTime CreateDate { get; set; }
+        public virtual DateTime CreateDate { get; set; }
     }
 }
