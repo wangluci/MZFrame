@@ -11,9 +11,9 @@ namespace MyAccess.DB
     /// </summary>
     public class DoExecSql : IDoSqlCommand
     {
-        protected string mSqlText;
-        protected int mRowCount;
-        protected IDoSqlCommand mContactCommand;
+        private string mSqlText;
+        private int mRowCount;
+        private IDoSqlCommand mContactCommand;
         /// <summary>
         /// 关联执行的IDoSqlCommand
         /// </summary>
@@ -42,6 +42,11 @@ namespace MyAccess.DB
         }
         public string GetSql()
         {
+            return mSqlText;
+        }
+        public string ReplaceSql(string oldValue, string newValue)
+        {
+            mSqlText = mSqlText.Replace(oldValue, newValue);
             return mSqlText;
         }
         protected virtual void AfterExcute(DbCommand command) { }

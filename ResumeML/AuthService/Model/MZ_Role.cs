@@ -1,4 +1,5 @@
-﻿using MyAccess.Json.Attributes;
+﻿using MyAccess.DB.Attr;
+using MyAccess.Json.Attributes;
 using System;
 
 namespace AuthService
@@ -6,6 +7,7 @@ namespace AuthService
     public class MZ_Role
     {
         [JsonName("key")]
+        [ID(true)]
         public long RoleID { get; set; }
         [JsonName("name")]
         public string RoleName { get; set; }

@@ -36,7 +36,7 @@ namespace MyAccess.DB
             {
                 inwhere = inwhere.Substring(1);
             }
-            mSqlText = mSqlText.Replace(mParamName, inwhere);
+            ReplaceSql(mParamName, inwhere);
         }
         public override void Excute(DbHelp help)
         {

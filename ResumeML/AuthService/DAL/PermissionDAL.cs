@@ -78,7 +78,7 @@ namespace AuthService
         [Trans]
         public virtual void SetRolePermissions(long id, MZ_Role_Permission[] permissions)
         {
-            DoDelete dd = new DoDelete("mz_role_permission", "@RoleID=" + id);
+            DoDelete dd = new DoDelete("mz_role_permission", "RoleID=" + id);
             help.DoCommand(dd);
 
             DoInsert<MZ_Role_Permission> isert = new DoInsert<MZ_Role_Permission>(permissions, "mz_role_permission");

@@ -127,14 +127,10 @@ namespace MyAccess.DB
 
         private void ExcuteInit(DbHelp help)
         {
-            if (string.IsNullOrEmpty(mSqlText))
-            {
-                string fields;
-                string values;
-                ObjToStr(help, out fields, out values);
-                mSqlText = string.Format("insert into {0} {1} values {2}", _tablename, fields, values);
-            }
-
+            string fields;
+            string values;
+            ObjToStr(help, out fields, out values);
+            SetSql(string.Format("insert into {0} {1} values {2}", _tablename, fields, values));
         }
         public override void Excute(DbHelp help)
         {

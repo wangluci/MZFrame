@@ -92,6 +92,7 @@ namespace MyAccess.DB
             {
                 rtSQL += updatestr + " where " + mwherestr;
             }
+            SetSql(rtSQL);
         }
         public override void Excute(DbHelp help)
         {
