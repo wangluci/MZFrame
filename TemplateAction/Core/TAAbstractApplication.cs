@@ -23,6 +23,7 @@ namespace TemplateAction.Core
         /// 插件集
         /// </summary>
         protected PluginCollection _plugins;
+        protected PluginObject _entryPlugin;
         protected LinkedListNode<IDispatcher> _pluginsnode;
         //监控插件更改
         protected FileSystemWatcher _watcher;
@@ -43,9 +44,12 @@ namespace TemplateAction.Core
         {
             get { return _pluginPath; }
         }
+        /// <summary>
+        /// 获取入口插件服务
+        /// </summary>
         public IServiceCollection Services
         {
-            get { return _plugins.Services; }
+            get { return _entryPlugin.Services; }
         }
         public ITAServices ServiceProvider
         {
@@ -223,20 +227,20 @@ namespace TemplateAction.Core
             {
                 return;
             }
+
             //初始化根目录
             _rootPath = rootpath;
             //默认插件路径
             _pluginPath = Path.Combine(_rootPath, "Plugin");
             //初始化定时器
             _timer = new HashedWheelTimer(TimeSpan.FromMilliseconds(400), 100000, 0);
-
-            BeforeInit();
             //监听插件事件
             TAEventDispatcher.Instance.RegisterPluginConfig(PluginConfig);
             TAEventDispatcher.Instance.RegisterPluginLoad(PluginLoad);
             TAEventDispatcher.Instance.RegisterPluginUnload(PluginUnload);
             //从应用程序域的程序集中初始化插件集
-            _plugins.InitFromEntryAssembly();
+            _entryPlugin = _plugins.InitFromEntryAssembly();
+            BeforeInit();
             //加载插件
             DirectoryInfo info = new DirectoryInfo(_pluginPath);
             if (info.Exists)

@@ -14,25 +14,8 @@ namespace TemplateAction.Core
     {
         private Dictionary<string, PluginObject> mPluginList = new Dictionary<string, PluginObject>();
         private ReaderWriterLockSlim _lockslim = new ReaderWriterLockSlim();
-        /// <summary>
-        /// 单例服务实例
-        /// </summary>
-        private ConcurrentStorer _singletonServices;
-        /// <summary>
-        /// 全局服务
-        /// </summary>
-        private IServiceCollection _services;
-        public IServiceCollection Services
-        {
-            get { return _services; }
-        }
-        /// <summary>
-        /// 单例服务实例
-        /// </summary>
-        public ConcurrentStorer SingletonServices
-        {
-            get { return _singletonServices; }
-        }
+
+
         private IPluginCollectionExtData _extionData;
         public IPluginCollectionExtData ExtentionData
         {
@@ -49,19 +32,12 @@ namespace TemplateAction.Core
         public PluginCollection(IPluginCollectionExtData extionData)
         {
             _extionData = extionData;
-            _singletonServices = new ConcurrentStorer();
-            _services = new ServiceCollection(string.Empty);
         }
         private IServiceDescriptorEnumerable FindServicesIn(string key)
         {
             List<string> tnslist = new List<string>();
             ServiceDescriptorUnion deslist = new ServiceDescriptorUnion();
-            IServiceDescriptorEnumerable gdes = _services[key];
-            if (gdes != null)
-            {
-                deslist.Union(gdes);
-                tnslist.Add("999");
-            }
+
             PluginObject[] tarr = null;
             _lockslim.EnterReadLock();
             try
@@ -102,32 +78,16 @@ namespace TemplateAction.Core
             {
                 foreach (string ns in nsArr)
                 {
-                    if (ns.Equals("999"))
+                    PluginObject pobj = GetPlugin(ns);
+                    IServiceDescriptorEnumerable des = pobj.FindService(key);
+                    if (des != null)
                     {
-                        IServiceDescriptorEnumerable gdes = _services[key];
-                        if (gdes != null)
-                        {
-                            deslist.Union(gdes);
-                        }
-                        else
-                        {
-                            _mulkeycache.TryRemove(key, out nsArr);
-                            return FindServicesIn(key);
-                        }
+                        deslist.Union(des);
                     }
                     else
                     {
-                        PluginObject pobj = GetPlugin(ns);
-                        IServiceDescriptorEnumerable des = pobj.FindService(key);
-                        if (des != null)
-                        {
-                            deslist.Union(des);
-                        }
-                        else
-                        {
-                            _mulkeycache.TryRemove(key, out nsArr);
-                            return FindServicesIn(key);
-                        }
+                        _mulkeycache.TryRemove(key, out nsArr);
+                        return FindServicesIn(key);
                     }
                 }
                 return deslist;
@@ -136,14 +96,8 @@ namespace TemplateAction.Core
         }
         private IServiceDescriptorEnumerable FindServiceIn(string key)
         {
-            //查找全局服务
-            IServiceDescriptorEnumerable returnDesc = _services[key];
-            if (returnDesc != null)
-            {
-                _keycache.TryAdd(key, "999");
-                return returnDesc;
-            }
-            //在其它的插件中查找
+            //在插件中查找
+            IServiceDescriptorEnumerable returnDesc = null;
             PluginObject[] tarr = null;
             _lockslim.EnterReadLock();
             try
@@ -168,7 +122,7 @@ namespace TemplateAction.Core
                     return returnDesc;
                 }
             }
-            return null;
+            return returnDesc;
         }
         /// <summary>
         /// 通过接口查找单个服务
@@ -181,32 +135,16 @@ namespace TemplateAction.Core
             string targetns;
             if (_keycache.TryGetValue(key, out targetns))
             {
-                if (targetns.Equals("999"))
+                PluginObject pobj = GetPlugin(targetns);
+                returnDesc = pobj.FindService(key);
+                if (returnDesc != null)
                 {
-                    returnDesc = _services[key];
-                    if (returnDesc != null)
-                    {
-                        return returnDesc;
-                    }
-                    else
-                    {
-                        _keycache.TryRemove(key, out targetns);
-                        return FindServiceIn(key);
-                    }
+                    return returnDesc;
                 }
                 else
                 {
-                    PluginObject pobj = GetPlugin(targetns);
-                    returnDesc = pobj.FindService(key);
-                    if (returnDesc != null)
-                    {
-                        return returnDesc;
-                    }
-                    else
-                    {
-                        _keycache.TryRemove(key, out targetns);
-                        return FindServiceIn(key);
-                    }
+                    _keycache.TryRemove(key, out targetns);
+                    return FindServiceIn(key);
                 }
             }
             else
@@ -312,19 +250,11 @@ namespace TemplateAction.Core
             {
                 case ServiceLifetime.Singleton:
                     {
-                        if (string.IsNullOrEmpty(plgname))
+                        PluginObject pobj = GetPlugin(plgname);
+                        if (!Equals(pobj, null))
                         {
-                            ConcurrentProxy proxy = this._singletonServices.GetOrAdd(serviceType.FullName);
+                            ConcurrentProxy proxy = pobj.Storer.GetOrAdd(serviceType.FullName);
                             result = proxy.GetValue(this, serviceType, factory, scopeFactory);
-                        }
-                        else
-                        {
-                            PluginObject pobj = GetPlugin(plgname);
-                            if (!Equals(pobj, null))
-                            {
-                                ConcurrentProxy proxy = pobj.Storer.GetOrAdd(serviceType.FullName);
-                                result = proxy.GetValue(this, serviceType, factory, scopeFactory);
-                            }
                         }
                     }
                     break;
@@ -526,18 +456,15 @@ namespace TemplateAction.Core
         /// <summary>
         /// 创建入口插件
         /// </summary>
-        public void InitFromEntryAssembly()
+        public PluginObject InitFromEntryAssembly()
         {
-            Assembly ass = Assembly.GetEntryAssembly();
-            if (ass != null)
+            PluginObject newObj = Create(Assembly.GetEntryAssembly(), string.Empty);
+            if (newObj != null)
             {
-                PluginObject newObj = Create(ass, string.Empty);
-                if (newObj != null)
-                {
-                    mPluginList[newObj.Name.ToLower()] = newObj;
-                    TAEventDispatcher.Instance.DispathPluginLoad(newObj);
-                }
+                mPluginList[newObj.Name.ToLower()] = newObj;
+                TAEventDispatcher.Instance.DispathPluginLoad(newObj);
             }
+            return newObj;
         }
         /// <summary>
         /// 创建插件
