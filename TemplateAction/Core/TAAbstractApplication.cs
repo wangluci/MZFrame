@@ -208,11 +208,13 @@ namespace TemplateAction.Core
         /// 判断是否初始化完成
         /// </summary>
         private bool _inited = false;
+
         /// <summary>
         /// 初始化并加载目录下的插件
         /// </summary>
         /// <param name="rootpath"></param>
-        protected void InitApplication(string rootpath)
+        /// <param name="entry">入口程序集</param>
+        protected void InitApplication(string rootpath, Assembly entry)
         {
             if (rootpath.Length > 0 && rootpath[rootpath.Length - 1] == Path.DirectorySeparatorChar)
             {
@@ -238,8 +240,13 @@ namespace TemplateAction.Core
             TAEventDispatcher.Instance.RegisterPluginConfig(PluginConfig);
             TAEventDispatcher.Instance.RegisterPluginLoad(PluginLoad);
             TAEventDispatcher.Instance.RegisterPluginUnload(PluginUnload);
+
             //从应用程序域的程序集中初始化插件集
-            _entryPlugin = _plugins.InitFromEntryAssembly();
+            if (entry == null)
+            {
+                throw new ArgumentNullException("入口程序集不能为null");
+            }
+            _entryPlugin = _plugins.CreatePlugin(entry, null);
             BeforeInit();
             //加载插件
             DirectoryInfo info = new DirectoryInfo(_pluginPath);

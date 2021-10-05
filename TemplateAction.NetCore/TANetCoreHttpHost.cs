@@ -101,7 +101,7 @@ namespace TemplateAction.NetCore
             TemplateAction.Core.TAEventDispatcher.Instance.Dispatch(_appBuilder);
 
             _app = new TANetCoreHttpApplication(_appBuilder);
-            _app.Init(_workroot);
+            _app.Init(_workroot, Assembly.GetEntryAssembly());
         }
 
 

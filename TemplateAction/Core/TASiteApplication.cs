@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using TemplateAction.Common;
 using TemplateAction.Label;
 using TemplateAction.Extension.Site;
+using System.Reflection;
+
 namespace TemplateAction.Core
 {
     /// <summary>
@@ -155,9 +157,9 @@ namespace TemplateAction.Core
             _pluginPath = path;
             return this;
         }
-        public TASiteApplication Init(string rootpath)
+        public TASiteApplication Init(string rootpath, Assembly entry)
         {
-            InitApplication(rootpath);
+            InitApplication(rootpath, entry);
             return this;
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace TemplateAction.Core
 {
@@ -24,7 +25,7 @@ namespace TemplateAction.Core
         }
         public TAApplication Init(string rootpath)
         {
-            InitApplication(rootpath);
+            InitApplication(rootpath, Assembly.GetEntryAssembly());
             return this;
         }
     }

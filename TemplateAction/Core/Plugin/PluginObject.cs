@@ -132,6 +132,13 @@ namespace TemplateAction.Core
 
                 }
             }
+
+
+            //入口程序集无Config，则创建一个默认的
+            if (this._config == null && string.IsNullOrEmpty(pluginpath))
+            {
+                this._config = new EmptyConfig();
+            }
         }
 
         /// <summary>

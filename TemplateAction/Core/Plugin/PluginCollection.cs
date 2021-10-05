@@ -450,32 +450,23 @@ namespace TemplateAction.Core
         private PluginObject Create(Assembly tAssembly, string filepath)
         {
             PluginObject newObj = new PluginObject(_extionData, tAssembly, filepath);
-            if (newObj.Config == null) return null;
-            return newObj;
-        }
-        /// <summary>
-        /// 创建入口插件
-        /// </summary>
-        public PluginObject InitFromEntryAssembly()
-        {
-            PluginObject newObj = Create(Assembly.GetEntryAssembly(), string.Empty);
-            if (newObj != null)
+            if (newObj.Config == null)
             {
-                mPluginList[newObj.Name.ToLower()] = newObj;
-                TAEventDispatcher.Instance.DispathPluginLoad(newObj);
+                return null;
             }
             return newObj;
         }
+       
         /// <summary>
         /// 创建插件
         /// </summary>
-        /// <param name="tAssembly"></param>
+        /// <param name="ass"></param>
         /// <param name="filepath"></param>
         /// <returns></returns>
-        public PluginObject CreatePlugin(Assembly tAssembly, string filepath)
+        public PluginObject CreatePlugin(Assembly ass, string filepath)
         {
-            if (tAssembly == null) return null;
-            PluginObject newObj = Create(tAssembly, filepath);
+            if (ass == null) return null;
+            PluginObject newObj = Create(ass, filepath);
             if (newObj != null)
             {
                 PluginObject oldPlugin;

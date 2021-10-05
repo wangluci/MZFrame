@@ -20,7 +20,7 @@ namespace SysWeb.TemplateAction
                 {
                     if (_app == null)
                     {
-                        _app = new TASiteApplication().Init(context.Server.MapPath("~"));
+                        _app = new TASiteApplication().Init(context.Server.MapPath("~"), HttpContext.Current.ApplicationInstance.GetType().BaseType.Assembly);
                     }
                 }
             }
