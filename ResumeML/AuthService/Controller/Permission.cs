@@ -18,14 +18,14 @@ namespace AuthService
         /// 对权限进行排序
         /// </summary>
         /// <param name="list"></param>
-        private void PermissionSort(List<Data_Permission> list)
+        private void PermissionSortAndLow(List<Data_Permission> list)
         {
             list.Sort((x, y) => { return x.sort - y.sort; });
             foreach (Data_Permission p in list)
             {
                 if (p.children != null)
                 {
-                    PermissionSort(p.children);
+                    PermissionSortAndLow(p.children);
                 }
             }
         }
@@ -72,7 +72,7 @@ namespace AuthService
                     }
                 }
             }
-            PermissionSort(datalist);
+            PermissionSortAndLow(datalist);
             return Success(MyAccess.Json.Json.Encode(datalist));
         }
 
