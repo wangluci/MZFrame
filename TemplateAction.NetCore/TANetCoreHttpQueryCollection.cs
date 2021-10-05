@@ -2,8 +2,8 @@
 using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Text;
+using System.Reflection;
+using TemplateAction.Common;
 using TemplateAction.Core;
 
 namespace TemplateAction.NetCore
@@ -38,16 +38,16 @@ namespace TemplateAction.NetCore
 
         public IEnumerator GetEnumerator()
         {
-            foreach (string key in _query.Keys)
-            {
-                yield return new TAObject(key, _query[key].ToString());
-            }
+            yield return _query.GetEnumerator();
         }
-
+        public bool Mapping(ParameterInfo pi, out object result)
+        {
+            return this.OldMapping(pi, out result);
+        }
         public bool TryGet(string key, out object result)
         {
             StringValues val;
-            if(_query.TryGetValue(key,out val))
+            if (_query.TryGetValue(key, out val))
             {
                 result = val.ToString();
                 return true;

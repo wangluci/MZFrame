@@ -47,9 +47,7 @@ namespace TemplateAction.NetCore
             if (ctstr.Trim() == "application/json")
             {
                 StreamReader sr = new StreamReader(request.Body, Encoding.GetEncoding(encodingstr));
-                string bodystr = sr.ReadToEnd();
-                Dictionary<string, object> dic = MyAccess.Json.Json.DecodeType<Dictionary<string, object>>(bodystr);
-                return new TANetCoreHttpFormDictionary(dic, null);
+                return new TANetCoreHttpFormJson(sr.ReadToEnd());
             }
             else
             {

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections;
+using System.Reflection;
 using TemplateAction.Core;
 
 namespace TemplateAction.NetCore
@@ -44,12 +45,13 @@ namespace TemplateAction.NetCore
 
         public IEnumerator GetEnumerator()
         {
-            foreach (string key in _form.Keys)
-            {
-                yield return new TAObject(key, _form[key].ToString());
-            }
+            yield return _form.GetEnumerator();
         }
 
+        public bool Mapping(ParameterInfo pi, out object result)
+        {
+            return this.OldMapping(pi,out result);
+        }
         public bool TryGet(string key, out object result)
         {
             StringValues val;

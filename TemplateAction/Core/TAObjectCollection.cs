@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using TemplateAction.Common;
 
 namespace TemplateAction.Core
@@ -22,10 +23,7 @@ namespace TemplateAction.Core
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            foreach (KeyValuePair<string, object> kvp in _values)
-            {
-                yield return new TAObject(kvp.Key, kvp.Value);
-            }
+            yield return _values.GetEnumerator();
         }
         public bool ContainsKey(string key)
         {
@@ -47,39 +45,14 @@ namespace TemplateAction.Core
                 return null;
             }
         }
+        public bool Mapping(ParameterInfo pi, out object result)
+        {
+            return this.TryGet(pi.Name, pi.ParameterType, out result);
+        }
         public bool TryGet(string key, out object result)
         {
             return _values.TryGetValue(key, out result);
         }
-        public bool TryConvert(string key, Type targetType, out object result)
-        {
-            if (_values.TryGetValue(key, out result))
-            {
-                if (TAConverter.Instance.TryConvert(result, targetType, out result))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
-        public T Cast<T>(string key, T def)
-        {
-            object result;
-            if (_values.TryGetValue(key, out result))
-            {
-                return TAConverter.Cast(result, def);
-            }
-            else
-            {
-                return def;
-            }
-        }
+
     }
 }

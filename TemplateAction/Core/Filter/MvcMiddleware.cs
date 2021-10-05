@@ -36,12 +36,15 @@ namespace TemplateAction.Core
                     for (int i = 0; i < pinfos.Length; i++)
                     {
                         //创建参数映射
-                        object mapobj = MappingFactory.Mapping(gc, pinfos[i]);
-                        if (Equals(mapobj, null))
+                        object mapobj;
+                        if (gc.Mapping(pinfos[i], out mapobj))
+                        {
+                            paramlist.Add(mapobj);
+                        }
+                        else
                         {
                             return null;
                         }
-                        paramlist.Add(mapobj);
                     }
                     return c.CallAction(method, paramlist.ToArray());
                 }

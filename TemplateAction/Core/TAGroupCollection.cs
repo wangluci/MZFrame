@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Reflection;
 using TemplateAction.Common;
 
 namespace TemplateAction.Core
@@ -65,35 +66,30 @@ namespace TemplateAction.Core
             }
         }
 
-        public T Cast<T>(string key, T def)
+        public bool Mapping(ParameterInfo pi, out object result)
         {
-            object result;
-            if (TryGet(key, out result))
+            ITARequest req = _ac.Context.Request;
+            if (req.Query != null)
             {
-                return TAConverter.Cast(result, def);
-            }
-            else
-            {
-                return def;
-            }
-        }
-
-
-        public bool TryConvert(string key, Type targetType, out object result)
-        {
-            if (TryGet(key, out result))
-            {
-                if (TAConverter.Instance.TryConvert(result, targetType, out result))
+                if (req.Query.Mapping(pi, out result))
                 {
                     return true;
                 }
-                else
+            }
+            if (req.Form != null)
+            {
+                if (req.Form.Mapping(pi, out result))
                 {
-                    return false;
+                    return true;
                 }
+            }
+            if (_ac.ExtParams != null)
+            {
+                return _ac.ExtParams.Mapping(pi, out result);
             }
             else
             {
+                result = null;
                 return false;
             }
         }
@@ -130,25 +126,15 @@ namespace TemplateAction.Core
             ITARequest req = _ac.Context.Request;
             if (req.Query != null)
             {
-                foreach (TAObject obj in req.Query)
-                {
-                    yield return obj;
-                }
+                yield return req.Query.GetEnumerator();
             }
             if (req.Form != null)
             {
-                foreach (TAObject obj in req.Form)
-                {
-                    yield return obj;
-                }
+                yield return req.Form.GetEnumerator();
             }
-          
             if (_ac.ExtParams != null)
             {
-                foreach (TAObject obj in _ac.ExtParams)
-                {
-                    yield return obj;
-                }
+                yield return _ac.ExtParams.GetEnumerator();
             }
         }
     }
