@@ -447,15 +447,7 @@ namespace TemplateAction.Core
                 _lockslim.ExitReadLock();
             }
         }
-        private PluginObject Create(Assembly tAssembly, string filepath)
-        {
-            PluginObject newObj = new PluginObject(_extionData, tAssembly, filepath);
-            if (newObj.Config == null)
-            {
-                return null;
-            }
-            return newObj;
-        }
+   
        
         /// <summary>
         /// 创建插件
@@ -466,31 +458,31 @@ namespace TemplateAction.Core
         public PluginObject CreatePlugin(Assembly ass, string filepath)
         {
             if (ass == null) return null;
-            PluginObject newObj = Create(ass, filepath);
-            if (newObj != null)
+            PluginObject newObj = new PluginObject(_extionData, ass, filepath);
+            if (newObj.Config == null)
             {
-                PluginObject oldPlugin;
-                _lockslim.EnterWriteLock();
-                try
-                {
-                    string keylow = newObj.Name.ToLower();
-                    mPluginList.TryGetValue(keylow, out oldPlugin);
-                    mPluginList[keylow] = newObj;
-                }
-                finally
-                {
-                    _lockslim.ExitWriteLock();
-                }
-
-                if (oldPlugin != null)
-                {
-                    oldPlugin.CacheDependency.NoticeChange();
-                    oldPlugin.Unload();
-                }
-
-                TAEventDispatcher.Instance.DispathPluginLoad(newObj);
+                return null;
+            }
+            PluginObject oldPlugin;
+            _lockslim.EnterWriteLock();
+            try
+            {
+                string keylow = newObj.Name.ToLower();
+                mPluginList.TryGetValue(keylow, out oldPlugin);
+                mPluginList[keylow] = newObj;
+            }
+            finally
+            {
+                _lockslim.ExitWriteLock();
             }
 
+            if (oldPlugin != null)
+            {
+                oldPlugin.CacheDependency.NoticeChange();
+                oldPlugin.Unload();
+            }
+
+            TAEventDispatcher.Instance.DispathPluginLoad(newObj);
             return newObj;
         }
         /// <summary>
