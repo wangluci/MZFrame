@@ -56,11 +56,20 @@ namespace AuthService
         {
             return BusResponse<List<MZ_Role>>.Success(_user.GetAllRole());
         }
-        public virtual BusResponse<long> AddRole(MZ_Role role)
+        public virtual BusResponse<long> AddRole(MZ_Role role, string[] permissions)
         {
             try
             {
-                return BusResponse<long>.Success(_user.AddRole(role));
+                long id = _user.AddRole(role);
+                MZ_Role_Permission[] role_permiss = new MZ_Role_Permission[permissions.Length];
+                for (int i = 0; i < role_permiss.Length; i++)
+                {
+                    role_permiss[i] = new MZ_Role_Permission();
+                    role_permiss[i].RoleID = id;
+                    role_permiss[i].RightCode = permissions[i];
+                }
+                _permission.SetRolePermissions(id, role_permiss);
+                return BusResponse<long>.Success(id);
             }
             catch (Exception ex)
             {
@@ -68,7 +77,7 @@ namespace AuthService
             }
 
         }
-        public virtual BusResponse<string> UpdateRole(MZ_Role role, long uid)
+        public virtual BusResponse<string> UpdateRole(MZ_Role role, string[] permissions, long uid)
         {
             try
             {
@@ -83,6 +92,14 @@ namespace AuthService
                     return BusResponse<string>.Error(-11, "无权编辑当前角色");
                 }
                 _user.UpdateRole(role);
+                MZ_Role_Permission[] role_permiss = new MZ_Role_Permission[permissions.Length];
+                for (int i = 0; i < role_permiss.Length; i++)
+                {
+                    role_permiss[i] = new MZ_Role_Permission();
+                    role_permiss[i].RoleID = role.RoleID;
+                    role_permiss[i].RightCode = permissions[i];
+                }
+                _permission.SetRolePermissions(role.RoleID, role_permiss);
                 return BusResponse<string>.Success(null);
             }
             catch (Exception ex)
@@ -107,7 +124,7 @@ namespace AuthService
                 _user.DeleteRole(id);
                 return BusResponse<string>.Success(null);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BusResponse<string>.Error(-12, ex.Message);
             }

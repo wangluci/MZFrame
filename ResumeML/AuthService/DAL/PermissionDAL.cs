@@ -1,5 +1,6 @@
 ﻿using Common.MySql;
 using Microsoft.Extensions.Options;
+using MyAccess.Aop;
 using MyAccess.DB;
 using MySqlConnector;
 using System;
@@ -73,6 +74,15 @@ namespace AuthService
             DoQuerySql<long> dqc = new DoQuerySql<long>("select ur.RoleID from mz_user_role ur inner join mz_role r on ur.RoleID=r.RoleID where UserId=@UserId and r.RoleType=1");
             help.DoCommand(dqc);
             return dqc.Count() > 0;
+        }
+        [Trans]
+        public virtual void SetRolePermissions(long id, MZ_Role_Permission[] permissions)
+        {
+            DoDelete dd = new DoDelete("mz_role_permission", "@RoleID=" + id);
+            help.DoCommand(dd);
+
+            DoInsert<MZ_Role_Permission> isert = new DoInsert<MZ_Role_Permission>(permissions, "mz_role_permission");
+            help.DoCommand(isert);
         }
     }
 }

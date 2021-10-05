@@ -95,7 +95,7 @@ namespace AuthService
         }
 
         [Des("新增角色")]
-        public AjaxResult PostRole(string name, string description)
+        public AjaxResult PostRole(string name, string description, string[] permissions)
         {
             ClientTokenInfo dataInfo = Context.Items["AuthToken"] as ClientTokenInfo;
 
@@ -105,10 +105,10 @@ namespace AuthService
             role.RoleType = 0;
             role.CreateUserId = dataInfo.UserId;
             role.CreateDate = DateTime.Now;
-            return _user.AddRole(role).ToAjaxResult(Context);
+            return _user.AddRole(role, permissions).ToAjaxResult(Context);
         }
         [Des("修改角色")]
-        public AjaxResult PutRole(long id, string name, string description)
+        public AjaxResult PutRole(long id, string name, string description, string[] permissions)
         {
             ClientTokenInfo dataInfo = Context.Items["AuthToken"] as ClientTokenInfo;
 
@@ -117,7 +117,7 @@ namespace AuthService
             role.RoleName = name;
             role.RoleDesc = description;
 
-            return _user.UpdateRole(role, dataInfo.UserId).ToAjaxResult(Context);
+            return _user.UpdateRole(role, permissions, dataInfo.UserId).ToAjaxResult(Context);
         }
         [Des("删除角色")]
         public AjaxResult DeleteRole(long id)
