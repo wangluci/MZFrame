@@ -1,124 +1,98 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
-
 namespace TemplateAction.Core
 {
     public class DefatulParamMapping : IParamMapping
     {
         internal static bool TAObjectMapping(ITAObjectCollection collection, string key, Type t, out object result)
         {
-            if (t.IsClass && t != typeof(string))
+            if (t.IsArray)
             {
-                if (t.IsArray)
+                string tlists = collection.Cast<string>(key + "[]", null);
+                if (tlists == null)
                 {
-                    string tlists = collection.Cast<string>(key + "[]", null);
-                    if (tlists == null)
-                    {
-                        tlists = collection.Cast<string>(key, null);
-                    }
+                    tlists = collection.Cast<string>(key, null);
+                }
 
-                    string[] sarr;
-                    if (tlists != null)
-                    {
-                        sarr = tlists.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                    }
-                    else
-                    {
-                        sarr = new string[0];
-                    }
-
-                    if (t == typeof(int[]))
-                    {
-                        int[] arr = new int[sarr.Length];
-                        for (int i = 0; i < sarr.Length; i++)
-                        {
-                            string s = sarr[i];
-                            int ti = 0;
-                            if (int.TryParse(s, out ti))
-                            {
-                                arr[i] = ti;
-                            }
-                            else
-                            {
-                                continue;
-                            }
-                        }
-                        result = arr;
-                        return true;
-                    }
-                    else if (t == typeof(long[]))
-                    {
-                        long[] arr = new long[sarr.Length];
-                        for (int i = 0; i < sarr.Length; i++)
-                        {
-                            string s = sarr[i];
-                            long ti = 0;
-                            if (long.TryParse(s, out ti))
-                            {
-                                arr[i] = ti;
-                            }
-                            else
-                            {
-                                continue;
-                            }
-                        }
-                        result = arr;
-                        return true;
-                    }
-                    else if (t == typeof(decimal[]))
-                    {
-                        decimal[] arr = new decimal[sarr.Length];
-                        for (int i = 0; i < sarr.Length; i++)
-                        {
-                            string s = sarr[i];
-                            decimal ti = 0;
-                            if (decimal.TryParse(s, out ti))
-                            {
-                                arr[i] = ti;
-                            }
-                            else
-                            {
-                                continue;
-                            }
-                        }
-                        result = arr;
-                        return true;
-                    }
-                    else
-                    {
-                        result = sarr;
-                        return true;
-                    }
+                string[] sarr;
+                if (tlists != null)
+                {
+                    sarr = tlists.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                 }
                 else
                 {
-                    result = null;
-                    PropertyInfo[] myallProinfos = t.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty);
-                    foreach (PropertyInfo myProInfo in myallProinfos)
+                    sarr = new string[0];
+                }
+
+                if (t == typeof(int[]))
+                {
+                    int[] arr = new int[sarr.Length];
+                    for (int i = 0; i < sarr.Length; i++)
                     {
-                        if (myProInfo.GetIndexParameters().Length != 0) continue;
-                        object tvalobj;
-                        if (collection.TryGet(myProInfo.Name, myProInfo.PropertyType, out tvalobj))
+                        string s = sarr[i];
+                        int ti = 0;
+                        if (int.TryParse(s, out ti))
                         {
-                            if (result == null)
-                            {
-                                result = Activator.CreateInstance(t);
-                            }
-                            myProInfo.SetValue(result, tvalobj, null);
+                            arr[i] = ti;
                         }
                         else
                         {
-                            return false;
+                            continue;
                         }
                     }
+                    result = arr;
+                    return true;
+                }
+                else if (t == typeof(long[]))
+                {
+                    long[] arr = new long[sarr.Length];
+                    for (int i = 0; i < sarr.Length; i++)
+                    {
+                        string s = sarr[i];
+                        long ti = 0;
+                        if (long.TryParse(s, out ti))
+                        {
+                            arr[i] = ti;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                    result = arr;
+                    return true;
+                }
+                else if (t == typeof(decimal[]))
+                {
+                    decimal[] arr = new decimal[sarr.Length];
+                    for (int i = 0; i < sarr.Length; i++)
+                    {
+                        string s = sarr[i];
+                        decimal ti = 0;
+                        if (decimal.TryParse(s, out ti))
+                        {
+                            arr[i] = ti;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                    result = arr;
+                    return true;
+                }
+                else if (t == typeof(string[]))
+                {
+                    result = sarr;
                     return true;
                 }
             }
-            else
+            else if (t.IsValueType || t == typeof(string))
             {
                 return collection.TryGet(key, t, out result);
             }
+            result = null;
+            return false;
         }
         /// <summary>
         /// 默认参数绑定
