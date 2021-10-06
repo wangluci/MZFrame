@@ -30,11 +30,33 @@ namespace TemplateAction.Core
         /// 正在使用的中间件名
         /// </summary>
         private HashSet<string> _middlewareUsing;
+
+        /// <summary>
+        /// 参数绑定插件链表
+        /// </summary>
+        private LinkedList<IParamMapping> _mappingLink = new LinkedList<IParamMapping>();
+        /// <summary>
+        /// 首个参数绑定插件
+        /// </summary>
+        /// <returns></returns>
+        public LinkedListNode<IParamMapping> FirstParamMapping()
+        {
+            return _mappingLink.First;
+        }
+        /// <summary>
+        /// 新增参数绑定插件
+        /// </summary>
+        /// <param name="parser"></param>
+        public void UseParamMapping(IParamMapping mapping)
+        {
+            _mappingLink.AddLast(mapping);
+        }
         public TASiteApplication()
         {
             _filterCenter = new FilterCenter();
             _readAssetsFromPlugin = true;
             _middlewareUsing = new HashSet<string>();
+            _mappingLink.AddLast(new DefatulParamMapping());
         }
         protected override IPluginCollectionExtData CreatePluginCollectionExtData()
         {

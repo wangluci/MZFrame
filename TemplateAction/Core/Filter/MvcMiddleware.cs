@@ -6,6 +6,41 @@ namespace TemplateAction.Core
 {
     public class MvcMiddleware : IFilterMiddleware
     {
+        /// <summary>
+        /// 参数绑定
+        /// </summary>
+        /// <param name="ac"></param>
+        /// <param name="pi"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        private bool Mapping(TAAction ac, ParameterInfo pi, out object result)
+        {
+            IEnumerable<AbstractMappingAttribute> attrs = pi.GetCustomAttributes<AbstractMappingAttribute>();
+            int attrc = 0;
+            foreach (AbstractMappingAttribute att in attrs)
+            {
+                attrc++;
+                if (att.Mapping(ac, pi.Name, pi.ParameterType, out result))
+                {
+                    return true;
+                }
+            }
+            if (attrc == 0)
+            {
+                LinkedListNode<IParamMapping> node = ac.Context.Application.FirstParamMapping();
+                if (node.Value.Mapping(node.Next, ac, pi.Name, pi.ParameterType, out result))
+                {
+                    return true;
+                }
+            }
+            if (pi.DefaultValue != DBNull.Value)
+            {
+                result = pi.DefaultValue;
+                return true;
+            }
+            result = null;
+            return false;
+        }
         public object Excute(TAAction ac, FilterMiddlewareNode next)
         {
             if (ac.ControllerNode == null) return null;
@@ -32,12 +67,11 @@ namespace TemplateAction.Core
                 if (pinfos.Length > 0)
                 {
                     List<object> paramlist = new List<object>();
-                    ITAObjectCollection gc = new TAGroupCollection(ac);
                     for (int i = 0; i < pinfos.Length; i++)
                     {
                         //创建参数映射
                         object mapobj;
-                        if (gc.Mapping(pinfos[i], out mapobj))
+                        if (Mapping(ac, pinfos[i], out mapobj))
                         {
                             paramlist.Add(mapobj);
                         }

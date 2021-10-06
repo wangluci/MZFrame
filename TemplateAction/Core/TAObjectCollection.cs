@@ -2,8 +2,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
-using TemplateAction.Common;
 
 namespace TemplateAction.Core
 {
@@ -45,10 +43,7 @@ namespace TemplateAction.Core
                 return null;
             }
         }
-        public bool Mapping(ParameterInfo pi, out object result)
-        {
-            return this.TryGet(pi.Name, pi.ParameterType, out result);
-        }
+
         public bool TryGet(string key, out object result)
         {
             return _values.TryGetValue(key, out result);

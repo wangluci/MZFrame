@@ -26,9 +26,17 @@ namespace TemplateAction.NetCore
         //初始化form
         private void InitForm()
         {
-            TANetCoreHttpApplication app = _request.HttpContext.Features.Get<TANetCoreHttpApplication>();
-            LinkedListNode<ITANetCoreFormParser> node = app.FirstFormParser();
-            _form = node.Value.ParseForm(_request, node.Next);
+            if (_request.HasFormContentType)
+            {
+                IFormCollection fc = _request.ReadFormAsync().GetAwaiter().GetResult();
+                int filecount = _request.Form.Files.Count;
+                TANetCoreHttpFile[] requestFiles = new TANetCoreHttpFile[filecount];
+                for (int i = 0; i < filecount; i++)
+                {
+                    requestFiles[i] = new TANetCoreHttpFile(_request.Form.Files[i]);
+                }
+                _form = new TANetCoreHttpFormCollection(fc, requestFiles);
+            }
         }
         public ITAObjectCollection Query
         {

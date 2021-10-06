@@ -22,9 +22,9 @@ namespace AuthService
         /// <param name="password"></param>
         /// <returns></returns>
         [Des("登录权限")]
-        public AjaxResult login(string username, string password)
+        public AjaxResult login(Input_Login ipt)
         {
-            BusResponse<Data_Login> response = _authBLL.Login(username, password, Context.GetTerminal());
+            BusResponse<Data_Login> response = _authBLL.Login(ipt, Context.GetTerminal());
             return response.ToAjaxResult(Context);
         }
         /// <summary>

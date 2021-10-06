@@ -28,10 +28,7 @@ namespace SysWeb.TemplateAction
 
         public IEnumerator GetEnumerator()
         {
-            foreach (string key in _nvc.Keys)
-            {
-                yield return new TAObject(key, _nvc[key]);
-            }
+            yield return _nvc.GetEnumerator();
         }
 
         public bool TryGet(string key, out object result)

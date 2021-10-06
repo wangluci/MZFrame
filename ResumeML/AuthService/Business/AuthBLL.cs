@@ -116,9 +116,9 @@ namespace AuthService
         /// <param name="password"></param>
         /// <param name="terminal">登录终端</param>
         /// <returns></returns>
-        public virtual BusResponse<Data_Login> Login(string username, string password, string terminal)
+        public virtual BusResponse<Data_Login> Login(Input_Login ipt, string terminal)
         {
-            MZ_AdminInfo account = _user.GetAdminByName(username);
+            MZ_AdminInfo account = _user.GetAdminByName(ipt.username);
             if (account == null) return BusResponse<Data_Login>.Error(-11, "用户不存在！");
 
             string limitmsg = _auth.LimitLoginTime(account.Id);
@@ -128,8 +128,8 @@ namespace AuthService
                 return BusResponse<Data_Login>.Error(-12, limitmsg);
             }
 
-            password = MyAccess.Core.Crypter.MD5(string.Concat(password, "@TANetAuth"));
-            if (!password.Equals(account.Password, StringComparison.OrdinalIgnoreCase))
+            ipt.password = MyAccess.Core.Crypter.MD5(string.Concat(ipt.password, "@TANetAuth"));
+            if (!ipt.password.Equals(account.Password, StringComparison.OrdinalIgnoreCase))
             {
                 MZ_SysLog log = new MZ_SysLog();
                 log.UserId = account.Id;

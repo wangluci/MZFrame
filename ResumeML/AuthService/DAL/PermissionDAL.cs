@@ -80,9 +80,11 @@ namespace AuthService
         {
             DoDelete dd = new DoDelete("mz_role_permission", "RoleID=" + id);
             help.DoCommand(dd);
-
-            DoInsert<MZ_Role_Permission> isert = new DoInsert<MZ_Role_Permission>(permissions, "mz_role_permission");
-            help.DoCommand(isert);
+            if (permissions.Length > 0)
+            {
+                DoInsert<MZ_Role_Permission> isert = new DoInsert<MZ_Role_Permission>(permissions, "mz_role_permission");
+                help.DoCommand(isert);
+            }
         }
     }
 }

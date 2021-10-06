@@ -48,10 +48,6 @@ namespace TemplateAction.NetCore
             yield return _form.GetEnumerator();
         }
 
-        public bool Mapping(ParameterInfo pi, out object result)
-        {
-            return this.OldMapping(pi,out result);
-        }
         public bool TryGet(string key, out object result)
         {
             StringValues val;
