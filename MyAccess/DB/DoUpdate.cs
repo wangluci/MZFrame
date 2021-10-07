@@ -40,6 +40,10 @@ namespace MyAccess.DB
             for (int i = 0; i < myProInfos.Length; i++)
             {
                 PropertyInfo pi = myProInfos[i];
+                if (pi.IsDefined(typeof(DataIgnoreAttribute)))
+                {
+                    continue;
+                }
                 object[] attrs = pi.GetCustomAttributes(typeof(IDAttribute), false);
                 bool canupdated = true;
                 if (attrs.Length > 0)

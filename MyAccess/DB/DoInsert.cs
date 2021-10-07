@@ -83,6 +83,10 @@ namespace MyAccess.DB
                 for (int i = 0; i < myProInfos.Length; i++)
                 {
                     PropertyInfo pi = myProInfos[i];
+                    if (pi.IsDefined(typeof(DataIgnoreAttribute)))
+                    {
+                        continue;
+                    }
                     IDAttribute idattr = (IDAttribute)pi.GetCustomAttribute(typeof(IDAttribute), false);
                     bool caninserted = true;
                     if (idattr != null)
