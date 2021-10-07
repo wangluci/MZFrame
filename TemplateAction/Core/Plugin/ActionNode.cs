@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -9,12 +10,13 @@ namespace TemplateAction.Core
     /// </summary>
     public class ActionNode : Node
     {
-        protected MethodInfo mMethod;
+        private MethodInfo mMethod;
         public MethodInfo Method
         {
             get { return mMethod; }
         }
-        protected bool _async;
+
+        private bool _async;
         /// <summary>
         /// 判断是否为异步方法
         /// </summary>
@@ -25,7 +27,7 @@ namespace TemplateAction.Core
         /// <summary>
         /// 关联模块
         /// </summary>
-        protected string mAboutModule;
+        private string mAboutModule;
         public string AboutModule
         {
             get { return mAboutModule; }
@@ -34,18 +36,18 @@ namespace TemplateAction.Core
         /// <summary>
         /// 关联动作
         /// </summary>
-        protected string mAboutAction;
+        private string mAboutAction;
         public string AboutAction
         {
             get { return mAboutAction; }
         }
 
-        protected byte _allowHttpMethod;
+        private byte _allowHttpMethod;
         public byte AllowHttpMethod
         {
             get { return _allowHttpMethod; }
         }
-        protected enum EHttpMethod : byte
+        private enum EHttpMethod : byte
         {
             Get = 1,
             Post = 2,
