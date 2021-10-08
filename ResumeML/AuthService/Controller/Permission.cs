@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using TemplateAction.Core;
 
@@ -9,10 +10,12 @@ namespace AuthService
     {
         private PermissionBLL _permission;
         private UserBLL _user;
-        public Permission(PermissionBLL permission, UserBLL user)
+        private IOptions<AuthOption> _conf;
+        public Permission(PermissionBLL permission, UserBLL user, IOptions<AuthOption> conf)
         {
             _permission = permission;
             _user = user;
+            _conf = conf;
         }
         /// <summary>
         /// 对权限进行排序
@@ -29,13 +32,29 @@ namespace AuthService
                 }
             }
         }
+
         /// <summary>
         /// 获取权限列表
         /// </summary>
         /// <returns></returns>
         public AjaxResult GetPermissions()
         {
-            List<DescribeInfo> tlist = Context.Application.FindAllDescribe();
+            List<DescribeInfo> tlist = null;
+            switch (_conf.Value.permission_from)
+            {
+                case 0:
+                    tlist = Context.Application.FindAllDescribe();
+                    break;
+                case 1:
+                    //从redis中取，微服务设置成这个,各个服务先调用FindAllDescribe上传权限数据到redis
+                    break;
+                case 2:
+                    //从数据库中取，同1的作用类似
+                    break;
+                default:
+                    tlist = new List<DescribeInfo>();
+                    break;
+            }
             Data_Permission parent = null;
             List<Data_Permission> datalist = new List<Data_Permission>();
             foreach (DescribeInfo db in tlist)
@@ -95,29 +114,25 @@ namespace AuthService
         }
 
         [Des("新增角色")]
-        public AjaxResult PostRole(Input_Role ipt)
+        public AjaxResult PostRole(MZ_Role role)
         {
             ClientTokenInfo dataInfo = Context.Items["AuthToken"] as ClientTokenInfo;
 
-            MZ_Role role = new MZ_Role();
-            role.RoleName = ipt.name;
-            role.RoleDesc = ipt.description;
             role.RoleType = 0;
             role.CreateUserId = dataInfo.UserId;
             role.CreateDate = DateTime.Now;
-            return _user.AddRole(role, ipt.permissions).ToAjaxResult(Context);
+            return _user.AddRole(role, role.permissions).ToAjaxResult(Context);
         }
         [Des("修改角色")]
-        public AjaxResult PutRole(long id, Input_Role ipt)
+        public AjaxResult PutRole(long id, MZ_Role role)
         {
             ClientTokenInfo dataInfo = Context.Items["AuthToken"] as ClientTokenInfo;
 
-            MZ_Role role = MyAccess.Aop.InterceptFactory.CreateEntityOp<MZ_Role>();
-            role.RoleID = id;
-            role.RoleName = ipt.name;
-            role.RoleDesc = ipt.description;
-
-            return _user.UpdateRole(role, ipt.permissions, dataInfo.UserId).ToAjaxResult(Context);
+            MZ_Role editRole = MyAccess.Aop.InterceptFactory.CreateEntityOp<MZ_Role>();
+            editRole.RoleID = id;
+            editRole.RoleName = role.RoleName;
+            editRole.RoleDesc = role.RoleDesc;
+            return _user.UpdateRole(editRole, role.permissions, dataInfo.UserId).ToAjaxResult(Context);
         }
         [Des("删除角色")]
         public AjaxResult DeleteRole(long id)

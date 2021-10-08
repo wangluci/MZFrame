@@ -89,6 +89,7 @@ namespace MyAccess.Aop
             be.StartRecord();
             return rt;
         }
+ 
 
 
         /// <summary>

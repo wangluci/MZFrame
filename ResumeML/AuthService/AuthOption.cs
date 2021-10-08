@@ -12,6 +12,10 @@ namespace AuthService
         /// </summary>
         public bool enable_permission { get; set; }
         /// <summary>
+        /// 权限列表来源，0为插件自动生成，1为redis来源，2为数据库来源
+        /// </summary>
+        public int permission_from { get; set; }
+        /// <summary>
         /// 是否启用单点登录,false则要设置sign_key,为true不用设置sign_key
         /// </summary>
         public bool enable_sso { get; set; }

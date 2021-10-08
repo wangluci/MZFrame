@@ -19,5 +19,7 @@ namespace AuthService
         public virtual long CreateUserId { get; set; }
         [JsonIgnore]
         public virtual DateTime CreateDate { get; set; }
+        [DataIgnore]
+        public string[] permissions { get; set; }
     }
 }
