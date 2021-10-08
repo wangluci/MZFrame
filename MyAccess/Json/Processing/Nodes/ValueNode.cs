@@ -37,12 +37,15 @@ namespace MyAccess.Json.Processing.Nodes
                         JsonIgnore ign = ja as JsonIgnore;
                         if (ign != null)
                         {
-                            if (ign.Flag == 0)
-                            {
-                                ignore = true;
-                                break;
-                            }
-                            else if (ign.Flag == HideFlag.HideCondition && ign.Fun(value))
+                            ignore = true;
+                            break;
+
+                        }
+
+                        JsonHide hide = ja as JsonHide;
+                        if (hide != null)
+                        {
+                            if (hide.Fun(value))
                             {
                                 ignore = true;
                                 break;

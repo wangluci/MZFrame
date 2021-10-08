@@ -44,7 +44,7 @@ namespace Common
             }
             else if (destT.IsValueType)
             {
-                return new AjaxResult(context, mCode, mMessage, AjaxResult.JsonData(mData.ToString().ToLower()));
+                return new AjaxResult(context, mCode, mMessage, mData.ToString());
             }
             else
             {

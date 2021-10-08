@@ -85,7 +85,10 @@ namespace MyAccess.Json.Processing.Nodes
 
                 string key = context.Input.Pop().Value<string>();
                 JsonFieldMappingBase fieldMapping = _mapping.FieldMappings[key];
-
+                if (fieldMapping == null)
+                {
+                    throw new MissingFieldException("class miss field " + key);
+                }
                 context.Input -= JsonToken.NameSeperator;
 
                 DoDecode instruction = new DoDecode(context.Input, fieldMapping.DesiredType);

@@ -72,6 +72,10 @@ namespace MyAccess.Json.Mapping
 
             foreach (MemberInfo memberInfo in members)
             {
+                if (memberInfo.IsDefined(typeof(JsonIgnore)))
+                {
+                    continue;
+                }
                 JsonName[] jsarr = (JsonName[])memberInfo.GetCustomAttributes(typeof(JsonName), false);
                 if (jsarr.Length > 0)
                 {

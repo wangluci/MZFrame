@@ -19,7 +19,7 @@ namespace AuthService
         /// <summary>
         /// 子权限
         /// </summary>
-        [JsonIgnore(val: null)]
+        [JsonHide(val: null)]
         public List<Data_Permission> children { get; set; }
     }
 }
