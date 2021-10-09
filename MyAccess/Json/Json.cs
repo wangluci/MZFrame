@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 namespace MyAccess.Json
 {
     /// <summary>
-    /// 比Newtonsoft.Json更简单易用
+    /// 简单易用json编解码
     /// </summary>
     public class Json
     {
