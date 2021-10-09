@@ -1,6 +1,7 @@
 ﻿using Common;
 using System;
 using TemplateAction.Core;
+using TemplateAction.NetCore;
 
 namespace AuthService
 {

@@ -121,7 +121,7 @@ namespace AuthService
             role.RoleType = 0;
             role.CreateUserId = dataInfo.UserId;
             role.CreateDate = DateTime.Now;
-            return _user.AddRole(role, role.permissions).ToAjaxResult(Context);
+            return _user.AddRole(role).ToAjaxResult(Context);
         }
         [Des("修改角色")]
         public AjaxResult PutRole(long id, MZ_Role role)
@@ -132,7 +132,8 @@ namespace AuthService
             editRole.RoleID = id;
             editRole.RoleName = role.RoleName;
             editRole.RoleDesc = role.RoleDesc;
-            return _user.UpdateRole(editRole, role.permissions, dataInfo.UserId).ToAjaxResult(Context);
+            editRole.permissions = role.permissions;
+            return _user.UpdateRole(editRole, dataInfo.UserId).ToAjaxResult(Context);
         }
         [Des("删除角色")]
         public AjaxResult DeleteRole(long id)

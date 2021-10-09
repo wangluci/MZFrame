@@ -1,6 +1,7 @@
-﻿using MyAccess.Json.Attributes;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace AuthService
 {
@@ -19,7 +20,7 @@ namespace AuthService
         /// <summary>
         /// 子权限
         /// </summary>
-        [JsonHide(val: null)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public List<Data_Permission> children { get; set; }
     }
 }

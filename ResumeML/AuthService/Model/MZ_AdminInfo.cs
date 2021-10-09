@@ -1,6 +1,6 @@
 ﻿using MyAccess.DB.Attr;
-using MyAccess.Json.Attributes;
 using System;
+using System.Text.Json.Serialization;
 
 namespace AuthService
 {

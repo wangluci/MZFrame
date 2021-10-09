@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.Json;
 using System.Xml.Serialization;
 using TemplateAction.Core;
 
@@ -53,7 +54,7 @@ namespace TemplateAction.NetCore
                             }
                             else
                             {
-                                result = MyAccess.Json.Json.Decode(sr.ReadToEnd(), t);
+                                result = JsonSerializer.Deserialize(sr.ReadToEnd(), t);
                             }
                             return true;
                         }

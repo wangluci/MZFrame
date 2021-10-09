@@ -3,6 +3,8 @@ using Microsoft.Extensions.Options;
 using System;
 using TemplateAction.Core;
 using System.Collections.Generic;
+using TemplateAction.NetCore;
+
 namespace AuthService
 {
     public class AuthMiddleware : IFilterMiddleware

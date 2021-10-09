@@ -65,34 +65,7 @@ namespace MyAccess.Aop
                 {
                     return Task.CompletedTask;
                 }
-                Task rt = invocation.ReturnValue as Task;
-                if (rt != null)
-                {
-                    ITransReturn irt = rt.GetType().GetProperty("Result").GetValue(rt, null) as ITransReturn;
-                    if (irt != null)
-                    {
-                        if (!irt.IsSuccess())
-                        {
-                            dbhelp.RollBack();
-                            return Task.CompletedTask;
-                        }
-
-                    }
-                    dbhelp.Commit();
-                }
-                else
-                {
-                    ITransReturn tr = invocation.ReturnValue as ITransReturn;
-                    if (tr != null)
-                    {
-                        if (!tr.IsSuccess())
-                        {
-                            dbhelp.RollBack();
-                            return Task.CompletedTask;
-                        }
-                    }
-                    dbhelp.Commit();
-                }
+                dbhelp.Commit();
             }
             else
             {
@@ -100,35 +73,7 @@ namespace MyAccess.Aop
                 {
                     return Task.CompletedTask;
                 }
-                Task rt = invocation.ReturnValue as Task;
-                if (rt != null)
-                {
-                    ITransReturn irt = rt.GetType().GetProperty("Result").GetValue(rt, null) as ITransReturn;
-                    if (irt != null)
-                    {
-                        if (!irt.IsSuccess())
-                        {
-                            DBTransScope.Instance().RollBack();
-                            return Task.CompletedTask;
-                        }
-
-                    }
-                    DBTransScope.Instance().Commit();
-                }
-                else
-                {
-                    ITransReturn tr = invocation.ReturnValue as ITransReturn;
-                    if (tr != null)
-                    {
-                        if (!tr.IsSuccess())
-                        {
-                            DBTransScope.Instance().RollBack();
-                            return Task.CompletedTask;
-                        }
-                    }
-                    DBTransScope.Instance().Commit();
-                }
-
+                DBTransScope.Instance().Commit();
             }
             return Task.CompletedTask;
         }

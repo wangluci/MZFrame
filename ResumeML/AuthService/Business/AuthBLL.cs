@@ -1,10 +1,8 @@
-﻿using Common;
-using Common.Redis;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
 using System.Text;
 using TemplateAction.Core;
+using TemplateAction.NetCore;
 
 namespace AuthService
 {

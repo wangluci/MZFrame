@@ -1,14 +1,14 @@
-﻿using MyAccess.Aop;
-using System;
+﻿using System;
+using System.Text.Json;
 using TemplateAction.Core;
 
-namespace Common
+namespace TemplateAction.NetCore
 {
     /// <summary>
     /// 业务逻辑返回处理
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class BusResponse<T> : ITransReturn
+    public class BusResponse<T>
     {
         private int mCode;
         private string mMessage;
@@ -48,7 +48,7 @@ namespace Common
             }
             else
             {
-                return new AjaxResult(context, mCode, mMessage, MyAccess.Json.Json.Encode(mData));
+                return new AjaxResult(context, mCode, mMessage, JsonSerializer.Serialize(mData));
             }
         }
         public bool IsSuccess()

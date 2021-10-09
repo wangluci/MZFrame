@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using TemplateAction.Common;
 using TemplateAction.Core;
@@ -29,13 +30,13 @@ namespace TemplateAction.NetCore
         }
         public static void SetObject(this ISession session, string key, object value)
         {
-            session.SetString(key, MyAccess.Json.Json.Encode(value));
+            session.SetString(key, JsonSerializer.Serialize(value));
         }
 
         public static T GetObject<T>(this ISession session, string key) where T : class
         {
             string value = session.GetString(key);
-            return value == null ? default(T) : MyAccess.Json.Json.DecodeType<T>(value);
+            return value == null ? default(T) : JsonSerializer.Deserialize<T>(value);
         }
         /// <summary>
         /// 文件新增异步保存

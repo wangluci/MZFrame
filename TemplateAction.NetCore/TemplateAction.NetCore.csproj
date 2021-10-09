@@ -15,7 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MyAccess\MyAccess.csproj" />
     <ProjectReference Include="..\TemplateAction.Route\TemplateAction.Route.csproj" />
     <ProjectReference Include="..\TemplateAction\TemplateAction.csproj" />
   </ItemGroup>

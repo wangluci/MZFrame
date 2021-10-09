@@ -1,6 +1,5 @@
-﻿using Common;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using TemplateAction.NetCore;
 
 namespace AuthService
 {
