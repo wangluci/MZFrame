@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using MyAccess.Core;
 using System;
 using TemplateAction.Core;
 
@@ -81,7 +80,7 @@ namespace TemplateAction.NetCore
             }
             else
             {
-                return Crypter.Decrypt(_value, _encodeKey);
+                return TANetCoreCripter.Decrypt(_value, _encodeKey);
             }
         }
 
@@ -100,7 +99,7 @@ namespace TemplateAction.NetCore
             }
             else
             {
-                _value = Crypter.Encrypt(value, _encodeKey);
+                _value = TANetCoreCripter.Encrypt(value, _encodeKey);
             }
         }
         public void SaveCookie()
