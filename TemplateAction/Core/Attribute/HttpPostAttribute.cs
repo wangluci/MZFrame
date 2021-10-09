@@ -1,8 +1,11 @@
 ﻿using System;
 namespace TemplateAction.Core
 {
-    [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-    public class HttpPostAttribute : Attribute
+    public class HttpPostAttribute : ActionNodeAttribute
     {
+        public override void ConfigAction(ActionNode node)
+        {
+            node.AllowHttpMethod |= (byte)ActionNode.TAHttpMethod.Post;
+        }
     }
 }

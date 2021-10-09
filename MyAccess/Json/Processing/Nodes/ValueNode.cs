@@ -33,35 +33,10 @@ namespace MyAccess.Json.Processing.Nodes
                     JsonAttr[] jsarr = (JsonAttr[])item.GetCustomAttributes(typeof(JsonAttr), false);
                     foreach(JsonAttr ja in jsarr)
                     {
-
-                        JsonIgnore ign = ja as JsonIgnore;
-                        if (ign != null)
+                        if(ja.DecodeBind(ref key,ref value))
                         {
                             ignore = true;
                             break;
-
-                        }
-
-                        JsonHide hide = ja as JsonHide;
-                        if (hide != null)
-                        {
-                            if (hide.Fun(value))
-                            {
-                                ignore = true;
-                                break;
-                            }
-                        }
-
-                        JsonDefault defobj = ja as JsonDefault;
-                        if (defobj != null)
-                        {
-                            value = defobj.Fun(value);
-                        }
-
-                        JsonName jsname = ja as JsonName;
-                        if (jsname != null)
-                        {
-                            key = jsname.Name;
                         }
                     }
 

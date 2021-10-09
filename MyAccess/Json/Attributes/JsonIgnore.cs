@@ -7,5 +7,9 @@ namespace MyAccess.Json.Attributes
     /// </summary>
     public class JsonIgnore : JsonAttr
     {
+        public override bool DecodeBind(ref object key, ref object val)
+        {
+            return true;
+        }
     }
 }

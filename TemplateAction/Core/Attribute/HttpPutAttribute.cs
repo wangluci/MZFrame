@@ -1,8 +1,11 @@
 ﻿using System;
 namespace TemplateAction.Core
 {
-    [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-    public class HttpPutAttribute : Attribute
+    public class HttpPutAttribute : ActionNodeAttribute
     {
+        public override void ConfigAction(ActionNode node)
+        {
+            node.AllowHttpMethod |= (byte)ActionNode.TAHttpMethod.Put;
+        }
     }
 }

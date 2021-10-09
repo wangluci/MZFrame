@@ -46,8 +46,9 @@ namespace TemplateAction.Core
         public byte AllowHttpMethod
         {
             get { return _allowHttpMethod; }
+            set { _allowHttpMethod = value; }
         }
-        private enum EHttpMethod : byte
+        public enum TAHttpMethod : byte
         {
             Get = 1,
             Post = 2,
@@ -66,13 +67,13 @@ namespace TemplateAction.Core
             switch (httpmethod)
             {
                 case "get":
-                    return (_allowHttpMethod & (byte)EHttpMethod.Get) != 0;
+                    return (_allowHttpMethod & (byte)TAHttpMethod.Get) != 0;
                 case "post":
-                    return (_allowHttpMethod & (byte)EHttpMethod.Post) != 0;
+                    return (_allowHttpMethod & (byte)TAHttpMethod.Post) != 0;
                 case "put":
-                    return (_allowHttpMethod & (byte)EHttpMethod.Put) != 0;
+                    return (_allowHttpMethod & (byte)TAHttpMethod.Put) != 0;
                 case "delete":
-                    return (_allowHttpMethod & (byte)EHttpMethod.Delete) != 0;
+                    return (_allowHttpMethod & (byte)TAHttpMethod.Delete) != 0;
                 default:
                     return false;
             }
@@ -82,7 +83,7 @@ namespace TemplateAction.Core
             _allowHttpMethod = 0;
             mKey = method.Name;
             mMethod = method;
-   
+
             string taboutmodule = string.Format("/{0}/{1}", plg.Name, controller);
             string taboutaction = string.Empty;//默认关联控制器权限
 
@@ -111,7 +112,8 @@ namespace TemplateAction.Core
                     taboutaction = ab.AbountAction;
                 }
             }
-
+            mAboutModule = taboutmodule;
+            mAboutAction = taboutaction;
 
             //路由特性
             RouteAttribute rtattr = (RouteAttribute)method.GetCustomAttribute(typeof(RouteAttribute));
@@ -121,34 +123,13 @@ namespace TemplateAction.Core
                 plg.Data.Get<IPluginRouterBuilder>()?.AddRouter(plg.Name, controller, mKey, rtattr.Template);
             }
 
-  
-            Attribute getattr = method.GetCustomAttribute(typeof(HttpGetAttribute));
-            if (getattr != null)
+
+            IEnumerable<ActionNodeAttribute> customAttrs = (ActionNodeAttribute[])method.GetCustomAttributes<ActionNodeAttribute>();
+            foreach(ActionNodeAttribute a in customAttrs)
             {
-                _allowHttpMethod |= (byte)EHttpMethod.Get;
+                a.ConfigAction(this);
             }
 
-            Attribute postattr = method.GetCustomAttribute(typeof(HttpPostAttribute));
-            if (postattr != null)
-            {
-                _allowHttpMethod |= (byte)EHttpMethod.Post;
-            }
-
-            Attribute putattr = method.GetCustomAttribute(typeof(HttpPutAttribute));
-            if (putattr != null)
-            {
-                _allowHttpMethod |= (byte)EHttpMethod.Put;
-            }
-
-            Attribute delattr = method.GetCustomAttribute(typeof(HttpDeleteAttribute));
-            if (delattr != null)
-            {
-                _allowHttpMethod |= (byte)EHttpMethod.Delete;
-            }
-
-
-            mAboutModule = taboutmodule;
-            mAboutAction = taboutaction;
         }
     }
 }

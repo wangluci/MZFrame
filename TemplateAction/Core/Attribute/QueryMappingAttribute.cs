@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Reflection;
-
 namespace TemplateAction.Core
 {
     public class QueryMappingAttribute : AbstractMappingAttribute

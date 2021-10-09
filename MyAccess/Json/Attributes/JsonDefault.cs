@@ -41,5 +41,11 @@ namespace MyAccess.Json.Attributes
                 }
             };
         }
+
+        public override bool DecodeBind(ref object key, ref object val)
+        {
+            val = Fun(val);
+            return false;
+        }
     }
 }

@@ -13,5 +13,10 @@ namespace MyAccess.Json.Attributes
         {
             _name = name;
         }
+        public override bool DecodeBind(ref object key, ref object val)
+        {
+            key = _name;
+            return false;
+        }
     }
 }

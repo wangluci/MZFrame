@@ -11,7 +11,7 @@ namespace MyAccess.Json.Attributes
         /// <returns></returns>
         public delegate bool HideFun(object input);
         public HideFun Fun { get; set; }
-  
+
         /// <summary>
         /// 指定值不编码
         /// </summary>
@@ -29,6 +29,15 @@ namespace MyAccess.Json.Attributes
                     return false;
                 }
             };
+        }
+
+        public override bool DecodeBind(ref object key, ref object val)
+        {
+            if (Fun(val))
+            {
+                return true;
+            }
+            return false;
         }
     }
 }
