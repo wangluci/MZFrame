@@ -8,9 +8,34 @@ using TemplateAction.Core;
 
 namespace TemplateAction.NetCore
 {
+    public delegate object? DecodeJson(string json, Type t);
+    public delegate object? DecodeXml(string xml, Type t);
     public class BodyParamMapping : IParamMapping
     {
-        internal static bool BodyMapping(TAAction ac, string key, Type t, out object result)
+        private DecodeJson _jsonFun;
+        private DecodeXml _xmlFun;
+        public BodyParamMapping(DecodeJson json, DecodeXml xml)
+        {
+            _jsonFun = json;
+            _xmlFun = xml;
+        }
+        public BodyParamMapping(DecodeJson json) : this(json, DefaultXml) { }
+        public BodyParamMapping(DecodeXml xml) : this(DefaultJson, xml) { }
+        public BodyParamMapping() : this(DefaultJson, DefaultXml) { }
+
+        internal static DecodeJson DefaultJson = (json, t) =>
+        {
+            return JsonSerializer.Deserialize(json, t);
+        };
+        internal static DecodeXml DefaultXml = (xml, t) =>
+        {
+            StringReader reader = new StringReader(xml);
+            XmlSerializer serializer = new XmlSerializer(t);
+            object rt = serializer.Deserialize(reader);
+            reader.Close();
+            return rt;
+        };
+        internal static bool BodyMapping(DecodeJson json, DecodeXml xml, TAAction ac, string key, Type t, out object result)
         {
             ITARequest req = ac.Context.Request;
             string contenttype = req.Header["content-type"];
@@ -54,7 +79,7 @@ namespace TemplateAction.NetCore
                             }
                             else
                             {
-                                result = JsonSerializer.Deserialize(sr.ReadToEnd(), t);
+                                result = json(sr.ReadToEnd(), t);
                             }
                             return true;
                         }
@@ -70,10 +95,7 @@ namespace TemplateAction.NetCore
                             }
                             else
                             {
-                                StringReader reader = new StringReader(sr.ReadToEnd());
-                                XmlSerializer serializer = new XmlSerializer(t);
-                                result = serializer.Deserialize(req.InputStream);
-                                reader.Close();
+                                result = xml(sr.ReadToEnd(), t);
                             }
                             return true;
                         }
@@ -86,7 +108,7 @@ namespace TemplateAction.NetCore
         }
         public bool Mapping(LinkedListNode<IParamMapping> next, TAAction ac, string key, Type t, out object result)
         {
-            if (BodyMapping(ac, key, t, out result))
+            if (BodyMapping(_jsonFun, _xmlFun, ac, key, t, out result))
             {
                 return true;
             }

@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Common;
+using Microsoft.Extensions.Options;
 using System;
 using System.Text;
 using TemplateAction.Core;
-using TemplateAction.NetCore;
-
 namespace AuthService
 {
     public class AuthBLL

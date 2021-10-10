@@ -12,6 +12,7 @@ using TemplateAction.Route;
 
 namespace TemplateAction.NetCore
 {
+
     public static class TANetCoreHttpExtension
     {
         public static void Write(this HttpResponse response, string content)
@@ -48,6 +49,7 @@ namespace TemplateAction.NetCore
         {
             await ((TANetCoreHttpFile)file).SaveAsAsync(filename);
         }
+
         /// <summary>
         /// 允许CORS请求
         /// </summary>

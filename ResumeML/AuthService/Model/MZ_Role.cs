@@ -1,17 +1,17 @@
 ﻿using MyAccess.DB.Attr;
+using MyAccess.Json.Attributes;
 using System;
-using System.Text.Json.Serialization;
 
 namespace AuthService
 {
     public class MZ_Role
     {
-        [JsonPropertyName("key")]
+        [JsonName("key")]
         [ID(true)]
         public virtual long RoleID { get; set; }
-        [JsonPropertyName("name")]
+        [JsonName("name")]
         public virtual string RoleName { get; set; }
-        [JsonPropertyName("description")]
+        [JsonName("description")]
         public virtual string RoleDesc { get; set; }
         [JsonIgnore]
         public virtual int RoleType { get; set; }

@@ -75,7 +75,6 @@ namespace TemplateAction.NetCore
         {
             _requestDelegate = appbuilder.Build();
             _appbuilder = appbuilder;
-            UseParamMapping(new BodyParamMapping());
         }
 
         public HttpContext CreateContext(IFeatureCollection contextFeatures)

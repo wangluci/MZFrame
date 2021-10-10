@@ -26,6 +26,10 @@ namespace ResumeML
                 builder.UseStaticFiles();
                 builder.UseTAMvc(app =>
                 {
+                    app.UseParamMapping(new BodyParamMapping(json: (json, t) =>
+                     {
+                         return MyAccess.Json.Json.Decode(json, t);
+                     }));
                     app.UseRouterBuilder(new RouterBuilder().UsePlugin().UseDefault(Assembly.GetEntryAssembly().GetName().Name));
                 });
             }).Build().Run();
