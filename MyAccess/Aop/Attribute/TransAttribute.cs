@@ -57,11 +57,11 @@ namespace MyAccess.Aop
         {
             if (dbhelp != null)
             {
-                if (DBTransScope.Instance().IsBegan())
+                if (dbhelp.DbTrans == null)
                 {
                     return Task.CompletedTask;
                 }
-                if (dbhelp.DbTrans == null)
+                if (DBTransScope.Instance().IsBegan())
                 {
                     return Task.CompletedTask;
                 }

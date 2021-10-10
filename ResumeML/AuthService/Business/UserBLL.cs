@@ -1,4 +1,5 @@
 ﻿using Common;
+using MyAccess.Aop;
 using System;
 using System.Collections.Generic;
 
@@ -56,19 +57,31 @@ namespace AuthService
         {
             return BusResponse<List<MZ_Role>>.Success(_user.GetAllRole());
         }
+        [Trans]
         public virtual BusResponse<long> AddRole(MZ_Role role)
         {
             try
             {
                 long id = _user.AddRole(role);
+                if (role.permissions != null)
+                {
+                    MZ_Role_Permission[] role_permiss = new MZ_Role_Permission[role.permissions.Length];
+                    for (int i = 0; i < role_permiss.Length; i++)
+                    {
+                        role_permiss[i] = new MZ_Role_Permission();
+                        role_permiss[i].RoleID = id;
+                        role_permiss[i].RightCode = role.permissions[i];
+                    }
+                    _permission.SetRolePermissions(id, role_permiss);
+                }
                 return BusResponse<long>.Success(id);
             }
             catch (Exception ex)
             {
                 return BusResponse<long>.Error(-12, ex.Message);
             }
-
         }
+        [Trans]
         public virtual BusResponse<string> UpdateRole(MZ_Role role, long uid)
         {
             try
@@ -85,6 +98,17 @@ namespace AuthService
                 }
 
                 _user.UpdateRole(role);
+                if (role.permissions != null)
+                {
+                    MZ_Role_Permission[] role_permiss = new MZ_Role_Permission[role.permissions.Length];
+                    for (int i = 0; i < role_permiss.Length; i++)
+                    {
+                        role_permiss[i] = new MZ_Role_Permission();
+                        role_permiss[i].RoleID = role.RoleID;
+                        role_permiss[i].RightCode = role.permissions[i];
+                    }
+                    _permission.SetRolePermissions(role.RoleID, role_permiss);
+                }
                 return BusResponse<string>.Success(null);
             }
             catch (Exception ex)
@@ -92,6 +116,7 @@ namespace AuthService
                 return BusResponse<string>.Error(-12, ex.Message);
             }
         }
+        [Trans]
         public virtual BusResponse<string> DeleteRole(long id, long uid)
         {
             try
@@ -108,6 +133,7 @@ namespace AuthService
                 }
 
                 _user.DeleteRole(id);
+                _permission.SetRolePermissions(id, Array.Empty<MZ_Role_Permission>());
                 return BusResponse<string>.Success(null);
             }
             catch (Exception ex)

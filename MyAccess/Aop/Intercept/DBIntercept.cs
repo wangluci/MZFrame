@@ -40,9 +40,11 @@ namespace MyAccess.Aop
                     {
                        await attribute.ProceedAfter(dbHelp, invocation);
                     }
-                    //同步
-                    //结束后自动清参数
-                    dbHelp?.Close();
+                    //结束后自动清链接
+                    if (dbHelp.DbTrans == null)
+                    {
+                        dbHelp?.Close();
+                    }
                 }
             }
             else
@@ -84,9 +86,11 @@ namespace MyAccess.Aop
                     {
                         await attribute.ProceedAfter(dbHelp, invocation);
                     }
-                    //同步
-                    //结束后自动清参数
-                    dbHelp?.Close();
+                    //结束后自动清链接
+                    if (dbHelp.DbTrans == null)
+                    {
+                        dbHelp?.Close();
+                    }
                 }
             }
             else
