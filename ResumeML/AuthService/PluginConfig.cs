@@ -3,6 +3,7 @@ using TemplateAction.Core;
 using TemplateAction.NetCore;
 using Microsoft.Extensions.Configuration;
 using TemplateAction.Extension.Site;
+using Microsoft.Extensions.Options;
 
 namespace AuthService
 {
@@ -45,6 +46,21 @@ namespace AuthService
             _services.Configure<AuthOption>(config.GetSection("AuthService"));
             //使用身份认证
             app.UseMiddlewareFirst<AuthMiddleware>();
+
+            //配置权限来源数据
+            try
+            {
+                IOptions<AuthOption> authOp = app.ServiceProvider.GetService<IOptions<AuthOption>>();
+                if (authOp.Value.permission_from == 1)
+                {
+                    AuthRedisHelper redis = app.ServiceProvider.GetService<AuthRedisHelper>();
+                    redis.HashSet("MZPermissions", "AuthService", ((TASiteApplication)app).FindAllDescribe());
+                }
+            }
+            catch { }
+
+
+
         }
         public void Unload() { }
     }

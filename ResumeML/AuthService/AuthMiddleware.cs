@@ -17,9 +17,9 @@ namespace AuthService
             _authBLL = auth;
             _conf = conf;
             _authModules = new HashSet<string>();
-            if (conf.Value.AuthModules != null)
+            if (conf.Value.auth_modules != null)
             {
-                foreach (string m in conf.Value.AuthModules)
+                foreach (string m in conf.Value.auth_modules)
                 {
                     _authModules.Add(m.ToLower());
                 }
