@@ -11,10 +11,10 @@ namespace AuthService
         private PermissionBLL _permission;
         private UserBLL _user;
         private IOptions<AuthOption> _conf;
-        private AuthRedisHelper _redis;
-        public Permission(AuthRedisHelper redis, PermissionBLL permission, UserBLL user, IOptions<AuthOption> conf)
+        private ITAServices _provider;
+        public Permission(ITAServices provider, PermissionBLL permission, UserBLL user, IOptions<AuthOption> conf)
         {
-            _redis = redis;
+            _provider = provider;
             _permission = permission;
             _user = user;
             _conf = conf;
@@ -49,7 +49,7 @@ namespace AuthService
                     break;
                 case 1:
                     //从redis中取，微服务设置成这个,各个服务先调用FindAllDescribe上传权限数据到redis
-                    tlist = _redis.HashKeys<DescribeInfo>("MZPermissions");
+                    tlist = _provider.GetService<AuthRedisHelper>().HashKeys<DescribeInfo>("MZPermissions");
                     break;
                 case 2:
                     //从数据库中取，同1的作用类似
