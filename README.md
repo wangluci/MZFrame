@@ -20,10 +20,6 @@ MainWeb目录为.net framework下mvc的测试项目
 
 MyAccess目录包含orm框架、json等
 
-MyNet目录为异步的、事件驱动的网络应用程序框架
-
-MyNet.TemplateAction目录.net framework嵌入式http服务器，并提供mvc框架支持
-
 ResumeML目录为.net core的mvc实现例子，是一个简历识别的例子，可以用来识别简历的字段
 
 SysWeb.TemplateAction目录为mvc框架asp.net的支持库
