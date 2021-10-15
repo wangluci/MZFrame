@@ -5,7 +5,7 @@ using TemplateAction.Core;
 
 namespace AuthService
 {
-    [Des("权限设置", -1)]
+    [Des("权限管理", -1)]
     public class Permission : TABaseController
     {
         private PermissionBLL _permission;

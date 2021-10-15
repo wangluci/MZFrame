@@ -1,11 +1,10 @@
 ﻿using Common;
 using System;
 using TemplateAction.Core;
-using TemplateAction.NetCore;
 
 namespace AuthService
 {
-    [Des("系统权限",-2)]
+    [Des("用户管理",-2)]
     public class User : TABaseController
     {
         private AuthBLL _authBLL;
