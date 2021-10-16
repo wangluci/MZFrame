@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Data.Common;
 using System.Threading.Tasks;
 
@@ -110,6 +108,12 @@ namespace MyAccess.DB
             command.CommandText = mSql;
             help.InitParamters(command);
             mValue = await command.ExecuteScalarAsync();
+        }
+
+        public string ReplaceSql(string oldValue, string newValue)
+        {
+            mSql = mSql.Replace(oldValue, newValue);
+            return mSql;
         }
     }
 }

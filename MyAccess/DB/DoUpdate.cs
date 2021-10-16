@@ -82,7 +82,8 @@ namespace MyAccess.DB
             }
         }
         public DoUpdate(object updated, string tablename) : this(updated, tablename, "") { }
-        private void ExcuteInit(DbHelp help)
+
+        public override void GenerateSql(DbHelp help)
         {
             string updatestr;
             //重设sql语句
@@ -98,15 +99,6 @@ namespace MyAccess.DB
             }
             SetSql(rtSQL);
         }
-        public override void Excute(DbHelp help)
-        {
-            ExcuteInit(help);
-            base.Excute(help);
-        }
-        public override async Task ExcuteAsync(DbHelp help)
-        {
-            ExcuteInit(help);
-            await base.ExcuteAsync(help);
-        }
+ 
     }
 }

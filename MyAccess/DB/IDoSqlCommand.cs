@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace MyAccess.DB
 {
@@ -6,5 +7,6 @@ namespace MyAccess.DB
     {
         void SetSql(string sql);
         string GetSql();
+        string ReplaceSql(string oldValue, string newValue);
     }
 }

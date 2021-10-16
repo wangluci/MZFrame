@@ -23,7 +23,8 @@ namespace MyAccess.DB
             mInArr = inarr;
             mParamName = paramname;
         }
-        private void InitDoQueryInT(DbHelp help)
+ 
+        public override void GenerateSql(DbHelp help)
         {
             string inwhere = string.Empty;
             StringBuilder sb = new StringBuilder();
@@ -37,17 +38,8 @@ namespace MyAccess.DB
             {
                 inwhere = inwhere.Substring(1);
             }
-            mSql = mSql.Replace(mParamName, inwhere);
+            ReplaceSql(mParamName, inwhere);
         }
-        public override void Excute(DbHelp help)
-        {
-            InitDoQueryInT(help);
-            base.Excute(help);
-        }
-        public override async Task ExcuteAsync(DbHelp help)
-        {
-            InitDoQueryInT(help);
-            await base.ExcuteAsync(help);
-        }
+
     }
 }

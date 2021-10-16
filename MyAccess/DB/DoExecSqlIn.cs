@@ -23,7 +23,8 @@ namespace MyAccess.DB
             mInArr = inarr;
             mParamName = paramname;
         }
-        private void ExcuteDoExecSqlInInit(DbHelp help)
+
+        public override void GenerateSql(DbHelp help)
         {
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < mInArr.Length; i++)
@@ -38,15 +39,6 @@ namespace MyAccess.DB
             }
             ReplaceSql(mParamName, inwhere);
         }
-        public override void Excute(DbHelp help)
-        {
-            ExcuteDoExecSqlInInit(help);
-            base.Excute(help);
-        }
-        public override async Task ExcuteAsync(DbHelp help)
-        {
-            ExcuteDoExecSqlInInit(help);
-            await base.ExcuteAsync(help);
-        }
+       
     }
 }

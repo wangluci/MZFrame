@@ -38,7 +38,7 @@ namespace AuthService
                 help.AddInParam("@RightCode", MySqlDbType.VarChar, code);
                 DoQuerySql<long> execsql2 = new DoQuerySql<long>("select nrr.RoleRightID from mz_role_permission nrr left join mz_user_role nur on nrr.RoleID = nur.RoleID where UserId=@UserId and RightCode=@RightCode");
                 help.DoCommand(execsql2);
-                return execsql2.Count() > 0;
+                return execsql2.Count > 0;
             }
         }
 
@@ -73,7 +73,7 @@ namespace AuthService
             help.AddInParam("@UserId", MySqlDbType.Int64, uid);
             DoQuerySql<long> dqc = new DoQuerySql<long>("select ur.RoleID from mz_user_role ur inner join mz_role r on ur.RoleID=r.RoleID where UserId=@UserId and r.RoleType=1");
             help.DoCommand(dqc);
-            return dqc.Count() > 0;
+            return dqc.Count > 0;
         }
         [Trans]
         public virtual void SetRolePermissions(long id, MZ_Role_Permission[] permissions)

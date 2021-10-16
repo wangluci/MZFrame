@@ -128,23 +128,12 @@ namespace MyAccess.DB
             }
 
         }
-
-        private void ExcuteInit(DbHelp help)
+        public override void GenerateSql(DbHelp help)
         {
             string fields;
             string values;
             ObjToStr(help, out fields, out values);
             SetSql(string.Format("insert into {0} {1} values {2}", _tablename, fields, values));
-        }
-        public override void Excute(DbHelp help)
-        {
-            ExcuteInit(help);
-            base.Excute(help);
-        }
-        public override async Task ExcuteAsync(DbHelp help)
-        {
-            ExcuteInit(help);
-            await base.ExcuteAsync(help);
         }
 
     }

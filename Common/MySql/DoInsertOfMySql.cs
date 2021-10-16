@@ -18,6 +18,7 @@ namespace Common.MySql
         public DoInsertOfMySql(List<T> inserted, string tablename = "") : base(inserted, tablename)
         {
         }
+
         protected override void AfterExcute(DbCommand command)
         {
             LastInsertedId = ((MySqlCommand)command).LastInsertedId;

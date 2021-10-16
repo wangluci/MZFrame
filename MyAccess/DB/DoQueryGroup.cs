@@ -1,33 +1,29 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Data.Common;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace MyAccess.DB
 {
-    public class DoQuerySql<T> : QueryResult<T>, IDoQuerySql
+    /// <summary>
+    /// 多实体返回查询
+    /// </summary>
+    public class DoQueryGroup : IDoCommand
     {
-        private string mSql;
-
-        public void SetSql(string sql)
+        private IDoQuerySql[] _querys;
+        private string _sep;
+        public DoQueryGroup(params IDoQuerySql[] querys)
         {
-            mSql = sql;
+            _querys = querys;
+            _sep = ";";
         }
-        public string GetSql()
+        public DoQueryGroup(string sep, params IDoQuerySql[] querys)
         {
-            return mSql;
+            _querys = querys;
+            _sep = sep;
         }
-        public string ReplaceSql(string oldValue, string newValue)
-        {
-            mSql = mSql.Replace(oldValue, newValue);
-            return mSql;
-        }
-
-        public DoQuerySql(string sql)
-        {
-            mSql = sql;
-        }
-
-        protected virtual DbCommand PreExcute(DbHelp help)
+        private DbCommand PreExcute(DbHelp help)
         {
             DbCommand command = help.CreateCommand();
             command.Connection = help.Connection;
@@ -36,28 +32,36 @@ namespace MyAccess.DB
                 command.Transaction = help.DbTrans;
             }
             command.CommandType = CommandType.Text;
-            command.CommandText = mSql;
+            StringBuilder sb = new StringBuilder();
+            foreach (IDoQuerySql q in _querys)
+            {
+                q.GenerateSql(help);
+                sb.Append(q.GetSql());
+                sb.Append(_sep);
+            }
+            command.CommandText = sb.ToString();
             help.InitParamters(command);
             return command;
         }
-        public virtual void Excute(DbHelp help)
+        public void Excute(DbHelp help)
         {
             DbCommand command = PreExcute(help);
             DbDataReader dataReader = command.ExecuteReader();
             using (dataReader)
             {
                 bool drbl = true;
-                while (drbl)
+                int i = 0;
+                while (drbl && _querys.Length > i)
                 {
                     while (dataReader.Read())
                     {
-                        SetResult(dataReader);
+                        _querys[i].SetResult(dataReader);
                     }
                     drbl = dataReader.NextResult();
+                    ++i;
                 }
             }
         }
-
 
         public async Task ExcuteAsync(DbHelp help)
         {
@@ -66,19 +70,17 @@ namespace MyAccess.DB
             using (dataReader)
             {
                 bool drbl = true;
-                while (drbl)
+                int i = 0;
+                while (drbl && _querys.Length > i)
                 {
                     while (await dataReader.ReadAsync())
                     {
-                        await SetResultAsync(dataReader);
+                        await _querys[i].SetResultAsync(dataReader);
                     }
                     drbl = dataReader.NextResult();
+                    ++i;
                 }
             }
         }
-
- 
-        public virtual void GenerateSql(DbHelp help) { }
-
     }
 }

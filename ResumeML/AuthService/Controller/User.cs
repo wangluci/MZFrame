@@ -4,17 +4,17 @@ using TemplateAction.Core;
 
 namespace AuthService
 {
-    [Des("用户管理",-2)]
+    [Des("用户管理", -2)]
     public class User : TABaseController
     {
         private AuthBLL _authBLL;
         private UserBLL _usrBLL;
-        public User(AuthBLL auth,UserBLL usr)
+        public User(AuthBLL auth, UserBLL usr)
         {
             _authBLL = auth;
             _usrBLL = usr;
         }
-       
+
         /// <summary>
         /// vue-element-admin用户登录
         /// </summary>
@@ -22,7 +22,7 @@ namespace AuthService
         /// <param name="password"></param>
         /// <returns></returns>
         [Des("登录权限")]
-        public AjaxResult login(Input_Login ipt)
+        public AjaxResult Login(Input_Login ipt)
         {
             BusResponse<Data_Login> response = _authBLL.Login(ipt, Context.GetTerminal());
             return response.ToAjaxResult(Context);
@@ -32,7 +32,7 @@ namespace AuthService
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        public AjaxResult info(string token)
+        public AjaxResult Info(string token)
         {
             BusResponse<ClientTokenInfo> response = _authBLL.CheckToken(token, Context.GetTerminal());
             if (!response.IsSuccess())
@@ -41,6 +41,14 @@ namespace AuthService
             }
 
             return _usrBLL.GetUserInfo(response.Data.UserId).ToAjaxResult(Context);
+        }
+        /// <summary>
+        /// 获取用户列表
+        /// </summary>
+        /// <returns></returns>
+        public AjaxResult List(Input_UserList ipt)
+        {
+            return Err(string.Empty);
         }
     }
 }

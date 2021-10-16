@@ -6,15 +6,21 @@ using System.Threading.Tasks;
 
 namespace MyAccess.DB
 {
-    public class DoQueryStored<T> : QueryResult<T>, IDoCommand
+    /// <summary>
+    /// 存储过程多个返回实体
+    /// </summary>
+    public class DoQueryStoredGroup : IDoCommand
     {
+        private IDoResult<DbDataReader>[] _results;
         private string mName;
         private Dictionary<string, object> mOutDict;
-        public DoQueryStored(string name)
+        public DoQueryStoredGroup(string name, params IDoResult<DbDataReader>[] results)
         {
+            _results = results;
             mName = name;
             mOutDict = new Dictionary<string, object>();
         }
+
         public int OutInt(string key)
         {
             if (mOutDict.ContainsKey(key))
@@ -77,13 +83,15 @@ namespace MyAccess.DB
             using (dataReader)
             {
                 bool drbl = true;
-                while (drbl)
+                int i = 0;
+                while (drbl && _results.Length > i)
                 {
                     while (dataReader.Read())
                     {
-                        SetResult(dataReader);
+                        _results[i].SetResult(dataReader);
                     }
                     drbl = dataReader.NextResult();
+                    ++i;
                 }
             }
             AfterExcute(command);
@@ -96,13 +104,15 @@ namespace MyAccess.DB
             using (dataReader)
             {
                 bool drbl = true;
-                while (drbl)
+                int i = 0;
+                while (drbl && _results.Length > i)
                 {
                     while (await dataReader.ReadAsync())
                     {
-                        await SetResultAsync(dataReader);
+                        await _results[i].SetResultAsync(dataReader);
                     }
                     drbl = dataReader.NextResult();
+                    ++i;
                 }
             }
             AfterExcute(command);

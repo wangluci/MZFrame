@@ -12,6 +12,24 @@ namespace AuthService
     {
         public UserDAL(IOptions<AuthOption> conf) : base(conf.Value.connstr) { }
 
+        public virtual List<MZ_AdminInfo> GetAllUser(string key, int page, int pagesize, out int total)
+        {
+            total = 0;
+            string sqlwhere = string.Empty;
+            if (!string.IsNullOrEmpty(key))
+            {
+                help.AddInParam("@Key", MySqlDbType.VarChar, key + "%");
+                sqlwhere += " and (RealName like @Key or UserName like @Key)";
+            }
+
+            int start_row = (page - 1) * pagesize;
+            if (start_row < 0) start_row = 0;
+            DoQuerySql<MZ_AdminInfo> querysql = new DoQuerySql<MZ_AdminInfo>("select SQL_CALC_FOUND_ROWS distinct * from mz_admin " + sqlwhere + " limit " + start_row + "," + pagesize);
+            DoQuerySql<int> querytotal = new DoQuerySql<int>("select FOUND_ROWS()");
+            help.DoCommand(new DoQueryGroup(querysql, querytotal));
+            total = querytotal.ToFirst();
+            return querysql.ToList();
+        }
         public virtual MZ_AdminInfo GetAdminByName(string username)
         {
             help.AddInParam("@UserName", MySqlDbType.VarChar, username);
@@ -39,7 +57,7 @@ namespace AuthService
             help.DoCommand(dqs);
             return dqs.ToFirst();
         }
-   
+
 
         [Trans]
         public virtual long AddRole(MZ_Role role)
